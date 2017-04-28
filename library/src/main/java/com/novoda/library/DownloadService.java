@@ -35,11 +35,6 @@ public class DownloadService extends Service implements DownloadServiceCommands 
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        return START_STICKY;
-    }
-
-    @Override
     public void download(final DownloadBatch downloadBatch, final DownloadBatch.Callback callback) {
         executor.execute(new Runnable() {
             @Override

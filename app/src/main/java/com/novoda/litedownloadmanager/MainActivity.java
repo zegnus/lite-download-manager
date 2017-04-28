@@ -36,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Log.setShowLogs(true);
+
         textViewBatch1 = (TextView) findViewById(R.id.batch_1);
         textViewBatch2 = (TextView) findViewById(R.id.batch_2);
 
@@ -97,8 +99,6 @@ public class MainActivity extends AppCompatActivity {
                 buttonResumeDownload2.setVisibility(View.GONE);
             }
         });
-
-        Log.setShowLogs(true);
 
         liteDownloadManagerCreator = new LiteDownloadManagerCreator(getApplicationContext());
         liteDownloadManagerCreator.create(new LiteDownloadManagerCreator.Callback() {

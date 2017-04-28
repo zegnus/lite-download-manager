@@ -1,7 +1,5 @@
 package com.novoda.library;
 
-import com.novoda.notils.logger.simple.Log;
-
 public class DownloadFile {
 
     private static final long TOTAL_FILE_SIZE = 5000000;
@@ -37,8 +35,6 @@ public class DownloadFile {
                 callback.onUpdate(new DownloadFileStatus(downloadFileId, bytesDownloaded, totalFileSizeBytes));
             }
         }
-
-        Log.v("Download file stop url: " + url);
     }
 
     long getTotalSize() {

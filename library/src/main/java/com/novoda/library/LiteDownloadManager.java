@@ -80,6 +80,7 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
     public void destroy() {
         Iterator<DownloadBatch.Callback> iterator = callbacks.iterator();
         while (iterator.hasNext()) {
+            iterator.next();
             iterator.remove();
         }
         downloadBatchMap.clear();
