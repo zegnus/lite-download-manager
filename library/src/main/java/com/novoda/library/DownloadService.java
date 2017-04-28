@@ -6,12 +6,12 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class DownloadService extends Service implements DownloadServiceCommands {
 
-    private Executor executor;
+    private ExecutorService executor;
     private IBinder binder;
 
     @Override
@@ -51,6 +51,7 @@ public class DownloadService extends Service implements DownloadServiceCommands 
 
     @Override
     public void onDestroy() {
+        executor.shutdown();
         super.onDestroy();
     }
 }

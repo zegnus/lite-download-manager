@@ -2,6 +2,8 @@ package com.novoda.library;
 
 import android.os.Handler;
 
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 class LiteDownloadManager implements LiteDownloadManagerCommands {
@@ -9,15 +11,16 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
     private final DownloadServiceCommands downloadService;
     private final Handler callbackHandler;
     private final Map<DownloadBatchId, DownloadBatch> downloadBatchMap;
-
-    private DownloadBatch.Callback callback = DownloadBatch.Callback.NO_OP;
+    private final List<DownloadBatch.Callback> callbacks;
 
     LiteDownloadManager(DownloadServiceCommands downloadService,
                         Handler callbackHandler,
-                        Map<DownloadBatchId, DownloadBatch> downloadBatchMap) {
+                        Map<DownloadBatchId, DownloadBatch> downloadBatchMap,
+                        List<DownloadBatch.Callback> callbacks) {
         this.downloadService = downloadService;
         this.callbackHandler = callbackHandler;
         this.downloadBatchMap = downloadBatchMap;
+        this.callbacks = callbacks;
     }
 
     @Override
@@ -29,7 +32,9 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
                 callbackHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        callback.onUpdate(downloadBatchStatus);
+                        for (DownloadBatch.Callback callback : callbacks) {
+                            callback.onUpdate(downloadBatchStatus);
+                        }
                         if (downloadBatchStatus.isCompleted()) {
                             downloadBatchMap.remove(downloadBatch.getId());
                         }
@@ -61,6 +66,22 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
 
     @Override
     public void addDownloadBatchCallback(DownloadBatch.Callback downloadBatchCallback) {
-        callback = downloadBatchCallback;
+        callbacks.add(downloadBatchCallback);
+    }
+
+    @Override
+    public void removeDownloadBatchCallback(DownloadBatch.Callback downloadBatchCallback) {
+        if (callbacks.contains(downloadBatchCallback)) {
+            callbacks.remove(downloadBatchCallback);
+        }
+    }
+
+    @Override
+    public void destroy() {
+        Iterator<DownloadBatch.Callback> iterator = callbacks.iterator();
+        while (iterator.hasNext()) {
+            iterator.remove();
+        }
+        downloadBatchMap.clear();
     }
 }

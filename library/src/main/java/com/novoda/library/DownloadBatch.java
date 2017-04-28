@@ -62,12 +62,5 @@ public class DownloadBatch {
     public interface Callback {
 
         void onUpdate(DownloadBatchStatus downloadBatchStatus);
-
-        Callback NO_OP = new Callback() {
-            @Override
-            public void onUpdate(DownloadBatchStatus downloadBatchStatus) {
-                // no-op
-            }
-        };
     }
 }

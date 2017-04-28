@@ -8,6 +8,7 @@ import android.content.ServiceConnection;
 import android.os.Handler;
 import android.os.IBinder;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class LiteDownloadManagerCreator {
@@ -17,6 +18,7 @@ public class LiteDownloadManagerCreator {
     private DownloadServiceCommands downloadService;
     private ServiceConnection serviceConnection;
     private boolean serviceIsBound;
+    private LiteDownloadManager liteDownloadManager;
 
     public LiteDownloadManagerCreator(Context applicationContext) {
         this.applicationContext = applicationContext;
@@ -31,10 +33,11 @@ public class LiteDownloadManagerCreator {
                 downloadService = binder.getService();
                 serviceIsBound = true;
 
-                LiteDownloadManager liteDownloadManager = new LiteDownloadManager(
+                liteDownloadManager = new LiteDownloadManager(
                         downloadService,
                         callbackHandler,
-                        new HashMap<DownloadBatchId, DownloadBatch>()
+                        new HashMap<DownloadBatchId, DownloadBatch>(),
+                        new ArrayList<DownloadBatch.Callback>()
                 );
                 callback.onSuccess(liteDownloadManager);
             }
@@ -51,6 +54,10 @@ public class LiteDownloadManagerCreator {
     public void destroy() {
         if (serviceIsBound) {
             applicationContext.unbindService(serviceConnection);
+        }
+
+        if (liteDownloadManager != null) {
+            liteDownloadManager.destroy();
         }
     }
 
