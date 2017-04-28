@@ -5,6 +5,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Handler;
 import android.os.IBinder;
 
 public class LiteDownloadManagerCreator {
@@ -19,7 +20,7 @@ public class LiteDownloadManagerCreator {
         this.applicationContext = applicationContext;
     }
 
-    public void create(final Callback callback) {
+    public void create(final Callback callback, final Handler callbackHandler) {
         Intent intent = new Intent(applicationContext, DownloadService.class);
         serviceConnection = new ServiceConnection() {
             @Override
@@ -28,7 +29,7 @@ public class LiteDownloadManagerCreator {
                 downloadService = binder.getService();
                 serviceIsBound = true;
 
-                LiteDownloadManager liteDownloadManager = new LiteDownloadManager(downloadService);
+                LiteDownloadManager liteDownloadManager = new LiteDownloadManager(downloadService, callbackHandler);
                 callback.onSuccess(liteDownloadManager);
             }
 

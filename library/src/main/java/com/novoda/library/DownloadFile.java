@@ -4,7 +4,7 @@ import com.novoda.notils.logger.simple.Log;
 
 public class DownloadFile {
 
-    private static final long TOTAL_FILE_SIZE = 10000000;
+    private static final long TOTAL_FILE_SIZE = 5000000;
     private static final int BUFFER_SIZE = 5000;
     private static final int NETWORK_COST = 10;
 
