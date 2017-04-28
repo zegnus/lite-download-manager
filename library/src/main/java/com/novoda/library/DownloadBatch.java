@@ -7,10 +7,12 @@ import java.util.Map;
 
 public class DownloadBatch {
 
+    private final DownloadBatchId downloadBatchId;
     private DownloadFile[] downloadFiles;
     private long totalBatchSizeBytes;
 
-    public DownloadBatch(DownloadFile[] downloadFiles) {
+    public DownloadBatch(DownloadBatchId downloadBatchId, DownloadFile[] downloadFiles) {
+        this.downloadBatchId = downloadBatchId;
         this.downloadFiles = downloadFiles;
     }
 
@@ -25,7 +27,7 @@ public class DownloadBatch {
             @Override
             public void onUpdate(DownloadFileStatus downloadFileStatus) {
                 fileBytesDownloadedMap.put(downloadFileStatus.getDownloadFileId(), downloadFileStatus.bytesDownloaded());
-                callback.onUpdate(new DownloadBatchStatus(fileBytesDownloadedMap, totalBatchSizeBytes));
+                callback.onUpdate(new DownloadBatchStatus(downloadBatchId, fileBytesDownloadedMap, totalBatchSizeBytes));
             }
         };
 

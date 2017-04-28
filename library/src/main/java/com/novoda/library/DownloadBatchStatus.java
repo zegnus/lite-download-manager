@@ -4,12 +4,14 @@ import java.util.Map;
 
 public class DownloadBatchStatus {
 
+    private final DownloadBatchId downloadBatchId;
     private final long bytesDownloaded;
     private final long totalFileSizeBytes;
 
     private int percentatgeDownloaded;
 
-    public DownloadBatchStatus(Map<DownloadFileId, Long> fileBytesDownloadedMap, long totalFileSizeBytes) {
+    public DownloadBatchStatus(DownloadBatchId downloadBatchId, Map<DownloadFileId, Long> fileBytesDownloadedMap, long totalFileSizeBytes) {
+        this.downloadBatchId = downloadBatchId;
         this.bytesDownloaded = getBytesDownloadedFrom(fileBytesDownloadedMap);
         this.totalFileSizeBytes = totalFileSizeBytes;
         this.percentatgeDownloaded = getPercentatgeFrom(bytesDownloaded, totalFileSizeBytes);
@@ -31,7 +33,11 @@ public class DownloadBatchStatus {
         return bytesDownloaded;
     }
 
-    public int percentatgeDownloaded() {
+    public int percentageDownloaded() {
         return percentatgeDownloaded;
+    }
+
+    public DownloadBatchId getDownloadBatchId() {
+        return downloadBatchId;
     }
 }

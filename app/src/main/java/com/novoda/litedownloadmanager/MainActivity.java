@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import com.novoda.library.DownloadBatch;
+import com.novoda.library.DownloadBatchId;
 import com.novoda.library.DownloadBatchStatus;
 import com.novoda.library.DownloadFile;
 import com.novoda.library.DownloadFileId;
@@ -29,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
                 DownloadFile[] downloadFiles = new DownloadFile[2];
                 downloadFiles[0] = new DownloadFile(DownloadFileId.from("one"), "http://ipv4.download.thinkbroadband.com/100MB.zip");
                 downloadFiles[1] = new DownloadFile(DownloadFileId.from("two"), "http://ipv4.download.thinkbroadband.com/100MB.zip");
-                DownloadBatch downloadBatch = new DownloadBatch(downloadFiles);
+                DownloadBatch downloadBatch = new DownloadBatch(DownloadBatchId.from("made-in-chelsea"), downloadFiles);
                 liteDownloadManagerCommands.download(downloadBatch, callback);
             }
 
@@ -43,7 +44,9 @@ public class MainActivity extends AppCompatActivity {
     private final DownloadBatch.Callback callback = new DownloadBatch.Callback() {
         @Override
         public void onUpdate(DownloadBatchStatus downloadBatchStatus) {
-            Log.v("Batch downloaded: " + downloadBatchStatus.percentatgeDownloaded() + ", bytes: " + downloadBatchStatus.bytesDownloaded());
+            Log.v("Batch " + downloadBatchStatus.getDownloadBatchId().getId()
+                          + " downloaded: " + downloadBatchStatus.percentageDownloaded()
+                          + ", bytes: " + downloadBatchStatus.bytesDownloaded());
         }
     };
 
