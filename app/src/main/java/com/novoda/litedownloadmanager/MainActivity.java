@@ -1,8 +1,6 @@
 package com.novoda.litedownloadmanager;
 
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
@@ -13,14 +11,11 @@ import com.novoda.library.DownloadBatchStatus;
 import com.novoda.library.DownloadFile;
 import com.novoda.library.DownloadFileId;
 import com.novoda.library.LiteDownloadManagerCommands;
-import com.novoda.library.LiteDownloadManagerCreator;
 import com.novoda.notils.logger.simple.Log;
 
 import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
-
-    private LiteDownloadManagerCreator liteDownloadManagerCreator;
 
     private TextView textViewBatch1;
     private TextView textViewBatch2;
@@ -100,19 +95,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        liteDownloadManagerCreator = new LiteDownloadManagerCreator(getApplicationContext());
-        liteDownloadManagerCreator.create(new LiteDownloadManagerCreator.Callback() {
-            @Override
-            public void onSuccess(LiteDownloadManagerCommands liteDownloadManagerCommands) {
-                MainActivity.this.liteDownloadManagerCommands = liteDownloadManagerCommands;
-                MainActivity.this.liteDownloadManagerCommands.addDownloadBatchCallback(callback);
-            }
-
-            @Override
-            public void onError() {
-                // no-op
-            }
-        }, new Handler(Looper.getMainLooper()));
+        DemoApplication demoApplication = (DemoApplication) getApplicationContext();
+        liteDownloadManagerCommands = demoApplication.getLiteDownloadManagerCommands();
+        //liteDownloadManagerCommands.addDownloadBatchCallback(callback);
     }
 
     private final DownloadBatch.Callback callback = new DownloadBatch.Callback() {
@@ -136,7 +121,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        liteDownloadManagerCreator.destroy();
         super.onDestroy();
     }
 }

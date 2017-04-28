@@ -16,8 +16,6 @@ public class LiteDownloadManagerCreator {
     private final Context applicationContext;
 
     private DownloadServiceCommands downloadService;
-    private ServiceConnection serviceConnection;
-    private boolean serviceIsBound;
     private LiteDownloadManager liteDownloadManager;
 
     public LiteDownloadManagerCreator(Context applicationContext) {
@@ -26,12 +24,11 @@ public class LiteDownloadManagerCreator {
 
     public void create(final Callback callback, final Handler callbackHandler) {
         Intent intent = new Intent(applicationContext, DownloadService.class);
-        serviceConnection = new ServiceConnection() {
+        ServiceConnection serviceConnection = new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
                 DownloadService.DownloadServiceBinder binder = (DownloadService.DownloadServiceBinder) service;
                 downloadService = binder.getService();
-                serviceIsBound = true;
 
                 liteDownloadManager = new LiteDownloadManager(
                         downloadService,
@@ -44,21 +41,10 @@ public class LiteDownloadManagerCreator {
 
             @Override
             public void onServiceDisconnected(ComponentName name) {
-                serviceIsBound = false;
                 callback.onError();
             }
         };
         applicationContext.bindService(intent, serviceConnection, Service.BIND_AUTO_CREATE);
-    }
-
-    public void destroy() {
-        if (serviceIsBound) {
-            applicationContext.unbindService(serviceConnection);
-        }
-
-        if (liteDownloadManager != null) {
-            liteDownloadManager.destroy();
-        }
     }
 
     public interface Callback {

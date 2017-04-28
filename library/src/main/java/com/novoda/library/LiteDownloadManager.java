@@ -2,7 +2,6 @@ package com.novoda.library;
 
 import android.os.Handler;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -74,15 +73,5 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
         if (callbacks.contains(downloadBatchCallback)) {
             callbacks.remove(downloadBatchCallback);
         }
-    }
-
-    @Override
-    public void destroy() {
-        Iterator<DownloadBatch.Callback> iterator = callbacks.iterator();
-        while (iterator.hasNext()) {
-            iterator.next();
-            iterator.remove();
-        }
-        downloadBatchMap.clear();
     }
 }

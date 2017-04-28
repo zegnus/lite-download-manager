@@ -11,6 +11,4 @@ public interface LiteDownloadManagerCommands {
     void addDownloadBatchCallback(DownloadBatch.Callback downloadBatchCallback);
 
     void removeDownloadBatchCallback(DownloadBatch.Callback downloadBatchCallback);
-
-    void destroy();
 }
