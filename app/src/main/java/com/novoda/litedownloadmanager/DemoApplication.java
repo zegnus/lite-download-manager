@@ -20,17 +20,7 @@ public class DemoApplication extends Application {
 
     private void createLiteDownloadManager() {
         LiteDownloadManagerCreator liteDownloadManagerCreator = new LiteDownloadManagerCreator(getApplicationContext());
-        liteDownloadManagerCreator.create(new LiteDownloadManagerCreator.Callback() {
-            @Override
-            public void onSuccess(LiteDownloadManagerCommands liteDownloadManagerCommands) {
-                DemoApplication.this.liteDownloadManagerCommands = liteDownloadManagerCommands;
-            }
-
-            @Override
-            public void onError() {
-                // no-op
-            }
-        }, new Handler(Looper.getMainLooper()));
+        liteDownloadManagerCommands = liteDownloadManagerCreator.create(new Handler(Looper.getMainLooper()));
     }
 
     public LiteDownloadManagerCommands getLiteDownloadManagerCommands() {

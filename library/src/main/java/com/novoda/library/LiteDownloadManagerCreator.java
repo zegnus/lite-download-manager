@@ -22,35 +22,30 @@ public class LiteDownloadManagerCreator {
         this.applicationContext = applicationContext;
     }
 
-    public void create(final Callback callback, final Handler callbackHandler) {
+    public LiteDownloadManager create(final Handler callbackHandler) {
         Intent intent = new Intent(applicationContext, DownloadService.class);
         ServiceConnection serviceConnection = new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
                 DownloadService.DownloadServiceBinder binder = (DownloadService.DownloadServiceBinder) service;
                 downloadService = binder.getService();
-
-                liteDownloadManager = new LiteDownloadManager(
-                        downloadService,
-                        callbackHandler,
-                        new HashMap<DownloadBatchId, DownloadBatch>(),
-                        new ArrayList<DownloadBatch.Callback>()
-                );
-                callback.onSuccess(liteDownloadManager);
+                liteDownloadManager.setDownloadService(downloadService);
             }
 
             @Override
             public void onServiceDisconnected(ComponentName name) {
-                callback.onError();
+                // no-op
             }
         };
+
         applicationContext.bindService(intent, serviceConnection, Service.BIND_AUTO_CREATE);
-    }
 
-    public interface Callback {
+        liteDownloadManager = new LiteDownloadManager(
+                callbackHandler,
+                new HashMap<DownloadBatchId, DownloadBatch>(),
+                new ArrayList<DownloadBatch.Callback>()
+        );
 
-        void onSuccess(LiteDownloadManagerCommands liteDownloadManagerCommands);
-
-        void onError();
+        return liteDownloadManager;
     }
 }

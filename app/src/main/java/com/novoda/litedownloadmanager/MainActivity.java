@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
 
         DemoApplication demoApplication = (DemoApplication) getApplicationContext();
         liteDownloadManagerCommands = demoApplication.getLiteDownloadManagerCommands();
-        //liteDownloadManagerCommands.addDownloadBatchCallback(callback);
+        liteDownloadManagerCommands.addDownloadBatchCallback(callback);
     }
 
     private final DownloadBatch.Callback callback = new DownloadBatch.Callback() {
