@@ -8,13 +8,13 @@ public class DownloadBatchStatus {
     private final long bytesDownloaded;
     private final long totalFileSizeBytes;
 
-    private int percentatgeDownloaded;
+    private int percentageDownloaded;
 
-    public DownloadBatchStatus(DownloadBatchId downloadBatchId, Map<DownloadFileId, Long> fileBytesDownloadedMap, long totalFileSizeBytes) {
+    DownloadBatchStatus(DownloadBatchId downloadBatchId, Map<DownloadFileId, Long> fileBytesDownloadedMap, long totalFileSizeBytes) {
         this.downloadBatchId = downloadBatchId;
         this.bytesDownloaded = getBytesDownloadedFrom(fileBytesDownloadedMap);
         this.totalFileSizeBytes = totalFileSizeBytes;
-        this.percentatgeDownloaded = getPercentatgeFrom(bytesDownloaded, totalFileSizeBytes);
+        this.percentageDownloaded = getPercentageFrom(bytesDownloaded, totalFileSizeBytes);
     }
 
     private long getBytesDownloadedFrom(Map<DownloadFileId, Long> fileBytesDownloadedMap) {
@@ -25,7 +25,7 @@ public class DownloadBatchStatus {
         return bytesDownloaded;
     }
 
-    private int getPercentatgeFrom(long bytesDownloaded, long totalFileSizeBytes) {
+    private int getPercentageFrom(long bytesDownloaded, long totalFileSizeBytes) {
         return (int) ((((float) bytesDownloaded) / ((float) totalFileSizeBytes)) * 100);
     }
 
@@ -34,14 +34,14 @@ public class DownloadBatchStatus {
     }
 
     public int percentageDownloaded() {
-        return percentatgeDownloaded;
+        return percentageDownloaded;
     }
 
     public DownloadBatchId getDownloadBatchId() {
         return downloadBatchId;
     }
 
-    public boolean isCompleted() {
+    boolean isCompleted() {
         return bytesDownloaded == totalFileSizeBytes;
     }
 }

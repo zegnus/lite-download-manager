@@ -22,8 +22,6 @@ public class DownloadFile {
     }
 
     void download(Callback callback) {
-        Log.v("Download file start url: " + url);
-
         totalFileSizeBytes = getTotalSize();
 
         while (proceed && bytesDownloaded < totalFileSizeBytes) {

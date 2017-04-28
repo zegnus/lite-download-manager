@@ -8,16 +8,15 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
 
     private final DownloadServiceCommands downloadService;
     private final Handler callbackHandler;
-    private final DownloadBatch.Callback callback;
     private final Map<DownloadBatchId, DownloadBatch> downloadBatchMap;
+
+    private DownloadBatch.Callback callback = DownloadBatch.Callback.NO_OP;
 
     LiteDownloadManager(DownloadServiceCommands downloadService,
                         Handler callbackHandler,
-                        DownloadBatch.Callback callback,
                         Map<DownloadBatchId, DownloadBatch> downloadBatchMap) {
         this.downloadService = downloadService;
         this.callbackHandler = callbackHandler;
-        this.callback = callback;
         this.downloadBatchMap = downloadBatchMap;
     }
 
@@ -58,5 +57,10 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
         downloadBatchMap.remove(downloadBatchId);
         downloadBatch.unpause();
         download(downloadBatch);
+    }
+
+    @Override
+    public void addDownloadBatchCallback(DownloadBatch.Callback downloadBatchCallback) {
+        callback = downloadBatchCallback;
     }
 }

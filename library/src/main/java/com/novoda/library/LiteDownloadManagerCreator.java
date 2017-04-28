@@ -22,7 +22,7 @@ public class LiteDownloadManagerCreator {
         this.applicationContext = applicationContext;
     }
 
-    public void create(final Callback callback, final Handler callbackHandler, final DownloadBatch.Callback downloadBatchCallback) {
+    public void create(final Callback callback, final Handler callbackHandler) {
         Intent intent = new Intent(applicationContext, DownloadService.class);
         serviceConnection = new ServiceConnection() {
             @Override
@@ -34,7 +34,6 @@ public class LiteDownloadManagerCreator {
                 LiteDownloadManager liteDownloadManager = new LiteDownloadManager(
                         downloadService,
                         callbackHandler,
-                        downloadBatchCallback,
                         new HashMap<DownloadBatchId, DownloadBatch>()
                 );
                 callback.onSuccess(liteDownloadManager);

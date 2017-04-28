@@ -7,4 +7,6 @@ public interface LiteDownloadManagerCommands {
     void pause(DownloadBatchId downloadBatchId);
 
     void resume(DownloadBatchId downloadBatchId);
+
+    void addDownloadBatchCallback(DownloadBatch.Callback downloadBatchCallback);
 }

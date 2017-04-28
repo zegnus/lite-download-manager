@@ -1,7 +1,5 @@
 package com.novoda.library;
 
-import com.novoda.notils.logger.simple.Log;
-
 import java.util.Map;
 
 public class DownloadBatch {
@@ -19,8 +17,6 @@ public class DownloadBatch {
     }
 
     void download(final Callback callback) {
-        Log.v("Download batch start");
-
         totalBatchSizeBytes = getTotalSize(downloadFiles);
 
         DownloadFile.Callback fileDownloadCallback = new DownloadFile.Callback() {
@@ -35,8 +31,6 @@ public class DownloadBatch {
         for (DownloadFile downloadFile : downloadFiles) {
             downloadFile.download(fileDownloadCallback);
         }
-
-        Log.v("Download batch end");
     }
 
     private long getTotalSize(DownloadFile[] downloadFiles) {
@@ -49,24 +43,31 @@ public class DownloadBatch {
         return totalBatchSizeBytes;
     }
 
-    public void pause() {
+    void pause() {
         for (DownloadFile downloadFile : downloadFiles) {
             downloadFile.pause();
         }
     }
 
-    public void unpause() {
+    void unpause() {
         for (DownloadFile downloadFile : downloadFiles) {
             downloadFile.unpause();
         }
     }
 
-    public DownloadBatchId getId() {
+    DownloadBatchId getId() {
         return downloadBatchId;
     }
 
     public interface Callback {
 
         void onUpdate(DownloadBatchStatus downloadBatchStatus);
+
+        Callback NO_OP = new Callback() {
+            @Override
+            public void onUpdate(DownloadBatchStatus downloadBatchStatus) {
+                // no-op
+            }
+        };
     }
 }

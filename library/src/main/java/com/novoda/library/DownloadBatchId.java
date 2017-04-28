@@ -1,15 +1,15 @@
 package com.novoda.library;
 
-public class DownloadBatchId {
+public final class DownloadBatchId {
 
     private final String id;
 
-    public DownloadBatchId(String id) {
-        this.id = id;
-    }
-
     public static DownloadBatchId from(String id) {
         return new DownloadBatchId(id);
+    }
+
+    private DownloadBatchId(String id) {
+        this.id = id;
     }
 
     public String getId() {

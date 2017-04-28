@@ -101,19 +101,18 @@ public class MainActivity extends AppCompatActivity {
         Log.setShowLogs(true);
 
         liteDownloadManagerCreator = new LiteDownloadManagerCreator(getApplicationContext());
-        Handler callbackHandler = new Handler(Looper.getMainLooper());
-
         liteDownloadManagerCreator.create(new LiteDownloadManagerCreator.Callback() {
             @Override
             public void onSuccess(LiteDownloadManagerCommands liteDownloadManagerCommands) {
                 MainActivity.this.liteDownloadManagerCommands = liteDownloadManagerCommands;
+                MainActivity.this.liteDownloadManagerCommands.addDownloadBatchCallback(callback);
             }
 
             @Override
             public void onError() {
                 // no-op
             }
-        }, callbackHandler, callback);
+        }, new Handler(Looper.getMainLooper()));
     }
 
     private final DownloadBatch.Callback callback = new DownloadBatch.Callback() {
