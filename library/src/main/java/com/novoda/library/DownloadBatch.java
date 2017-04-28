@@ -2,18 +2,20 @@ package com.novoda.library;
 
 import com.novoda.notils.logger.simple.Log;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class DownloadBatch {
 
     private final DownloadBatchId downloadBatchId;
+    private final Map<DownloadFileId, Long> fileBytesDownloadedMap;
+
     private DownloadFile[] downloadFiles;
     private long totalBatchSizeBytes;
 
-    public DownloadBatch(DownloadBatchId downloadBatchId, DownloadFile[] downloadFiles) {
+    public DownloadBatch(DownloadBatchId downloadBatchId, DownloadFile[] downloadFiles, Map<DownloadFileId, Long> fileBytesDownloadedMap) {
         this.downloadBatchId = downloadBatchId;
         this.downloadFiles = downloadFiles;
+        this.fileBytesDownloadedMap = fileBytesDownloadedMap;
     }
 
     void download(final Callback callback) {
@@ -22,7 +24,6 @@ public class DownloadBatch {
         totalBatchSizeBytes = getTotalSize(downloadFiles);
 
         DownloadFile.Callback fileDownloadCallback = new DownloadFile.Callback() {
-            private Map<DownloadFileId, Long> fileBytesDownloadedMap = new HashMap<>();
 
             @Override
             public void onUpdate(DownloadFileStatus downloadFileStatus) {
@@ -31,9 +32,8 @@ public class DownloadBatch {
             }
         };
 
-        DownloadFile[] files = downloadFiles;
-        for (DownloadFile file : files) {
-            file.download(fileDownloadCallback);
+        for (DownloadFile downloadFile : downloadFiles) {
+            downloadFile.download(fileDownloadCallback);
         }
 
         Log.v("Download batch end");
@@ -47,6 +47,22 @@ public class DownloadBatch {
         }
 
         return totalBatchSizeBytes;
+    }
+
+    public void pause() {
+        for (DownloadFile downloadFile : downloadFiles) {
+            downloadFile.pause();
+        }
+    }
+
+    public void unpause() {
+        for (DownloadFile downloadFile : downloadFiles) {
+            downloadFile.unpause();
+        }
+    }
+
+    public DownloadBatchId getId() {
+        return downloadBatchId;
     }
 
     public interface Callback {

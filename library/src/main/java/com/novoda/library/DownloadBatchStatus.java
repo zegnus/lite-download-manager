@@ -40,4 +40,8 @@ public class DownloadBatchStatus {
     public DownloadBatchId getDownloadBatchId() {
         return downloadBatchId;
     }
+
+    public boolean isCompleted() {
+        return bytesDownloaded == totalFileSizeBytes;
+    }
 }

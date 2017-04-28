@@ -13,10 +13,12 @@ public class DownloadFile {
 
     private long bytesDownloaded;
     private long totalFileSizeBytes;
+    private boolean proceed;
 
     public DownloadFile(DownloadFileId downloadFileId, String url) {
         this.url = url;
         this.downloadFileId = downloadFileId;
+        this.proceed = true;
     }
 
     void download(Callback callback) {
@@ -24,7 +26,7 @@ public class DownloadFile {
 
         totalFileSizeBytes = getTotalSize();
 
-        while (bytesDownloaded < totalFileSizeBytes) {
+        while (proceed && bytesDownloaded < totalFileSizeBytes) {
             try {
                 Thread.sleep(NETWORK_COST);
             } catch (InterruptedException e) {
@@ -33,7 +35,9 @@ public class DownloadFile {
 
             bytesDownloaded += BUFFER_SIZE;
 
-            callback.onUpdate(new DownloadFileStatus(downloadFileId, bytesDownloaded, totalFileSizeBytes));
+            if (proceed) {
+                callback.onUpdate(new DownloadFileStatus(downloadFileId, bytesDownloaded, totalFileSizeBytes));
+            }
         }
 
         Log.v("Download file stop url: " + url);
@@ -46,6 +50,14 @@ public class DownloadFile {
         }
 
         return totalFileSizeBytes;
+    }
+
+    void pause() {
+        proceed = false;
+    }
+
+    void unpause() {
+        proceed = true;
     }
 
     interface Callback {

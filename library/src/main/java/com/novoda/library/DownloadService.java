@@ -11,11 +11,18 @@ import java.util.concurrent.Executors;
 
 public class DownloadService extends Service implements DownloadServiceCommands {
 
-    private final Executor executor = Executors.newSingleThreadExecutor();
-    private final IBinder binder = new DownloadServiceBinder();
+    private Executor executor;
+    private IBinder binder;
+
+    @Override
+    public void onCreate() {
+        executor = Executors.newSingleThreadExecutor();
+        binder = new DownloadServiceBinder();
+
+        super.onCreate();
+    }
 
     class DownloadServiceBinder extends Binder {
-
         DownloadServiceCommands getService() {
             return DownloadService.this;
         }
@@ -25,11 +32,6 @@ public class DownloadService extends Service implements DownloadServiceCommands 
     @Override
     public IBinder onBind(Intent intent) {
         return binder;
-    }
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
     }
 
     @Override

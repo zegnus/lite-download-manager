@@ -8,6 +8,8 @@ import android.content.ServiceConnection;
 import android.os.Handler;
 import android.os.IBinder;
 
+import java.util.HashMap;
+
 public class LiteDownloadManagerCreator {
 
     private final Context applicationContext;
@@ -20,7 +22,7 @@ public class LiteDownloadManagerCreator {
         this.applicationContext = applicationContext;
     }
 
-    public void create(final Callback callback, final Handler callbackHandler) {
+    public void create(final Callback callback, final Handler callbackHandler, final DownloadBatch.Callback downloadBatchCallback) {
         Intent intent = new Intent(applicationContext, DownloadService.class);
         serviceConnection = new ServiceConnection() {
             @Override
@@ -29,7 +31,12 @@ public class LiteDownloadManagerCreator {
                 downloadService = binder.getService();
                 serviceIsBound = true;
 
-                LiteDownloadManager liteDownloadManager = new LiteDownloadManager(downloadService, callbackHandler);
+                LiteDownloadManager liteDownloadManager = new LiteDownloadManager(
+                        downloadService,
+                        callbackHandler,
+                        downloadBatchCallback,
+                        new HashMap<DownloadBatchId, DownloadBatch>()
+                );
                 callback.onSuccess(liteDownloadManager);
             }
 
