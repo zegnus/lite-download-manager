@@ -1,36 +1,43 @@
 package com.novoda.library;
 
-import java.util.Map;
-
 public class DownloadBatchStatus {
 
+    public enum Status {
+        QUEUED,
+        DOWNLOADING,
+        PAUSED,
+        ERROR,
+        DOWNLOADED
+    }
+
     private final DownloadBatchId downloadBatchId;
-    private final long bytesDownloaded;
-    private final long totalFileSizeBytes;
 
+    private long bytesDownloaded;
+    private long totalBatchSizeBytes;
     private int percentageDownloaded;
+    private Status status;
 
-    DownloadBatchStatus(DownloadBatchId downloadBatchId, Map<DownloadFileId, Long> fileBytesDownloadedMap, long totalFileSizeBytes) {
+    public DownloadBatchStatus(DownloadBatchId downloadBatchId, Status status) {
         this.downloadBatchId = downloadBatchId;
-        this.bytesDownloaded = getBytesDownloadedFrom(fileBytesDownloadedMap);
-        this.totalFileSizeBytes = totalFileSizeBytes;
-        this.percentageDownloaded = getPercentageFrom(bytesDownloaded, totalFileSizeBytes);
-    }
-
-    private long getBytesDownloadedFrom(Map<DownloadFileId, Long> fileBytesDownloadedMap) {
-        long bytesDownloaded = 0;
-        for (Map.Entry<DownloadFileId, Long> entry : fileBytesDownloadedMap.entrySet()) {
-            bytesDownloaded += entry.getValue();
-        }
-        return bytesDownloaded;
-    }
-
-    private int getPercentageFrom(long bytesDownloaded, long totalFileSizeBytes) {
-        return (int) ((((float) bytesDownloaded) / ((float) totalFileSizeBytes)) * 100);
+        this.status = status;
     }
 
     public long bytesDownloaded() {
         return bytesDownloaded;
+    }
+
+    void update(long currentBytesDownloaded, long totalBatchSizeBytes) {
+        this.bytesDownloaded = currentBytesDownloaded;
+        this.totalBatchSizeBytes = totalBatchSizeBytes;
+        this.percentageDownloaded = getPercentageFrom(bytesDownloaded, totalBatchSizeBytes);
+
+        if (this.bytesDownloaded == this.totalBatchSizeBytes) {
+            this.status = Status.DOWNLOADED;
+        }
+    }
+
+    private int getPercentageFrom(long bytesDownloaded, long totalFileSizeBytes) {
+        return (int) ((((float) bytesDownloaded) / ((float) totalFileSizeBytes)) * 100);
     }
 
     public int percentageDownloaded() {
@@ -42,6 +49,22 @@ public class DownloadBatchStatus {
     }
 
     boolean isCompleted() {
-        return bytesDownloaded == totalFileSizeBytes;
+        return bytesDownloaded == totalBatchSizeBytes;
+    }
+
+    public Status status() {
+        return status;
+    }
+
+    void setIsDownloading() {
+        status = Status.DOWNLOADING;
+    }
+
+    void setIsPaused() {
+        status = Status.PAUSED;
+    }
+
+    void setIsQueued() {
+        status = Status.QUEUED;
     }
 }

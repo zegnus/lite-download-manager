@@ -1,13 +1,17 @@
 package com.novoda.library;
 
-class DownloadFileStatus {
+public class DownloadFileStatus {
 
     private final DownloadFileId downloadFileId;
-    private final long bytesDownloaded;
-    private final long totalFileSizeBytes;
 
-    DownloadFileStatus(DownloadFileId downloadFileId, long bytesDownloaded, long totalFileSizeBytes) {
+    private long bytesDownloaded;
+    private long totalFileSizeBytes;
+
+    public DownloadFileStatus(DownloadFileId downloadFileId) {
         this.downloadFileId = downloadFileId;
+    }
+
+    void update(long bytesDownloaded, long totalFileSizeBytes) {
         this.bytesDownloaded = bytesDownloaded;
         this.totalFileSizeBytes = totalFileSizeBytes;
     }
@@ -16,7 +20,7 @@ class DownloadFileStatus {
         return bytesDownloaded;
     }
 
-    public DownloadFileId getDownloadFileId() {
+    DownloadFileId getDownloadFileId() {
         return downloadFileId;
     }
 }

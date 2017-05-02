@@ -8,19 +8,24 @@ public class DownloadFile {
 
     private final DownloadFileId downloadFileId;
     private final String url;
+    private final DownloadFileStatus downloadFileStatus;
 
     private long bytesDownloaded;
     private long totalFileSizeBytes;
     private boolean proceed;
 
-    public DownloadFile(DownloadFileId downloadFileId, String url) {
+
+    public DownloadFile(DownloadFileId downloadFileId, String url, DownloadFileStatus downloadFileStatus) {
         this.url = url;
         this.downloadFileId = downloadFileId;
+        this.downloadFileStatus = downloadFileStatus;
         this.proceed = true;
     }
 
     void download(Callback callback) {
         totalFileSizeBytes = getTotalSize();
+
+        callback.onUpdate(downloadFileStatus);
 
         while (proceed && bytesDownloaded < totalFileSizeBytes) {
             try {
@@ -32,9 +37,12 @@ public class DownloadFile {
             bytesDownloaded += BUFFER_SIZE;
 
             if (proceed) {
-                callback.onUpdate(new DownloadFileStatus(downloadFileId, bytesDownloaded, totalFileSizeBytes));
+                downloadFileStatus.update(bytesDownloaded, totalFileSizeBytes);
+                callback.onUpdate(downloadFileStatus);
             }
         }
+
+        callback.onUpdate(downloadFileStatus);
     }
 
     long getTotalSize() {
