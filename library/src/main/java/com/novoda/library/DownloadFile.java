@@ -13,7 +13,13 @@ public class DownloadFile {
     private long bytesDownloaded;
     private long totalFileSizeBytes;
 
-    public DownloadFile(DownloadFileId downloadFileId, String url, DownloadFileStatus downloadFileStatus) {
+    public static DownloadFile newInstance(String id, String url) {
+        DownloadFileId downloadFileId = DownloadFileId.from(id);
+        DownloadFileStatus downloadFileStatus = new DownloadFileStatus(downloadFileId, DownloadFileStatus.Status.QUEUED);
+        return new DownloadFile(downloadFileId, url, downloadFileStatus);
+    }
+
+    DownloadFile(DownloadFileId downloadFileId, String url, DownloadFileStatus downloadFileStatus) {
         this.url = url;
         this.downloadFileId = downloadFileId;
         this.downloadFileStatus = downloadFileStatus;

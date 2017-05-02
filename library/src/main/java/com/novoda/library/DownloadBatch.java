@@ -1,5 +1,6 @@
 package com.novoda.library;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class DownloadBatch {
@@ -12,19 +13,32 @@ public class DownloadBatch {
     private long totalBatchSizeBytes;
     private Callback callback;
 
-    public DownloadBatch(DownloadBatchId downloadBatchId,
-                         DownloadFile[] downloadFiles,
-                         Map<DownloadFileId, Long> fileBytesDownloadedMap,
-                         DownloadBatchStatus downloadBatchStatus) {
+    public static DownloadBatch newInstance(String id, DownloadFile[] downloadFiles) {
+        DownloadBatchId downloadBatchId = DownloadBatchId.from(id);
+        DownloadBatchStatus downloadBatchStatus = new DownloadBatchStatus(downloadBatchId, DownloadBatchStatus.Status.QUEUED);
+        return new DownloadBatch(
+                downloadBatchId,
+                downloadFiles,
+                new HashMap<DownloadFileId, Long>(),
+                downloadBatchStatus
+        );
+    }
+
+    DownloadBatch(DownloadBatchId downloadBatchId,
+                  DownloadFile[] downloadFiles,
+                  Map<DownloadFileId, Long> fileBytesDownloadedMap,
+                  DownloadBatchStatus downloadBatchStatus) {
         this.downloadBatchId = downloadBatchId;
         this.downloadFiles = downloadFiles;
         this.fileBytesDownloadedMap = fileBytesDownloadedMap;
         this.downloadBatchStatus = downloadBatchStatus;
     }
 
-    void download(Callback callback) {
+    void setCallback(Callback callback) {
         this.callback = callback;
+    }
 
+    void download() {
         if (downloadBatchStatus.isPaused()) {
             return;
         }

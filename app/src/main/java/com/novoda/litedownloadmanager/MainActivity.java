@@ -9,12 +9,8 @@ import com.novoda.library.DownloadBatch;
 import com.novoda.library.DownloadBatchId;
 import com.novoda.library.DownloadBatchStatus;
 import com.novoda.library.DownloadFile;
-import com.novoda.library.DownloadFileId;
-import com.novoda.library.DownloadFileStatus;
 import com.novoda.library.LiteDownloadManagerCommands;
 import com.novoda.notils.logger.simple.Log;
-
-import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -42,29 +38,16 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 v.setVisibility(View.INVISIBLE);
 
-                DownloadFileId one = DownloadFileId.from("one");
-                DownloadFileId two = DownloadFileId.from("two");
-
                 DownloadFile[] downloadFiles = new DownloadFile[2];
-                downloadFiles[0] = new DownloadFile(one, "http://ipv4.download.thinkbroadband.com/100MB.zip", new DownloadFileStatus(one, DownloadFileStatus.Status.QUEUED));
-                downloadFiles[1] = new DownloadFile(two, "http://ipv4.download.thinkbroadband.com/100MB.zip", new DownloadFileStatus(two, DownloadFileStatus.Status.QUEUED));
-                DownloadBatch downloadBatch = new DownloadBatch(
-                        DownloadBatchId.from("made-in-chelsea"),
-                        downloadFiles,
-                        new HashMap<DownloadFileId, Long>(),
-                        new DownloadBatchStatus(DownloadBatchId.from("made-in-chelsea"), DownloadBatchStatus.Status.QUEUED)
-                );
+                downloadFiles[0] = DownloadFile.newInstance("one", "http://ipv4.download.thinkbroadband.com/100MB.zip");
+                downloadFiles[1] = DownloadFile.newInstance("two", "http://ipv4.download.thinkbroadband.com/100MB.zip");
+                DownloadBatch downloadBatch = DownloadBatch.newInstance("made-in-chelsea", downloadFiles);
                 liteDownloadManagerCommands.download(downloadBatch);
 
                 downloadFiles = new DownloadFile[2];
-                downloadFiles[0] = new DownloadFile(one, "http://ipv4.download.thinkbroadband.com/100MB.zip", new DownloadFileStatus(one, DownloadFileStatus.Status.QUEUED));
-                downloadFiles[1] = new DownloadFile(two, "http://ipv4.download.thinkbroadband.com/100MB.zip", new DownloadFileStatus(two, DownloadFileStatus.Status.QUEUED));
-                downloadBatch = new DownloadBatch(
-                        DownloadBatchId.from("hollyoaks"),
-                        downloadFiles,
-                        new HashMap<DownloadFileId, Long>(),
-                        new DownloadBatchStatus(DownloadBatchId.from("hollyoaks"), DownloadBatchStatus.Status.QUEUED)
-                );
+                downloadFiles[0] = DownloadFile.newInstance("one", "http://ipv4.download.thinkbroadband.com/100MB.zip");
+                downloadFiles[1] = DownloadFile.newInstance("two", "http://ipv4.download.thinkbroadband.com/100MB.zip");
+                downloadBatch = DownloadBatch.newInstance("hollyoaks", downloadFiles);
                 liteDownloadManagerCommands.download(downloadBatch);
             }
         });

@@ -40,10 +40,12 @@ public class DownloadService extends Service implements DownloadServiceCommands 
         downloadBatchStatus.setIsQueued();
         callback.onUpdate(downloadBatchStatus);
 
+        downloadBatch.setCallback(callback);
+
         executor.execute(new Runnable() {
             @Override
             public void run() {
-                downloadBatch.download(callback);
+                downloadBatch.download();
             }
         });
     }
