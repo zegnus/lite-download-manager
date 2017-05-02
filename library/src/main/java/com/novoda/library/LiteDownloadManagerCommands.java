@@ -1,5 +1,7 @@
 package com.novoda.library;
 
+import java.util.List;
+
 public interface LiteDownloadManagerCommands {
         
     void download(DownloadBatch downloadBatch);
@@ -11,4 +13,6 @@ public interface LiteDownloadManagerCommands {
     void addDownloadBatchCallback(DownloadBatch.Callback downloadBatchCallback);
 
     void removeDownloadBatchCallback(DownloadBatch.Callback downloadBatchCallback);
+
+    List<DownloadBatchStatus> getAllDownloadBatchStatuses();
 }

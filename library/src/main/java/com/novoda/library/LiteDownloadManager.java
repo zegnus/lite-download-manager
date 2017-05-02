@@ -2,6 +2,7 @@ package com.novoda.library;
 
 import android.os.Handler;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -110,5 +111,16 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
         if (callbacks.contains(downloadBatchCallback)) {
             callbacks.remove(downloadBatchCallback);
         }
+    }
+
+    @Override
+    public List<DownloadBatchStatus> getAllDownloadBatchStatuses() {
+        List<DownloadBatchStatus> downloadBatchStatuses = new ArrayList<>(downloadBatchMap.size());
+
+        for (DownloadBatch downloadBatch : downloadBatchMap.values()) {
+            downloadBatchStatuses.add(downloadBatch.getDownloadBatchStatus());
+        }
+
+        return downloadBatchStatuses;
     }
 }

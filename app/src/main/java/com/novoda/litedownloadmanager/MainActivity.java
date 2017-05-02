@@ -12,6 +12,8 @@ import com.novoda.library.DownloadFile;
 import com.novoda.library.LiteDownloadManagerCommands;
 import com.novoda.notils.logger.simple.Log;
 
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
 
     private TextView textViewBatch1;
@@ -52,6 +54,19 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        bindViews();
+
+        DemoApplication demoApplication = (DemoApplication) getApplicationContext();
+        liteDownloadManagerCommands = demoApplication.getLiteDownloadManagerCommands();
+        liteDownloadManagerCommands.addDownloadBatchCallback(callback);
+
+        List<DownloadBatchStatus> downloadBatchStatuses = liteDownloadManagerCommands.getAllDownloadBatchStatuses();
+        for (DownloadBatchStatus downloadBatchStatus : downloadBatchStatuses) {
+            callback.onUpdate(downloadBatchStatus);
+        }
+    }
+
+    private void bindViews() {
         buttonPauseDownload1 = findViewById(R.id.button_pause_downloading_1);
         buttonPauseDownload1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -91,10 +106,6 @@ public class MainActivity extends AppCompatActivity {
                 buttonResumeDownload2.setVisibility(View.GONE);
             }
         });
-
-        DemoApplication demoApplication = (DemoApplication) getApplicationContext();
-        liteDownloadManagerCommands = demoApplication.getLiteDownloadManagerCommands();
-        liteDownloadManagerCommands.addDownloadBatchCallback(callback);
     }
 
     private final DownloadBatch.Callback callback = new DownloadBatch.Callback() {
