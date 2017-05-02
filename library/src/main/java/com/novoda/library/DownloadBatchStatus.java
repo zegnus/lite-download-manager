@@ -48,10 +48,6 @@ public class DownloadBatchStatus {
         return downloadBatchId;
     }
 
-    boolean isCompleted() {
-        return bytesDownloaded == totalBatchSizeBytes;
-    }
-
     public Status status() {
         return status;
     }
@@ -66,5 +62,9 @@ public class DownloadBatchStatus {
 
     void setIsQueued() {
         status = Status.QUEUED;
+    }
+
+    boolean isPaused() {
+        return status == Status.PAUSED;
     }
 }

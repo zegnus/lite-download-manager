@@ -46,8 +46,8 @@ public class MainActivity extends AppCompatActivity {
                 DownloadFileId two = DownloadFileId.from("two");
 
                 DownloadFile[] downloadFiles = new DownloadFile[2];
-                downloadFiles[0] = new DownloadFile(one, "http://ipv4.download.thinkbroadband.com/100MB.zip", new DownloadFileStatus(one));
-                downloadFiles[1] = new DownloadFile(two, "http://ipv4.download.thinkbroadband.com/100MB.zip", new DownloadFileStatus(two));
+                downloadFiles[0] = new DownloadFile(one, "http://ipv4.download.thinkbroadband.com/100MB.zip", new DownloadFileStatus(one, DownloadFileStatus.Status.QUEUED));
+                downloadFiles[1] = new DownloadFile(two, "http://ipv4.download.thinkbroadband.com/100MB.zip", new DownloadFileStatus(two, DownloadFileStatus.Status.QUEUED));
                 DownloadBatch downloadBatch = new DownloadBatch(
                         DownloadBatchId.from("made-in-chelsea"),
                         downloadFiles,
@@ -57,8 +57,8 @@ public class MainActivity extends AppCompatActivity {
                 liteDownloadManagerCommands.download(downloadBatch);
 
                 downloadFiles = new DownloadFile[2];
-                downloadFiles[0] = new DownloadFile(one, "http://ipv4.download.thinkbroadband.com/100MB.zip", new DownloadFileStatus(one));
-                downloadFiles[1] = new DownloadFile(two, "http://ipv4.download.thinkbroadband.com/100MB.zip", new DownloadFileStatus(two));
+                downloadFiles[0] = new DownloadFile(one, "http://ipv4.download.thinkbroadband.com/100MB.zip", new DownloadFileStatus(one, DownloadFileStatus.Status.QUEUED));
+                downloadFiles[1] = new DownloadFile(two, "http://ipv4.download.thinkbroadband.com/100MB.zip", new DownloadFileStatus(two, DownloadFileStatus.Status.QUEUED));
                 downloadBatch = new DownloadBatch(
                         DownloadBatchId.from("hollyoaks"),
                         downloadFiles,

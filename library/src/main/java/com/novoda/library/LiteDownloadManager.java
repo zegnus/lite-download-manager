@@ -62,9 +62,6 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
                         for (DownloadBatch.Callback callback : callbacks) {
                             callback.onUpdate(downloadBatchStatus);
                         }
-                        if (downloadBatchStatus.isCompleted()) {
-                            downloadBatchMap.remove(downloadBatch.getId());
-                        }
                     }
                 });
             }
@@ -99,7 +96,7 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
             return;
         }
         downloadBatchMap.remove(downloadBatchId);
-        downloadBatch.unpause();
+        downloadBatch.resume();
         download(downloadBatch);
     }
 

@@ -24,6 +24,11 @@ public class DownloadBatch {
 
     void download(Callback callback) {
         this.callback = callback;
+
+        if (downloadBatchStatus.isPaused()) {
+            return;
+        }
+
         downloadBatchStatus.setIsDownloading();
         totalBatchSizeBytes = getTotalSize(downloadFiles);
 
@@ -76,16 +81,20 @@ public class DownloadBatch {
         }
     }
 
-    void unpause() {
+    void resume() {
         downloadBatchStatus.setIsQueued();
         notifyCallback(downloadBatchStatus);
         for (DownloadFile downloadFile : downloadFiles) {
-            downloadFile.unpause();
+            downloadFile.resume();
         }
     }
 
     DownloadBatchId getId() {
         return downloadBatchId;
+    }
+
+    DownloadBatchStatus getDownloadBatchStatus() {
+        return downloadBatchStatus;
     }
 
     public interface Callback {

@@ -12,37 +12,39 @@ public class DownloadFile {
 
     private long bytesDownloaded;
     private long totalFileSizeBytes;
-    private boolean proceed;
-
 
     public DownloadFile(DownloadFileId downloadFileId, String url, DownloadFileStatus downloadFileStatus) {
         this.url = url;
         this.downloadFileId = downloadFileId;
         this.downloadFileStatus = downloadFileStatus;
-        this.proceed = true;
     }
 
     void download(Callback callback) {
-        totalFileSizeBytes = getTotalSize();
-
         callback.onUpdate(downloadFileStatus);
 
-        while (proceed && bytesDownloaded < totalFileSizeBytes) {
+        totalFileSizeBytes = getTotalSize();
+
+        moveStatusToDownloadingIfQueued();
+
+        while (downloadFileStatus.isDownloading() && bytesDownloaded < totalFileSizeBytes) {
             try {
                 Thread.sleep(NETWORK_COST);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
 
-            bytesDownloaded += BUFFER_SIZE;
-
-            if (proceed) {
+            if (downloadFileStatus.isDownloading()) {
+                bytesDownloaded += BUFFER_SIZE;
                 downloadFileStatus.update(bytesDownloaded, totalFileSizeBytes);
                 callback.onUpdate(downloadFileStatus);
             }
         }
+    }
 
-        callback.onUpdate(downloadFileStatus);
+    private void moveStatusToDownloadingIfQueued() {
+        if (downloadFileStatus.isQueued()) {
+            downloadFileStatus.setIsDownloading();
+        }
     }
 
     long getTotalSize() {
@@ -55,11 +57,11 @@ public class DownloadFile {
     }
 
     void pause() {
-        proceed = false;
+        downloadFileStatus.setIsPaused();
     }
 
-    void unpause() {
-        proceed = true;
+    void resume() {
+        downloadFileStatus.setIsQueued();
     }
 
     interface Callback {
