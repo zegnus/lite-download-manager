@@ -16,12 +16,15 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final DownloadBatchId DOWNLOAD_BATCH_ID_1 = DownloadBatchId.from("made-in-chelsea");
+    private static final DownloadBatchId DOWNLOAD_BATCH_ID_2 = DownloadBatchId.from("hollyoaks");
     private TextView textViewBatch1;
     private TextView textViewBatch2;
     private View buttonPauseDownload1;
     private View buttonPauseDownload2;
     private View buttonResumeDownload1;
     private View buttonResumeDownload2;
+    private View buttonDownload;
 
     private LiteDownloadManagerCommands liteDownloadManagerCommands;
 
@@ -35,7 +38,8 @@ public class MainActivity extends AppCompatActivity {
         textViewBatch1 = (TextView) findViewById(R.id.batch_1);
         textViewBatch2 = (TextView) findViewById(R.id.batch_2);
 
-        findViewById(R.id.button_start_downloading).setOnClickListener(new View.OnClickListener() {
+        buttonDownload = findViewById(R.id.button_start_downloading);
+        buttonDownload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 v.setVisibility(View.INVISIBLE);
@@ -64,6 +68,39 @@ public class MainActivity extends AppCompatActivity {
         for (DownloadBatchStatus downloadBatchStatus : downloadBatchStatuses) {
             callback.onUpdate(downloadBatchStatus);
         }
+
+        updateViews(downloadBatchStatuses);
+    }
+
+    private void updateViews(List<DownloadBatchStatus> downloadBatchStatuses) {
+        if (downloadBatchStatuses.isEmpty()) {
+            return;
+        }
+
+        buttonDownload.setVisibility(View.INVISIBLE);
+
+        for (DownloadBatchStatus downloadBatchStatus : downloadBatchStatuses) {
+            DownloadBatchId downloadBatchId = downloadBatchStatus.getDownloadBatchId();
+            if (DOWNLOAD_BATCH_ID_1.equals(downloadBatchId)) {
+                if (downloadBatchStatus.isPaused()) {
+                    buttonPauseDownload1.setVisibility(View.GONE);
+                    buttonResumeDownload1.setVisibility(View.VISIBLE);
+                } else {
+                    buttonPauseDownload1.setVisibility(View.VISIBLE);
+                    buttonResumeDownload1.setVisibility(View.GONE);
+                }
+            }
+
+            if (DOWNLOAD_BATCH_ID_2.equals(downloadBatchId)) {
+                if (downloadBatchStatus.isPaused()) {
+                    buttonPauseDownload2.setVisibility(View.GONE);
+                    buttonResumeDownload2.setVisibility(View.VISIBLE);
+                } else {
+                    buttonPauseDownload2.setVisibility(View.VISIBLE);
+                    buttonResumeDownload2.setVisibility(View.GONE);
+                }
+            }
+        }
     }
 
     private void bindViews() {
@@ -71,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
         buttonPauseDownload1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                liteDownloadManagerCommands.pause(DownloadBatchId.from("made-in-chelsea"));
+                liteDownloadManagerCommands.pause(DOWNLOAD_BATCH_ID_1);
                 buttonPauseDownload1.setVisibility(View.GONE);
                 buttonResumeDownload1.setVisibility(View.VISIBLE);
             }
@@ -81,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
         buttonPauseDownload2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                liteDownloadManagerCommands.pause(DownloadBatchId.from("hollyoaks"));
+                liteDownloadManagerCommands.pause(DOWNLOAD_BATCH_ID_2);
                 buttonPauseDownload2.setVisibility(View.GONE);
                 buttonResumeDownload2.setVisibility(View.VISIBLE);
             }
@@ -91,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
         buttonResumeDownload1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                liteDownloadManagerCommands.resume(DownloadBatchId.from("made-in-chelsea"));
+                liteDownloadManagerCommands.resume(DOWNLOAD_BATCH_ID_1);
                 buttonPauseDownload1.setVisibility(View.VISIBLE);
                 buttonResumeDownload1.setVisibility(View.GONE);
             }
@@ -101,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
         buttonResumeDownload2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                liteDownloadManagerCommands.resume(DownloadBatchId.from("hollyoaks"));
+                liteDownloadManagerCommands.resume(DOWNLOAD_BATCH_ID_2);
                 buttonPauseDownload2.setVisibility(View.VISIBLE);
                 buttonResumeDownload2.setVisibility(View.GONE);
             }

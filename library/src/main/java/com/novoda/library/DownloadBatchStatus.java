@@ -64,7 +64,7 @@ public class DownloadBatchStatus {
         status = Status.QUEUED;
     }
 
-    boolean isPaused() {
+    public boolean isPaused() {
         return status == Status.PAUSED;
     }
 }
