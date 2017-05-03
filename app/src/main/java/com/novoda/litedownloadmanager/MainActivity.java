@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private View buttonResumeDownload1;
     private View buttonResumeDownload2;
     private View buttonDownload;
+    private View buttonDeleteAll;
 
     private LiteDownloadManagerCommands liteDownloadManagerCommands;
 
@@ -42,7 +43,8 @@ public class MainActivity extends AppCompatActivity {
         buttonDownload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                v.setVisibility(View.INVISIBLE);
+                buttonDownload.setVisibility(View.GONE);
+                buttonDeleteAll.setVisibility(View.VISIBLE);
 
                 DownloadFile[] downloadFiles = new DownloadFile[2];
                 downloadFiles[0] = DownloadFile.newInstance("one", "http://ipv4.download.thinkbroadband.com/100MB.zip");
@@ -55,6 +57,15 @@ public class MainActivity extends AppCompatActivity {
                 downloadFiles[1] = DownloadFile.newInstance("two", "http://ipv4.download.thinkbroadband.com/100MB.zip");
                 downloadBatch = DownloadBatch.newInstance("hollyoaks", downloadFiles);
                 liteDownloadManagerCommands.download(downloadBatch);
+            }
+        });
+
+        buttonDeleteAll = findViewById(R.id.button_delete_all);
+        buttonDeleteAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                liteDownloadManagerCommands.delete(DOWNLOAD_BATCH_ID_1);
+                liteDownloadManagerCommands.delete(DOWNLOAD_BATCH_ID_2);
             }
         });
 
@@ -77,12 +88,13 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        buttonDownload.setVisibility(View.INVISIBLE);
+        buttonDownload.setVisibility(View.GONE);
+        buttonDeleteAll.setVisibility(View.VISIBLE);
 
         for (DownloadBatchStatus downloadBatchStatus : downloadBatchStatuses) {
             DownloadBatchId downloadBatchId = downloadBatchStatus.getDownloadBatchId();
             if (DOWNLOAD_BATCH_ID_1.equals(downloadBatchId)) {
-                if (downloadBatchStatus.isPaused()) {
+                if (downloadBatchStatus.isMarkedAsPaused()) {
                     buttonPauseDownload1.setVisibility(View.GONE);
                     buttonResumeDownload1.setVisibility(View.VISIBLE);
                 } else {
@@ -92,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             if (DOWNLOAD_BATCH_ID_2.equals(downloadBatchId)) {
-                if (downloadBatchStatus.isPaused()) {
+                if (downloadBatchStatus.isMarkedAsPaused()) {
                     buttonPauseDownload2.setVisibility(View.GONE);
                     buttonResumeDownload2.setVisibility(View.VISIBLE);
                 } else {
@@ -161,6 +173,18 @@ public class MainActivity extends AppCompatActivity {
                 case "hollyoaks":
                     textViewBatch2.setText(message);
                     break;
+            }
+
+            List<DownloadBatchStatus> allDownloadBatchStatuses = liteDownloadManagerCommands.getAllDownloadBatchStatuses();
+            if (allDownloadBatchStatuses.isEmpty()) {
+                buttonDownload.setVisibility(View.VISIBLE);
+                buttonDeleteAll.setVisibility(View.GONE);
+
+                buttonPauseDownload1.setVisibility(View.VISIBLE);
+                buttonResumeDownload1.setVisibility(View.GONE);
+
+                buttonPauseDownload2.setVisibility(View.VISIBLE);
+                buttonResumeDownload2.setVisibility(View.GONE);
             }
         }
     };

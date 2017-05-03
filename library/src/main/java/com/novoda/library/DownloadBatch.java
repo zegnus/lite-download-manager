@@ -39,11 +39,15 @@ public class DownloadBatch {
     }
 
     void download() {
-        if (downloadBatchStatus.isPaused()) {
+        if (downloadBatchStatus.isMarkedAsPaused()) {
             return;
         }
 
-        downloadBatchStatus.setIsDownloading();
+        if (downloadBatchStatus.isMarkedForDeletion()) {
+            return;
+        }
+
+        downloadBatchStatus.markAsDownloading();
         totalBatchSizeBytes = getTotalSize(downloadFiles);
 
         DownloadFile.Callback fileDownloadCallback = new DownloadFile.Callback() {
@@ -88,7 +92,7 @@ public class DownloadBatch {
     }
 
     void pause() {
-        downloadBatchStatus.setIsPaused();
+        downloadBatchStatus.markAsPaused();
         notifyCallback(downloadBatchStatus);
         for (DownloadFile downloadFile : downloadFiles) {
             downloadFile.pause();
@@ -96,10 +100,18 @@ public class DownloadBatch {
     }
 
     void resume() {
-        downloadBatchStatus.setIsQueued();
+        downloadBatchStatus.markAsQueued();
         notifyCallback(downloadBatchStatus);
         for (DownloadFile downloadFile : downloadFiles) {
             downloadFile.resume();
+        }
+    }
+
+    void delete() {
+        downloadBatchStatus.markForDeletion();
+        notifyCallback(downloadBatchStatus);
+        for (DownloadFile downloadFile : downloadFiles) {
+            downloadFile.delete();
         }
     }
 

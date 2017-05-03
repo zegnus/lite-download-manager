@@ -1,11 +1,12 @@
 package com.novoda.library;
 
-public class DownloadFileStatus {
+class DownloadFileStatus {
 
-    public enum Status {
+    enum Status {
         PAUSED,
         QUEUED,
-        DOWNLOADING
+        DOWNLOADING,
+        DELETION
     }
 
     private final DownloadFileId downloadFileId;
@@ -14,7 +15,7 @@ public class DownloadFileStatus {
     private long bytesDownloaded;
     private long totalFileSizeBytes;
 
-    public DownloadFileStatus(DownloadFileId downloadFileId, DownloadFileStatus.Status status) {
+    DownloadFileStatus(DownloadFileId downloadFileId, DownloadFileStatus.Status status) {
         this.downloadFileId = downloadFileId;
         this.status = status;
     }
@@ -32,23 +33,31 @@ public class DownloadFileStatus {
         return downloadFileId;
     }
 
-    boolean isDownloading() {
+    boolean isMarkedAsDownloading() {
         return status == Status.DOWNLOADING;
     }
 
-    boolean isQueued() {
+    boolean isMarkedAsQueued() {
         return status == Status.QUEUED;
     }
 
-    void setIsDownloading() {
+    boolean isMarkedForDeletion() {
+        return status == Status.DELETION;
+    }
+
+    void markAsDownloading() {
         status = Status.DOWNLOADING;
     }
 
-    void setIsPaused() {
+    void isMarkedAsPaused() {
         status = Status.PAUSED;
     }
 
-    void setIsQueued() {
+    void markAsQueued() {
         status = Status.QUEUED;
+    }
+
+    void markForDeletion() {
+        status = Status.DELETION;
     }
 }

@@ -102,6 +102,16 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
     }
 
     @Override
+    public void delete(DownloadBatchId downloadBatchId) {
+        DownloadBatch downloadBatch = downloadBatchMap.get(downloadBatchId);
+        if (downloadBatch == null) {
+            return;
+        }
+        downloadBatchMap.remove(downloadBatchId);
+        downloadBatch.delete();
+    }
+
+    @Override
     public void addDownloadBatchCallback(DownloadBatch.Callback downloadBatchCallback) {
         callbacks.add(downloadBatchCallback);
     }

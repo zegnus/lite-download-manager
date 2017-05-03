@@ -10,6 +10,8 @@ public interface LiteDownloadManagerCommands {
 
     void resume(DownloadBatchId downloadBatchId);
 
+    void delete(DownloadBatchId downloadBatchId);
+
     void addDownloadBatchCallback(DownloadBatch.Callback downloadBatchCallback);
 
     void removeDownloadBatchCallback(DownloadBatch.Callback downloadBatchCallback);

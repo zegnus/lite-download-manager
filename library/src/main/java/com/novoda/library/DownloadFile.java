@@ -2,13 +2,14 @@ package com.novoda.library;
 
 public class DownloadFile {
 
-    private static final long TOTAL_FILE_SIZE = 5000000;
     private static final int BUFFER_SIZE = 5000;
     private static final int NETWORK_COST = 10;
 
     private final DownloadFileId downloadFileId;
     private final String url;
     private final DownloadFileStatus downloadFileStatus;
+    private final FileDeleter fileDeleter;
+    private final FileSizeRequester fileSizeRequester;
 
     private long bytesDownloaded;
     private long totalFileSizeBytes;
@@ -16,13 +17,21 @@ public class DownloadFile {
     public static DownloadFile newInstance(String id, String url) {
         DownloadFileId downloadFileId = DownloadFileId.from(id);
         DownloadFileStatus downloadFileStatus = new DownloadFileStatus(downloadFileId, DownloadFileStatus.Status.QUEUED);
-        return new DownloadFile(downloadFileId, url, downloadFileStatus);
+        FileDeleter fileDeleter = new FileDeleter();
+        FileSizeRequester fileSizeRequester = new FileSizeRequester();
+        return new DownloadFile(downloadFileId, url, downloadFileStatus, fileDeleter, fileSizeRequester);
     }
 
-    DownloadFile(DownloadFileId downloadFileId, String url, DownloadFileStatus downloadFileStatus) {
+    DownloadFile(DownloadFileId downloadFileId,
+                 String url,
+                 DownloadFileStatus downloadFileStatus,
+                 FileDeleter fileDeleter,
+                 FileSizeRequester fileSizeRequester) {
         this.url = url;
         this.downloadFileId = downloadFileId;
         this.downloadFileStatus = downloadFileStatus;
+        this.fileDeleter = fileDeleter;
+        this.fileSizeRequester = fileSizeRequester;
     }
 
     void download(Callback callback) {
@@ -32,42 +41,49 @@ public class DownloadFile {
 
         moveStatusToDownloadingIfQueued();
 
-        while (downloadFileStatus.isDownloading() && bytesDownloaded < totalFileSizeBytes) {
+        while (downloadFileStatus.isMarkedAsDownloading() && bytesDownloaded < totalFileSizeBytes) {
             try {
                 Thread.sleep(NETWORK_COST);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
 
-            if (downloadFileStatus.isDownloading()) {
+            if (downloadFileStatus.isMarkedAsDownloading()) {
                 bytesDownloaded += BUFFER_SIZE;
                 downloadFileStatus.update(bytesDownloaded, totalFileSizeBytes);
                 callback.onUpdate(downloadFileStatus);
             }
         }
+
+        if (downloadFileStatus.isMarkedForDeletion()) {
+            fileDeleter.delete(downloadFileId);
+        }
     }
 
     private void moveStatusToDownloadingIfQueued() {
-        if (downloadFileStatus.isQueued()) {
-            downloadFileStatus.setIsDownloading();
+        if (downloadFileStatus.isMarkedAsQueued()) {
+            downloadFileStatus.markAsDownloading();
         }
     }
 
     long getTotalSize() {
         if (totalFileSizeBytes == 0) {
-            // request network file size
-            totalFileSizeBytes = TOTAL_FILE_SIZE;
+            totalFileSizeBytes = fileSizeRequester.requestFileSize(url);
         }
 
         return totalFileSizeBytes;
     }
 
     void pause() {
-        downloadFileStatus.setIsPaused();
+        downloadFileStatus.isMarkedAsPaused();
     }
 
     void resume() {
-        downloadFileStatus.setIsQueued();
+        downloadFileStatus.markAsQueued();
+    }
+
+    void delete() {
+        downloadFileStatus.markForDeletion();
     }
 
     interface Callback {

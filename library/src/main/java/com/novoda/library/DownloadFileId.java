@@ -1,6 +1,6 @@
 package com.novoda.library;
 
-public final class DownloadFileId {
+final class DownloadFileId {
 
     private final int id;
 
@@ -25,6 +25,10 @@ public final class DownloadFileId {
 
         return id == that.id;
 
+    }
+
+    String toRawId() {
+        return String.valueOf(id);
     }
 
     @Override

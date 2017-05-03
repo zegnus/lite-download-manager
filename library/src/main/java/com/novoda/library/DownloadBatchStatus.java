@@ -2,11 +2,12 @@ package com.novoda.library;
 
 public class DownloadBatchStatus {
 
-    public enum Status {
+    enum Status {
         QUEUED,
         DOWNLOADING,
         PAUSED,
         ERROR,
+        DELETION,
         DOWNLOADED
     }
 
@@ -17,7 +18,7 @@ public class DownloadBatchStatus {
     private int percentageDownloaded;
     private Status status;
 
-    public DownloadBatchStatus(DownloadBatchId downloadBatchId, Status status) {
+    DownloadBatchStatus(DownloadBatchId downloadBatchId, Status status) {
         this.downloadBatchId = downloadBatchId;
         this.status = status;
     }
@@ -52,19 +53,27 @@ public class DownloadBatchStatus {
         return status;
     }
 
-    void setIsDownloading() {
+    void markAsDownloading() {
         status = Status.DOWNLOADING;
     }
 
-    void setIsPaused() {
+    void markAsPaused() {
         status = Status.PAUSED;
     }
 
-    void setIsQueued() {
+    void markAsQueued() {
         status = Status.QUEUED;
     }
 
-    public boolean isPaused() {
+    void markForDeletion() {
+        status = Status.DELETION;
+    }
+
+    public boolean isMarkedAsPaused() {
         return status == Status.PAUSED;
+    }
+
+    boolean isMarkedForDeletion() {
+        return status == Status.DELETION;
     }
 }
