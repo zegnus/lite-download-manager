@@ -1,6 +1,7 @@
 package com.novoda.litedownloadmanager;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
@@ -160,10 +161,13 @@ public class MainActivity extends AppCompatActivity {
     private final DownloadBatch.Callback callback = new DownloadBatch.Callback() {
         @Override
         public void onUpdate(DownloadBatchStatus downloadBatchStatus) {
+
+            String status = getStatusMessage(downloadBatchStatus);
+
             String message = "Batch " + downloadBatchStatus.getDownloadBatchId().getId()
                     + "\ndownloaded: " + downloadBatchStatus.percentageDownloaded()
                     + "\nbytes: " + downloadBatchStatus.bytesDownloaded()
-                    + "\nstatus: " + downloadBatchStatus.status()
+                    + status
                     + "\n";
 
             switch (downloadBatchStatus.getDownloadBatchId().getId()) {
@@ -185,6 +189,17 @@ public class MainActivity extends AppCompatActivity {
 
                 buttonPauseDownload2.setVisibility(View.VISIBLE);
                 buttonResumeDownload2.setVisibility(View.GONE);
+            }
+        }
+
+        @NonNull
+        private String getStatusMessage(DownloadBatchStatus downloadBatchStatus) {
+            if (downloadBatchStatus.isMarkedAsError()) {
+                return "\nstatus: " + downloadBatchStatus.status()
+                        + " - " + downloadBatchStatus.getDownloadErrorType()
+                        + " : " + downloadBatchStatus.getDownloadErrorCode();
+            } else {
+                return "\nstatus: " + downloadBatchStatus.status();
             }
         }
     };

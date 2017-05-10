@@ -57,6 +57,10 @@ public class DownloadBatch {
                 fileBytesDownloadedMap.put(downloadFileStatus.getDownloadFileId(), downloadFileStatus.bytesDownloaded());
                 long currentBytesDownloaded = getBytesDownloadedFrom(fileBytesDownloadedMap);
                 downloadBatchStatus.update(currentBytesDownloaded, totalBatchSizeBytes);
+                if (downloadFileStatus.isMarkedAsError()) {
+                    downloadBatchStatus.markAsError(downloadFileStatus.getError());
+                }
+
                 notifyCallback(downloadBatchStatus);
             }
         };

@@ -2,31 +2,39 @@ package com.novoda.library;
 
 class DownloadFileStatus {
 
+    private static final int ZERO_BYTES = 0;
+
     enum Status {
         PAUSED,
         QUEUED,
         DOWNLOADING,
-        DELETION
+        DELETION,
+        ERROR
     }
 
     private final DownloadFileId downloadFileId;
 
+    private DownloadError downloadError;
+    private FileSize fileSize;
     private Status status;
-    private long bytesDownloaded;
-    private long totalFileSizeBytes;
 
-    DownloadFileStatus(DownloadFileId downloadFileId, DownloadFileStatus.Status status) {
+    DownloadFileStatus(DownloadFileId downloadFileId, DownloadFileStatus.Status status, FileSize fileSize, DownloadError downloadError) {
         this.downloadFileId = downloadFileId;
         this.status = status;
+        this.fileSize = fileSize;
+        this.downloadError = downloadError;
     }
 
-    void update(long bytesDownloaded, long totalFileSizeBytes) {
-        this.bytesDownloaded = bytesDownloaded;
-        this.totalFileSizeBytes = totalFileSizeBytes;
+    void update(FileSize fileSize) {
+        this.fileSize = fileSize;
     }
 
     long bytesDownloaded() {
-        return bytesDownloaded;
+        if (fileSize.areBytesDownloadedKnown()) {
+            return fileSize.getCurrentSize();
+        } else {
+            return ZERO_BYTES;
+        }
     }
 
     DownloadFileId getDownloadFileId() {
@@ -53,11 +61,28 @@ class DownloadFileStatus {
         status = Status.PAUSED;
     }
 
+    boolean isMarkedAsError() {
+        return status == Status.ERROR;
+    }
+
     void markAsQueued() {
         status = Status.QUEUED;
     }
 
     void markForDeletion() {
         status = Status.DELETION;
+    }
+
+    void markAsError(DownloadError.Error error) {
+        status = Status.ERROR;
+        downloadError.setError(error);
+    }
+
+    void setErrorCode(int errorCode) {
+        downloadError.setErrorCode(errorCode);
+    }
+
+    DownloadError getError() {
+        return downloadError;
     }
 }
