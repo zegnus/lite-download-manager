@@ -41,7 +41,7 @@ public class DownloadBatchStatus {
     }
 
     private int getPercentageFrom(long bytesDownloaded, long totalFileSizeBytes) {
-        if (totalBatchSizeBytes == ZERO_BYTES) {
+        if (totalBatchSizeBytes <= ZERO_BYTES) {
             return 0;
         } else {
             return (int) ((((float) bytesDownloaded) / ((float) totalFileSizeBytes)) * 100);

@@ -2,17 +2,17 @@ package com.novoda.library;
 
 class FileSize {
 
-    private static final int UNKNOWN_VALUE = -1;
+    private static final int ZERO_BYTES = 0;
 
     private long currentSize;
     private long totalSize;
 
     static FileSize Unknown() {
-        return new FileSize(UNKNOWN_VALUE, UNKNOWN_VALUE);
+        return new FileSize(ZERO_BYTES, ZERO_BYTES);
     }
 
     static FileSize Total(long totalFileSize) {
-        return new FileSize(UNKNOWN_VALUE, totalFileSize);
+        return new FileSize(ZERO_BYTES, totalFileSize);
     }
 
     private FileSize(long currentSize, long totalSize) {
@@ -21,11 +21,11 @@ class FileSize {
     }
 
     boolean isTotalSizeUnknown() {
-        return totalSize == UNKNOWN_VALUE;
+        return totalSize <= ZERO_BYTES;
     }
 
     boolean areBytesDownloadedKnown() {
-        return currentSize != UNKNOWN_VALUE;
+        return currentSize > ZERO_BYTES;
     }
 
     long getCurrentSize() {
@@ -38,5 +38,13 @@ class FileSize {
 
     void addToCurrentSize(long newBytes) {
         currentSize += newBytes;
+    }
+
+    void setTotalSize(long totalSize) {
+        this.totalSize = totalSize;
+    }
+
+    void setCurrentSize(long currentSize) {
+        this.currentSize = currentSize;
     }
 }

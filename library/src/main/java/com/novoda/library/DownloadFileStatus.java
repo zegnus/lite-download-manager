@@ -2,8 +2,6 @@ package com.novoda.library;
 
 class DownloadFileStatus {
 
-    private static final int ZERO_BYTES = 0;
-
     enum Status {
         PAUSED,
         QUEUED,
@@ -30,11 +28,7 @@ class DownloadFileStatus {
     }
 
     long bytesDownloaded() {
-        if (fileSize.areBytesDownloadedKnown()) {
-            return fileSize.getCurrentSize();
-        } else {
-            return ZERO_BYTES;
-        }
+        return fileSize.getCurrentSize();
     }
 
     DownloadFileId getDownloadFileId() {

@@ -1,5 +1,6 @@
 package com.novoda.library;
 
+import com.novoda.notils.logger.simple.Log;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
@@ -30,7 +31,7 @@ class NetworkFileSizeRequester implements FileSizeRequester {
                 return FileSize.Total(totalFileSize);
             }
         } catch (IOException e) {
-            // log exception
+            Log.e("Error requesting file size", e);
         }
 
         return FileSize.Unknown();

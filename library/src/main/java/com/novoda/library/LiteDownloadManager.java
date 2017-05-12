@@ -1,5 +1,6 @@
 package com.novoda.library;
 
+import android.content.Context;
 import android.os.Handler;
 
 import java.util.ArrayList;
@@ -34,26 +35,26 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
     }
 
     @Override
-    public void download(final DownloadBatch downloadBatch) {
+    public void download(final DownloadBatch downloadBatch, Context context) {
         downloadBatchMap.put(downloadBatch.getId(), downloadBatch);
         if (downloadService == null) {
-            ensureDownloadServiceExistsAndProceed(downloadBatch);
+            ensureDownloadServiceExistsAndProceed(downloadBatch, context);
         } else {
-            executeDownload(downloadBatch);
+            executeDownload(downloadBatch, context);
         }
     }
 
-    private void ensureDownloadServiceExistsAndProceed(final DownloadBatch downloadBatch) {
+    private void ensureDownloadServiceExistsAndProceed(final DownloadBatch downloadBatch, final Context context) {
         executor.submit(new Runnable() {
             @Override
             public void run() {
                 waitForDownloadService();
-                executeDownload(downloadBatch);
+                executeDownload(downloadBatch, context);
             }
         });
     }
 
-    private void executeDownload(final DownloadBatch downloadBatch) {
+    private void executeDownload(final DownloadBatch downloadBatch, Context context) {
         downloadService.download(downloadBatch, new DownloadBatch.Callback() {
             @Override
             public void onUpdate(final DownloadBatchStatus downloadBatchStatus) {
@@ -66,7 +67,7 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
                     }
                 });
             }
-        });
+        }, context);
     }
 
     private void waitForDownloadService() {
@@ -91,14 +92,14 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
     }
 
     @Override
-    public void resume(DownloadBatchId downloadBatchId) {
+    public void resume(DownloadBatchId downloadBatchId, Context context) {
         DownloadBatch downloadBatch = downloadBatchMap.get(downloadBatchId);
         if (downloadBatch == null) {
             return;
         }
         downloadBatchMap.remove(downloadBatchId);
         downloadBatch.resume();
-        download(downloadBatch);
+        download(downloadBatch, context);
     }
 
     @Override

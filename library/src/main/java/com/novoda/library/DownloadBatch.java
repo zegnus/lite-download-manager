@@ -1,10 +1,13 @@
 package com.novoda.library;
 
+import android.content.Context;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class DownloadBatch {
 
+    private static final int ZERO_BYTES = 0;
     private final DownloadBatchId downloadBatchId;
     private final Map<DownloadFileId, Long> fileBytesDownloadedMap;
     private final DownloadBatchStatus downloadBatchStatus;
@@ -38,7 +41,7 @@ public class DownloadBatch {
         this.callback = callback;
     }
 
-    void download() {
+    void download(Context context) {
         if (downloadBatchStatus.isMarkedAsPaused()) {
             return;
         }
@@ -48,7 +51,17 @@ public class DownloadBatch {
         }
 
         downloadBatchStatus.markAsDownloading();
+        notifyCallback(downloadBatchStatus);
+
         totalBatchSizeBytes = getTotalSize(downloadFiles);
+
+        if (totalBatchSizeBytes <= ZERO_BYTES) {
+            DownloadError downloadError = new DownloadError();
+            downloadError.setError(DownloadError.Error.CANNOT_DOWNLOAD_FILE_FROM_NETWORK);
+            downloadBatchStatus.markAsError(downloadError);
+            notifyCallback(downloadBatchStatus);
+            return;
+        }
 
         DownloadFile.Callback fileDownloadCallback = new DownloadFile.Callback() {
 
@@ -66,7 +79,10 @@ public class DownloadBatch {
         };
 
         for (DownloadFile downloadFile : downloadFiles) {
-            downloadFile.download(fileDownloadCallback);
+            downloadFile.download(fileDownloadCallback, context);
+            if (downloadFile.isMarkedAsError()) {
+                break;
+            }
         }
     }
 

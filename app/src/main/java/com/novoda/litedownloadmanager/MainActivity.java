@@ -51,13 +51,13 @@ public class MainActivity extends AppCompatActivity {
                 downloadFiles[0] = DownloadFile.newInstance("one", "http://ipv4.download.thinkbroadband.com/100MB.zip");
                 downloadFiles[1] = DownloadFile.newInstance("two", "http://ipv4.download.thinkbroadband.com/100MB.zip");
                 DownloadBatch downloadBatch = DownloadBatch.newInstance("made-in-chelsea", downloadFiles);
-                liteDownloadManagerCommands.download(downloadBatch);
+                liteDownloadManagerCommands.download(downloadBatch, getApplicationContext());
 
                 downloadFiles = new DownloadFile[2];
                 downloadFiles[0] = DownloadFile.newInstance("one", "http://ipv4.download.thinkbroadband.com/100MB.zip");
                 downloadFiles[1] = DownloadFile.newInstance("two", "http://ipv4.download.thinkbroadband.com/100MB.zip");
                 downloadBatch = DownloadBatch.newInstance("hollyoaks", downloadFiles);
-                liteDownloadManagerCommands.download(downloadBatch);
+                liteDownloadManagerCommands.download(downloadBatch, getApplicationContext());
             }
         });
 
@@ -141,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
         buttonResumeDownload1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                liteDownloadManagerCommands.resume(DOWNLOAD_BATCH_ID_1);
+                liteDownloadManagerCommands.resume(DOWNLOAD_BATCH_ID_1, getApplicationContext());
                 buttonPauseDownload1.setVisibility(View.VISIBLE);
                 buttonResumeDownload1.setVisibility(View.GONE);
             }
@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
         buttonResumeDownload2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                liteDownloadManagerCommands.resume(DOWNLOAD_BATCH_ID_2);
+                liteDownloadManagerCommands.resume(DOWNLOAD_BATCH_ID_2, getApplicationContext());
                 buttonPauseDownload2.setVisibility(View.VISIBLE);
                 buttonResumeDownload2.setVisibility(View.GONE);
             }

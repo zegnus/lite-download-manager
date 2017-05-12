@@ -1,30 +1,29 @@
 package com.novoda.library;
 
+import android.content.Context;
+
 import com.novoda.library.DownloadError.Error;
 import com.squareup.okhttp.Call;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.util.concurrent.TimeUnit;
 
 public class DownloadFile {
 
     private static final int BUFFER_SIZE = 8 * 512;
-    private static final int ZERO_BYTES = 0;
 
     private final DownloadFileId downloadFileId;
     private final String url;
-    private final String localPath;
     private final DownloadFileStatus downloadFileStatus;
     private final FileDeleter fileDeleter;
     private final FileSizeRequester fileSizeRequester;
     private final OkHttpClient httpClient;
+    private final Persistence persistence;
 
     private FileSize fileSize;
 
@@ -34,33 +33,47 @@ public class DownloadFile {
         DownloadError downloadError = new DownloadError();
         DownloadFileStatus downloadFileStatus = new DownloadFileStatus(downloadFileId, DownloadFileStatus.Status.QUEUED, fileSize, downloadError);
         FileDeleter fileDeleter = new FileDeleter();
-        String localPath = "";
         OkHttpClient httpClient = new OkHttpClient();
+        httpClient.setConnectTimeout(5, TimeUnit.SECONDS);
+        httpClient.setWriteTimeout(5, TimeUnit.SECONDS);
+        httpClient.setReadTimeout(5, TimeUnit.SECONDS);
+        Persistence persistence = PersistanceCreator.createInternalPhysicalPersistance();
         FileSizeRequester fileSizeRequester = new NetworkFileSizeRequester(httpClient);
 
-        return new DownloadFile(downloadFileId, url, localPath, downloadFileStatus, fileDeleter, fileSizeRequester, httpClient, fileSize);
+        return new DownloadFile(
+                downloadFileId,
+                url,
+                downloadFileStatus,
+                fileDeleter,
+                fileSizeRequester,
+                httpClient,
+                persistence,
+                fileSize
+        );
     }
 
     DownloadFile(DownloadFileId downloadFileId,
                  String url,
-                 String localPath,
                  DownloadFileStatus downloadFileStatus,
                  FileDeleter fileDeleter,
                  FileSizeRequester fileSizeRequester,
                  OkHttpClient httpClient,
+                 Persistence persistence,
                  FileSize fileSize) {
         this.url = url;
         this.downloadFileId = downloadFileId;
-        this.localPath = localPath;
         this.downloadFileStatus = downloadFileStatus;
         this.fileDeleter = fileDeleter;
         this.fileSizeRequester = fileSizeRequester;
         this.httpClient = httpClient;
+        this.persistence = persistence;
         this.fileSize = fileSize;
     }
 
-    void download(Callback callback) {
+    void download(Callback callback, Context context) {
         callback.onUpdate(downloadFileStatus);
+
+        moveStatusToDownloadingIfQueued();
 
         if (fileSize.isTotalSizeUnknown()) {
             FileSize requestFileSize = fileSizeRequester.requestFileSize(url);
@@ -69,19 +82,19 @@ public class DownloadFile {
                 callback.onUpdate(downloadFileStatus);
                 return;
             }
+
+            fileSize.setTotalSize(requestFileSize.getTotalSize());
         }
 
-        moveStatusToDownloadingIfQueued();
-
-        File file = new File(localPath);
-
-        try {
-            file.createNewFile();
-        } catch (IOException e) {
-            e.printStackTrace();
-            downloadFileStatus.markAsError(Error.FILE_CANNOT_BE_CREATED_LOCALLY);
+        FileName fileName = FileName.fromUrl(url);
+        Persistence.Status status = persistence.create(fileName, context, fileSize);
+        if (status.isMarkedAsError()) {
+            downloadFileStatus.markAsError(Error.FILE_CANNOT_BE_CREATED_LOCALLY_INSUFFICIENT_FREE_SPACE);
             callback.onUpdate(downloadFileStatus);
+            return;
         }
+
+        fileSize.setCurrentSize(persistence.getCurrentSize());
 
         Request.Builder requestBuilder = new Request.Builder().url(url);
         if (fileSize.areBytesDownloadedKnown()) {
@@ -92,22 +105,17 @@ public class DownloadFile {
         Response response = null;
         try {
             response = call.execute();
-            if (response.code() == HttpURLConnection.HTTP_OK) {
+            int responseCode = response.code();
+            if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_PARTIAL) {
                 InputStream in = response.body().byteStream();
-                OutputStream out = new FileOutputStream(file, fileSize.areBytesDownloadedKnown());
                     byte[] buffer = new byte[BUFFER_SIZE];
                     int readLast = 0;
                     while (downloadFileStatus.isMarkedAsDownloading() && readLast != -1) {
-                        try {
-                            readLast = in.read(buffer);
-                        } catch(IOException e) {
-                            downloadFileStatus.markAsError(Error.CANNOT_READ_FROM_STREAM);
-                            callback.onUpdate(downloadFileStatus);
-                        }
+                        readLast = in.read(buffer);
 
                         if (readLast != 0 && readLast != -1) {
                             try {
-                                out.write(buffer, 0, readLast);
+                                persistence.write(buffer, 0, readLast);
                             } catch (IOException e) {
                                 downloadFileStatus.markAsError(Error.CANNOT_WRITE);
                                 callback.onUpdate(downloadFileStatus);
@@ -122,8 +130,7 @@ public class DownloadFile {
                     }
             } else {
                 downloadFileStatus.markAsError(Error.CANNOT_DOWNLOAD_FILE_FROM_NETWORK);
-                int errorCode = response.code();
-                downloadFileStatus.setErrorCode(errorCode);
+                downloadFileStatus.setErrorCode(responseCode);
                 callback.onUpdate(downloadFileStatus);
             }
         } catch (IOException e) {
@@ -139,6 +146,8 @@ public class DownloadFile {
                 e.printStackTrace();
             }
         }
+
+        persistence.close();
 
         if (downloadFileStatus.isMarkedForDeletion()) {
             fileDeleter.delete(downloadFileId);
@@ -165,10 +174,15 @@ public class DownloadFile {
 
     long getTotalSize() {
         if (fileSize.isTotalSizeUnknown()) {
-            return ZERO_BYTES;
-        } else {
-            return fileSize.getTotalSize();
+            FileSize requestFileSize = fileSizeRequester.requestFileSize(url);
+            fileSize.setTotalSize(requestFileSize.getTotalSize());
         }
+
+        return fileSize.getTotalSize();
+    }
+
+    boolean isMarkedAsError() {
+        return downloadFileStatus.isMarkedAsError();
     }
 
     interface Callback {
