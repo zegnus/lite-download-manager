@@ -1,5 +1,6 @@
 package com.novoda.litedownloadmanager;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -44,20 +45,23 @@ public class MainActivity extends AppCompatActivity {
         buttonDownload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Context applicationContext = getApplicationContext();
+
                 buttonDownload.setVisibility(View.GONE);
                 buttonDeleteAll.setVisibility(View.VISIBLE);
 
                 DownloadFile[] downloadFiles = new DownloadFile[2];
-                downloadFiles[0] = DownloadFile.newInstance("one", "http://ipv4.download.thinkbroadband.com/100MB.zip");
-                downloadFiles[1] = DownloadFile.newInstance("two", "http://ipv4.download.thinkbroadband.com/100MB.zip");
+
+                downloadFiles[0] = DownloadFile.newInstance(applicationContext, "one", "http://ipv4.download.thinkbroadband.com/100MB.zip");
+                downloadFiles[1] = DownloadFile.newInstance(applicationContext, "two", "http://ipv4.download.thinkbroadband.com/100MB.zip");
                 DownloadBatch downloadBatch = DownloadBatch.newInstance("made-in-chelsea", downloadFiles);
-                liteDownloadManagerCommands.download(downloadBatch, getApplicationContext());
+                liteDownloadManagerCommands.download(downloadBatch);
 
                 downloadFiles = new DownloadFile[2];
-                downloadFiles[0] = DownloadFile.newInstance("one", "http://ipv4.download.thinkbroadband.com/100MB.zip");
-                downloadFiles[1] = DownloadFile.newInstance("two", "http://ipv4.download.thinkbroadband.com/100MB.zip");
+                downloadFiles[0] = DownloadFile.newInstance(applicationContext, "one", "http://ipv4.download.thinkbroadband.com/100MB.zip");
+                downloadFiles[1] = DownloadFile.newInstance(applicationContext, "two", "http://ipv4.download.thinkbroadband.com/100MB.zip");
                 downloadBatch = DownloadBatch.newInstance("hollyoaks", downloadFiles);
-                liteDownloadManagerCommands.download(downloadBatch, getApplicationContext());
+                liteDownloadManagerCommands.download(downloadBatch);
             }
         });
 
@@ -141,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
         buttonResumeDownload1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                liteDownloadManagerCommands.resume(DOWNLOAD_BATCH_ID_1, getApplicationContext());
+                liteDownloadManagerCommands.resume(DOWNLOAD_BATCH_ID_1);
                 buttonPauseDownload1.setVisibility(View.VISIBLE);
                 buttonResumeDownload1.setVisibility(View.GONE);
             }
@@ -151,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
         buttonResumeDownload2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                liteDownloadManagerCommands.resume(DOWNLOAD_BATCH_ID_2, getApplicationContext());
+                liteDownloadManagerCommands.resume(DOWNLOAD_BATCH_ID_2);
                 buttonPauseDownload2.setVisibility(View.VISIBLE);
                 buttonResumeDownload2.setVisibility(View.GONE);
             }
@@ -196,8 +200,7 @@ public class MainActivity extends AppCompatActivity {
         private String getStatusMessage(DownloadBatchStatus downloadBatchStatus) {
             if (downloadBatchStatus.isMarkedAsError()) {
                 return "\nstatus: " + downloadBatchStatus.status()
-                        + " - " + downloadBatchStatus.getDownloadErrorType()
-                        + " : " + downloadBatchStatus.getDownloadErrorCode();
+                        + " - " + downloadBatchStatus.getDownloadErrorType();
             } else {
                 return "\nstatus: " + downloadBatchStatus.status();
             }

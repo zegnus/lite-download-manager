@@ -13,17 +13,17 @@ import java.util.HashMap;
 
 public class LiteDownloadManagerCreator {
 
-    private final Context applicationContext;
+    private final Context context;
 
     private DownloadServiceCommands downloadService;
     private LiteDownloadManager liteDownloadManager;
 
-    public LiteDownloadManagerCreator(Context applicationContext) {
-        this.applicationContext = applicationContext;
+    public LiteDownloadManagerCreator(Context context) {
+        this.context = context.getApplicationContext();
     }
 
     public LiteDownloadManager create(final Handler callbackHandler) {
-        Intent intent = new Intent(applicationContext, DownloadService.class);
+        Intent intent = new Intent(context, DownloadService.class);
         ServiceConnection serviceConnection = new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
@@ -38,7 +38,7 @@ public class LiteDownloadManagerCreator {
             }
         };
 
-        applicationContext.bindService(intent, serviceConnection, Service.BIND_AUTO_CREATE);
+        context.bindService(intent, serviceConnection, Service.BIND_AUTO_CREATE);
 
         liteDownloadManager = new LiteDownloadManager(
                 callbackHandler,

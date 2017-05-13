@@ -1,9 +1,5 @@
 package com.novoda.library;
 
-import android.content.Context;
-
-import java.io.IOException;
-
 interface Persistence {
 
     enum Status {
@@ -17,9 +13,11 @@ interface Persistence {
 
     }
 
-    Status create(FileName fileName, Context context, FileSize fileSize);
+    Status create(FileName fileName, FileSize fileSize);
 
-    void write(byte[] buffer, int i, int readLast) throws IOException;
+    boolean write(byte[] buffer, int i, int readLast);
+
+    void delete();
 
     long getCurrentSize();
 

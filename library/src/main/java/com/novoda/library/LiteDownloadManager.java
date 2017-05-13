@@ -1,6 +1,5 @@
 package com.novoda.library;
 
-import android.content.Context;
 import android.os.Handler;
 
 import java.util.ArrayList;
@@ -35,26 +34,26 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
     }
 
     @Override
-    public void download(final DownloadBatch downloadBatch, Context context) {
+    public void download(final DownloadBatch downloadBatch) {
         downloadBatchMap.put(downloadBatch.getId(), downloadBatch);
         if (downloadService == null) {
-            ensureDownloadServiceExistsAndProceed(downloadBatch, context);
+            ensureDownloadServiceExistsAndProceed(downloadBatch);
         } else {
-            executeDownload(downloadBatch, context);
+            executeDownload(downloadBatch);
         }
     }
 
-    private void ensureDownloadServiceExistsAndProceed(final DownloadBatch downloadBatch, final Context context) {
+    private void ensureDownloadServiceExistsAndProceed(final DownloadBatch downloadBatch) {
         executor.submit(new Runnable() {
             @Override
             public void run() {
                 waitForDownloadService();
-                executeDownload(downloadBatch, context);
+                executeDownload(downloadBatch);
             }
         });
     }
 
-    private void executeDownload(final DownloadBatch downloadBatch, Context context) {
+    private void executeDownload(final DownloadBatch downloadBatch) {
         downloadService.download(downloadBatch, new DownloadBatch.Callback() {
             @Override
             public void onUpdate(final DownloadBatchStatus downloadBatchStatus) {
@@ -67,7 +66,7 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
                     }
                 });
             }
-        }, context);
+        });
     }
 
     private void waitForDownloadService() {
@@ -92,14 +91,14 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
     }
 
     @Override
-    public void resume(DownloadBatchId downloadBatchId, Context context) {
+    public void resume(DownloadBatchId downloadBatchId) {
         DownloadBatch downloadBatch = downloadBatchMap.get(downloadBatchId);
         if (downloadBatch == null) {
             return;
         }
         downloadBatchMap.remove(downloadBatchId);
         downloadBatch.resume();
-        download(downloadBatch, context);
+        download(downloadBatch);
     }
 
     @Override

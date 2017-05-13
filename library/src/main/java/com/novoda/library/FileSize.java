@@ -24,6 +24,10 @@ class FileSize {
         return totalSize <= ZERO_BYTES;
     }
 
+    boolean isTotalSizeKnown() {
+        return totalSize > ZERO_BYTES;
+    }
+
     boolean areBytesDownloadedKnown() {
         return currentSize > ZERO_BYTES;
     }
@@ -46,5 +50,9 @@ class FileSize {
 
     void setCurrentSize(long currentSize) {
         this.currentSize = currentSize;
+    }
+
+    FileSize copy() {
+        return new FileSize(currentSize, totalSize);
     }
 }

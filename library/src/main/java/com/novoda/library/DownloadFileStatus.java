@@ -72,10 +72,6 @@ class DownloadFileStatus {
         downloadError.setError(error);
     }
 
-    void setErrorCode(int errorCode) {
-        downloadError.setErrorCode(errorCode);
-    }
-
     DownloadError getError() {
         return downloadError;
     }

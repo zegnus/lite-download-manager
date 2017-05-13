@@ -1,16 +1,14 @@
 package com.novoda.library;
 
-import android.content.Context;
-
 import java.util.List;
 
 public interface LiteDownloadManagerCommands {
         
-    void download(DownloadBatch downloadBatch, Context context);
+    void download(DownloadBatch downloadBatch);
 
     void pause(DownloadBatchId downloadBatchId);
 
-    void resume(DownloadBatchId downloadBatchId, Context context);
+    void resume(DownloadBatchId downloadBatchId);
 
     void delete(DownloadBatchId downloadBatchId);
 

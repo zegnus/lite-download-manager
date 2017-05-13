@@ -2,7 +2,6 @@ package com.novoda.library;
 
 import android.app.Notification;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
@@ -40,7 +39,7 @@ public class DownloadService extends Service implements DownloadServiceCommands 
     }
 
     @Override
-    public void download(final DownloadBatch downloadBatch, final DownloadBatch.Callback callback, final Context context) {
+    public void download(final DownloadBatch downloadBatch, final DownloadBatch.Callback callback) {
         DownloadBatchStatus downloadBatchStatus = downloadBatch.getDownloadBatchStatus();
 
         startNotification();
@@ -53,7 +52,7 @@ public class DownloadService extends Service implements DownloadServiceCommands 
         executor.execute(new Runnable() {
             @Override
             public void run() {
-                downloadBatch.download(context);
+                downloadBatch.download();
             }
         });
     }

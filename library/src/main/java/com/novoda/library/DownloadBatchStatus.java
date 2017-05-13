@@ -96,8 +96,4 @@ public class DownloadBatchStatus {
     public DownloadError.Error getDownloadErrorType() {
         return downloadError.getError();
     }
-
-    public int getDownloadErrorCode() {
-        return downloadError.getErrorCode();
-    }
 }
