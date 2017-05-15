@@ -1,64 +1,40 @@
 package com.novoda.library;
 
-import android.content.Context;
-
 import com.novoda.library.DownloadError.Error;
-import com.squareup.okhttp.OkHttpClient;
-
-import java.util.concurrent.TimeUnit;
 
 public class DownloadFile {
 
     private final String url;
     private final DownloadFileStatus downloadFileStatus;
+    private final FileName fileName;
     private final FileSizeRequester fileSizeRequester;
     private final Persistence persistence;
     private final Downloader downloader;
-    private final FileName fileName;
 
     private FileSize fileSize;
 
-    public static DownloadFile newInstance(Context context, String id, String url) {
-        FileSize fileSize = FileSize.Unknown();
-        DownloadFileId downloadFileId = DownloadFileId.from(id);
-        DownloadError downloadError = new DownloadError();
-        DownloadFileStatus downloadFileStatus = new DownloadFileStatus(downloadFileId, DownloadFileStatus.Status.QUEUED, fileSize, downloadError);
-        OkHttpClient httpClient = new OkHttpClient();
-        httpClient.setConnectTimeout(5, TimeUnit.SECONDS);
-        httpClient.setWriteTimeout(5, TimeUnit.SECONDS);
-        httpClient.setReadTimeout(5, TimeUnit.SECONDS);
-        Persistence persistence = PersistenceCreator.createInternalPhysicalPersistence(context);
-        FileSizeRequester fileSizeRequester = new NetworkFileSizeRequester(httpClient);
-        Downloader downloader = new NetworkDownloader(httpClient);
-        FileName fileName = FileName.fromUrl(url);
-
-        return new DownloadFile(
-                url,
-                downloadFileStatus,
-                fileSizeRequester,
-                persistence,
-                downloader,
-                fileName,
-                fileSize
-        );
-    }
-
     DownloadFile(String url,
                  DownloadFileStatus downloadFileStatus,
+                 FileName fileName,
+                 FileSize fileSize,
                  FileSizeRequester fileSizeRequester,
                  Persistence persistence,
-                 Downloader downloader, FileName fileName, FileSize fileSize) {
+                 Downloader downloader) {
         this.url = url;
         this.downloadFileStatus = downloadFileStatus;
+        this.fileName = fileName;
         this.fileSizeRequester = fileSizeRequester;
         this.persistence = persistence;
         this.downloader = downloader;
-        this.fileName = fileName;
         this.fileSize = fileSize;
     }
 
     void download(final Callback callback) {
         callback.onUpdate(downloadFileStatus);
+
+        if (fileSize.getCurrentSize() == fileSize.getTotalSize()) {
+            return;
+        }
 
         moveStatusToDownloadingIfQueued();
 
@@ -97,7 +73,7 @@ public class DownloadFile {
             }
 
             @Override
-            public void onDownloadStopped() {
+            public void onDownloadFinished() {
                 persistence.close();
                 if (downloadFileStatus.isMarkedForDeletion()) {
                     persistence.delete();

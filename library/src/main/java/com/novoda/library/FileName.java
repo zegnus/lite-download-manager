@@ -4,10 +4,9 @@ final class FileName {
 
     private final String name;
 
-    public static FileName fromUrl(String url) {
-        int hashCode = url.hashCode();
-        String stringHashCode = String.valueOf(hashCode);
-        return new FileName(stringHashCode);
+    public static FileName from(Batch batch, String fileUrl) {
+        String name = batch + fileUrl + String.valueOf(System.nanoTime());
+        return new FileName(String.valueOf(name.hashCode()));
     }
 
     FileName(String name) {

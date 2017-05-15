@@ -13,17 +13,26 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
     private final Handler callbackHandler;
     private final Map<DownloadBatchId, DownloadBatch> downloadBatchMap;
     private final Object waitForDownloadService = new Object();
-    private final List<DownloadBatch.Callback> callbacks;
+    private final List<DownloadBatchCallback> callbacks;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final FileSizeRequester fileSizeRequester;
+    private final Persistence persistence;
+    private final Downloader downloader;
 
     private DownloadServiceCommands downloadService;
 
     LiteDownloadManager(Handler callbackHandler,
                         Map<DownloadBatchId, DownloadBatch> downloadBatchMap,
-                        List<DownloadBatch.Callback> callbacks) {
+                        List<DownloadBatchCallback> callbacks,
+                        FileSizeRequester fileSizeRequester,
+                        Persistence persistence,
+                        Downloader downloader) {
         this.callbackHandler = callbackHandler;
         this.downloadBatchMap = downloadBatchMap;
         this.callbacks = callbacks;
+        this.fileSizeRequester = fileSizeRequester;
+        this.persistence = persistence;
+        this.downloader = downloader;
     }
 
     void setDownloadService(DownloadServiceCommands downloadService) {
@@ -34,7 +43,13 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
     }
 
     @Override
-    public void download(final DownloadBatch downloadBatch) {
+    public DownloadBatchId download(Batch batch) {
+        DownloadBatch downloadBatch = DownloadBatch.from(batch, fileSizeRequester, persistence, downloader);
+        download(downloadBatch);
+        return downloadBatch.getId();
+    }
+
+    private void download(DownloadBatch downloadBatch) {
         downloadBatchMap.put(downloadBatch.getId(), downloadBatch);
         if (downloadService == null) {
             ensureDownloadServiceExistsAndProceed(downloadBatch);
@@ -54,13 +69,13 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
     }
 
     private void executeDownload(final DownloadBatch downloadBatch) {
-        downloadService.download(downloadBatch, new DownloadBatch.Callback() {
+        downloadService.download(downloadBatch, new DownloadBatchCallback() {
             @Override
             public void onUpdate(final DownloadBatchStatus downloadBatchStatus) {
                 callbackHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        for (DownloadBatch.Callback callback : callbacks) {
+                        for (DownloadBatchCallback callback : callbacks) {
                             callback.onUpdate(downloadBatchStatus);
                         }
                     }
@@ -98,6 +113,7 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
         }
         downloadBatchMap.remove(downloadBatchId);
         downloadBatch.resume();
+
         download(downloadBatch);
     }
 
@@ -112,12 +128,12 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
     }
 
     @Override
-    public void addDownloadBatchCallback(DownloadBatch.Callback downloadBatchCallback) {
+    public void addDownloadBatchCallback(DownloadBatchCallback downloadBatchCallback) {
         callbacks.add(downloadBatchCallback);
     }
 
     @Override
-    public void removeDownloadBatchCallback(DownloadBatch.Callback downloadBatchCallback) {
+    public void removeDownloadBatchCallback(DownloadBatchCallback downloadBatchCallback) {
         if (callbacks.contains(downloadBatchCallback)) {
             callbacks.remove(downloadBatchCallback);
         }

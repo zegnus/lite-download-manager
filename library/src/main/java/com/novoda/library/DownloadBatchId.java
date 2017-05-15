@@ -4,7 +4,8 @@ public final class DownloadBatchId {
 
     private final String id;
 
-    public static DownloadBatchId from(String id) {
+    public static DownloadBatchId from(Batch batch) {
+        String id = batch.getId();
         return new DownloadBatchId(id);
     }
 

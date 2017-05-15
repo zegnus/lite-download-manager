@@ -64,7 +64,7 @@ class NetworkDownloader implements Downloader {
             }
         }
 
-        callback.onDownloadStopped();
+        callback.onDownloadFinished();
     }
 
     @Override

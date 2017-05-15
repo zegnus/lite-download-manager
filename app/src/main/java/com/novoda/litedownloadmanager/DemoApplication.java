@@ -19,7 +19,7 @@ public class DemoApplication extends Application {
     }
 
     private void createLiteDownloadManager() {
-        LiteDownloadManagerCreator liteDownloadManagerCreator = new LiteDownloadManagerCreator(getApplicationContext());
+        LiteDownloadManagerCreator liteDownloadManagerCreator = LiteDownloadManagerCreator.newInstance(getApplicationContext());
         liteDownloadManagerCommands = liteDownloadManagerCreator.create(new Handler(Looper.getMainLooper()));
     }
 

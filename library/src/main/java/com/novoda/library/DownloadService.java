@@ -5,18 +5,20 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
-
-import com.novoda.notils.logger.simple.Log;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class DownloadService extends Service implements DownloadServiceCommands {
 
+    private static final String WAKELOCK_TAG = "WakelockTag";
+
     private ExecutorService executor;
     private IBinder binder;
+    private PowerManager.WakeLock wakeLock;
 
     @Override
     public void onCreate() {
@@ -39,7 +41,7 @@ public class DownloadService extends Service implements DownloadServiceCommands 
     }
 
     @Override
-    public void download(final DownloadBatch downloadBatch, final DownloadBatch.Callback callback) {
+    public void download(final DownloadBatch downloadBatch, final DownloadBatchCallback callback) {
         DownloadBatchStatus downloadBatchStatus = downloadBatch.getDownloadBatchStatus();
 
         startNotification();
@@ -52,9 +54,21 @@ public class DownloadService extends Service implements DownloadServiceCommands 
         executor.execute(new Runnable() {
             @Override
             public void run() {
+                acquireCpuWakeLock();
                 downloadBatch.download();
+                releaseCpuWakeLock();
             }
         });
+    }
+
+    private void acquireCpuWakeLock() {
+        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKELOCK_TAG);
+        wakeLock.acquire();
+    }
+
+    private void releaseCpuWakeLock() {
+        wakeLock.release();
     }
 
     private void startNotification() {
@@ -70,14 +84,12 @@ public class DownloadService extends Service implements DownloadServiceCommands 
 
     @Override
     public void onDestroy() {
-        Log.v("Service onDestroy");
         executor.shutdown();
         super.onDestroy();
     }
 
     @Override
     public void onTaskRemoved(Intent rootIntent) {
-        Log.v("Service onTaskRemoved");
         super.onTaskRemoved(rootIntent);
     }
 }

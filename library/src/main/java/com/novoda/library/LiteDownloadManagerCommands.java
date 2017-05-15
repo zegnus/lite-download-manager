@@ -3,8 +3,8 @@ package com.novoda.library;
 import java.util.List;
 
 public interface LiteDownloadManagerCommands {
-        
-    void download(DownloadBatch downloadBatch);
+
+    DownloadBatchId download(Batch batch);
 
     void pause(DownloadBatchId downloadBatchId);
 
@@ -12,9 +12,9 @@ public interface LiteDownloadManagerCommands {
 
     void delete(DownloadBatchId downloadBatchId);
 
-    void addDownloadBatchCallback(DownloadBatch.Callback downloadBatchCallback);
+    void addDownloadBatchCallback(DownloadBatchCallback downloadBatchCallback);
 
-    void removeDownloadBatchCallback(DownloadBatch.Callback downloadBatchCallback);
+    void removeDownloadBatchCallback(DownloadBatchCallback downloadBatchCallback);
 
     List<DownloadBatchStatus> getAllDownloadBatchStatuses();
 }

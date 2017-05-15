@@ -1,22 +1,38 @@
 package com.novoda.library;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-public class DownloadBatch {
+class DownloadBatch {
 
     private static final int ZERO_BYTES = 0;
 
     private final DownloadBatchId downloadBatchId;
     private final Map<DownloadFileId, Long> fileBytesDownloadedMap;
     private final DownloadBatchStatus downloadBatchStatus;
+    private final List<DownloadFile> downloadFiles;
 
-    private DownloadFile[] downloadFiles;
-    private Callback callback;
+    private DownloadBatchCallback callback;
     private long totalBatchSizeBytes;
 
-    public static DownloadBatch newInstance(String id, DownloadFile[] downloadFiles) {
-        DownloadBatchId downloadBatchId = DownloadBatchId.from(id);
+    public static DownloadBatch from(Batch batch, FileSizeRequester fileSizeRequester, Persistence persistence, Downloader downloader) {
+        DownloadBatchId downloadBatchId = DownloadBatchId.from(batch);
+        List<String> fileUrls = batch.getFileUrls();
+        List<DownloadFile> downloadFiles = new ArrayList<>(fileUrls.size());
+
+        for (String fileUrl : fileUrls) {
+            FileSize fileSize = FileSize.Unknown();
+            DownloadFileId downloadFileId = DownloadFileId.from(batch);
+            DownloadError downloadError = new DownloadError();
+            DownloadFileStatus downloadFileStatus = new DownloadFileStatus(downloadFileId, DownloadFileStatus.Status.QUEUED, fileSize, downloadError);
+            FileName fileName = FileName.from(batch, fileUrl);
+
+            DownloadFile downloadFile = new DownloadFile(fileUrl, downloadFileStatus, fileName, fileSize, fileSizeRequester, persistence, downloader);
+            downloadFiles.add(downloadFile);
+        }
+
         DownloadBatchStatus downloadBatchStatus = new DownloadBatchStatus(downloadBatchId, DownloadBatchStatus.Status.QUEUED);
         return new DownloadBatch(
                 downloadBatchId,
@@ -27,7 +43,7 @@ public class DownloadBatch {
     }
 
     DownloadBatch(DownloadBatchId downloadBatchId,
-                  DownloadFile[] downloadFiles,
+                  List<DownloadFile> downloadFiles,
                   Map<DownloadFileId, Long> fileBytesDownloadedMap,
                   DownloadBatchStatus downloadBatchStatus) {
         this.downloadBatchId = downloadBatchId;
@@ -36,7 +52,7 @@ public class DownloadBatch {
         this.downloadBatchStatus = downloadBatchStatus;
     }
 
-    void setCallback(Callback callback) {
+    void setCallback(DownloadBatchCallback callback) {
         this.callback = callback;
     }
 
@@ -104,7 +120,7 @@ public class DownloadBatch {
         callback.onUpdate(downloadBatchStatus);
     }
 
-    private long getTotalSize(DownloadFile[] downloadFiles) {
+    private long getTotalSize(List<DownloadFile> downloadFiles) {
         if (totalBatchSizeBytes == 0) {
             for (DownloadFile downloadFile : downloadFiles) {
                 totalBatchSizeBytes += downloadFile.getTotalSize();
@@ -144,10 +160,5 @@ public class DownloadBatch {
 
     DownloadBatchStatus getDownloadBatchStatus() {
         return downloadBatchStatus;
-    }
-
-    public interface Callback {
-
-        void onUpdate(DownloadBatchStatus downloadBatchStatus);
     }
 }

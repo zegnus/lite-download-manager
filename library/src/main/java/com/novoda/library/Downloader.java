@@ -12,6 +12,6 @@ interface Downloader {
 
         void onError();
 
-        void onDownloadStopped();
+        void onDownloadFinished();
     }
 }

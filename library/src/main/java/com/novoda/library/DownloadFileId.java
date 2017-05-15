@@ -4,8 +4,9 @@ final class DownloadFileId {
 
     private final int id;
 
-    public static DownloadFileId from(String url) {
-        return new DownloadFileId(url.hashCode());
+    public static DownloadFileId from(Batch batch) {
+        String id = batch.getId() + String.valueOf(System.nanoTime());
+        return new DownloadFileId(id.hashCode());
     }
 
     private DownloadFileId(int id) {

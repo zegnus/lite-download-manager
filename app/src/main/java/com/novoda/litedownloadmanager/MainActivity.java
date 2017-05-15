@@ -1,16 +1,15 @@
 package com.novoda.litedownloadmanager;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
 
-import com.novoda.library.DownloadBatch;
+import com.novoda.library.Batch;
+import com.novoda.library.DownloadBatchCallback;
 import com.novoda.library.DownloadBatchId;
 import com.novoda.library.DownloadBatchStatus;
-import com.novoda.library.DownloadFile;
 import com.novoda.library.LiteDownloadManagerCommands;
 import com.novoda.notils.logger.simple.Log;
 
@@ -18,8 +17,8 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final DownloadBatchId DOWNLOAD_BATCH_ID_1 = DownloadBatchId.from("made-in-chelsea");
-    private static final DownloadBatchId DOWNLOAD_BATCH_ID_2 = DownloadBatchId.from("hollyoaks");
+    private DownloadBatchId downloadBatchId1;
+    private DownloadBatchId downloadBatchId2;
     private TextView textViewBatch1;
     private TextView textViewBatch2;
     private View buttonPauseDownload1;
@@ -45,23 +44,20 @@ public class MainActivity extends AppCompatActivity {
         buttonDownload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Context applicationContext = getApplicationContext();
-
                 buttonDownload.setVisibility(View.GONE);
                 buttonDeleteAll.setVisibility(View.VISIBLE);
 
-                DownloadFile[] downloadFiles = new DownloadFile[2];
+                Batch batch = new Batch.Builder("made-in-chelsea")
+                        .addFile("http://ipv4.download.thinkbroadband.com/10MB.zip")
+                        .addFile("http://ipv4.download.thinkbroadband.com/10MB.zip")
+                        .build();
+                downloadBatchId1 = liteDownloadManagerCommands.download(batch);
 
-                downloadFiles[0] = DownloadFile.newInstance(applicationContext, "one", "http://ipv4.download.thinkbroadband.com/100MB.zip");
-                downloadFiles[1] = DownloadFile.newInstance(applicationContext, "two", "http://ipv4.download.thinkbroadband.com/100MB.zip");
-                DownloadBatch downloadBatch = DownloadBatch.newInstance("made-in-chelsea", downloadFiles);
-                liteDownloadManagerCommands.download(downloadBatch);
-
-                downloadFiles = new DownloadFile[2];
-                downloadFiles[0] = DownloadFile.newInstance(applicationContext, "one", "http://ipv4.download.thinkbroadband.com/100MB.zip");
-                downloadFiles[1] = DownloadFile.newInstance(applicationContext, "two", "http://ipv4.download.thinkbroadband.com/100MB.zip");
-                downloadBatch = DownloadBatch.newInstance("hollyoaks", downloadFiles);
-                liteDownloadManagerCommands.download(downloadBatch);
+                batch = new Batch.Builder("hollyoaks")
+                        .addFile("http://ipv4.download.thinkbroadband.com/10MB.zip")
+                        .addFile("http://ipv4.download.thinkbroadband.com/10MB.zip")
+                        .build();
+                downloadBatchId2 = liteDownloadManagerCommands.download(batch);
             }
         });
 
@@ -69,8 +65,8 @@ public class MainActivity extends AppCompatActivity {
         buttonDeleteAll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                liteDownloadManagerCommands.delete(DOWNLOAD_BATCH_ID_1);
-                liteDownloadManagerCommands.delete(DOWNLOAD_BATCH_ID_2);
+                liteDownloadManagerCommands.delete(downloadBatchId1);
+                liteDownloadManagerCommands.delete(downloadBatchId2);
             }
         });
 
@@ -98,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
 
         for (DownloadBatchStatus downloadBatchStatus : downloadBatchStatuses) {
             DownloadBatchId downloadBatchId = downloadBatchStatus.getDownloadBatchId();
-            if (DOWNLOAD_BATCH_ID_1.equals(downloadBatchId)) {
+            if (downloadBatchId1.equals(downloadBatchId)) {
                 if (downloadBatchStatus.isMarkedAsPaused()) {
                     buttonPauseDownload1.setVisibility(View.GONE);
                     buttonResumeDownload1.setVisibility(View.VISIBLE);
@@ -108,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
-            if (DOWNLOAD_BATCH_ID_2.equals(downloadBatchId)) {
+            if (downloadBatchId2.equals(downloadBatchId)) {
                 if (downloadBatchStatus.isMarkedAsPaused()) {
                     buttonPauseDownload2.setVisibility(View.GONE);
                     buttonResumeDownload2.setVisibility(View.VISIBLE);
@@ -125,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
         buttonPauseDownload1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                liteDownloadManagerCommands.pause(DOWNLOAD_BATCH_ID_1);
+                liteDownloadManagerCommands.pause(downloadBatchId1);
                 buttonPauseDownload1.setVisibility(View.GONE);
                 buttonResumeDownload1.setVisibility(View.VISIBLE);
             }
@@ -135,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
         buttonPauseDownload2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                liteDownloadManagerCommands.pause(DOWNLOAD_BATCH_ID_2);
+                liteDownloadManagerCommands.pause(downloadBatchId2);
                 buttonPauseDownload2.setVisibility(View.GONE);
                 buttonResumeDownload2.setVisibility(View.VISIBLE);
             }
@@ -145,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
         buttonResumeDownload1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                liteDownloadManagerCommands.resume(DOWNLOAD_BATCH_ID_1);
+                liteDownloadManagerCommands.resume(downloadBatchId1);
                 buttonPauseDownload1.setVisibility(View.VISIBLE);
                 buttonResumeDownload1.setVisibility(View.GONE);
             }
@@ -155,14 +151,14 @@ public class MainActivity extends AppCompatActivity {
         buttonResumeDownload2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                liteDownloadManagerCommands.resume(DOWNLOAD_BATCH_ID_2);
+                liteDownloadManagerCommands.resume(downloadBatchId2);
                 buttonPauseDownload2.setVisibility(View.VISIBLE);
                 buttonResumeDownload2.setVisibility(View.GONE);
             }
         });
     }
 
-    private final DownloadBatch.Callback callback = new DownloadBatch.Callback() {
+    private final DownloadBatchCallback callback = new DownloadBatchCallback() {
         @Override
         public void onUpdate(DownloadBatchStatus downloadBatchStatus) {
 
