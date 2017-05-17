@@ -75,4 +75,8 @@ class DownloadFileStatus {
     DownloadError getError() {
         return downloadError;
     }
+
+    Status getStatus() {
+        return status;
+    }
 }

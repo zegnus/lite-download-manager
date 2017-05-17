@@ -5,12 +5,41 @@ public class DownloadBatchStatus {
     private static final long ZERO_BYTES = 0;
 
     enum Status {
-        QUEUED,
-        DOWNLOADING,
-        PAUSED,
-        ERROR,
-        DELETION,
-        DOWNLOADED
+        QUEUED("queued"),
+        DOWNLOADING("downloading"),
+        PAUSED("paused"),
+        ERROR("error"),
+        DELETION("deletion"),
+        DOWNLOADED("downloaded");
+
+        private final String rawValue;
+
+        Status(String rawValue) {
+            this.rawValue = rawValue;
+        }
+
+        public String toRawValue() {
+            return rawValue;
+        }
+
+        public static Status fromRawValue(String rawValue) {
+            switch (rawValue) {
+                case "queued":
+                    return QUEUED;
+                case "downloading":
+                    return DOWNLOADING;
+                case "paused":
+                    return PAUSED;
+                case "error":
+                    return ERROR;
+                case "deletion":
+                    return DELETION;
+                case "downloaded":
+                    return DOWNLOADED;
+                default:
+                    throw new IllegalStateException("Status value " + rawValue + " is not supported");
+            }
+        }
     }
 
     private final DownloadBatchId downloadBatchId;

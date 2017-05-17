@@ -18,6 +18,7 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
     private final FileSizeRequester fileSizeRequester;
     private final PersistenceCreator persistenceCreator;
     private final Downloader downloader;
+    private final DownloadsPersistence downloadsPersistence;
 
     private DownloadServiceCommands downloadService;
 
@@ -26,13 +27,15 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
                         List<DownloadBatchCallback> callbacks,
                         FileSizeRequester fileSizeRequester,
                         PersistenceCreator persistenceCreator,
-                        Downloader downloader) {
+                        Downloader downloader,
+                        DownloadsPersistence downloadsPersistence) {
         this.callbackHandler = callbackHandler;
         this.downloadBatchMap = downloadBatchMap;
         this.callbacks = callbacks;
         this.fileSizeRequester = fileSizeRequester;
         this.persistenceCreator = persistenceCreator;
         this.downloader = downloader;
+        this.downloadsPersistence = downloadsPersistence;
     }
 
     void setDownloadService(DownloadServiceCommands downloadService) {
@@ -44,7 +47,8 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
 
     @Override
     public DownloadBatchId download(Batch batch) {
-        DownloadBatch downloadBatch = DownloadBatch.from(batch, fileSizeRequester, persistenceCreator, downloader);
+        DownloadBatch downloadBatch = DownloadBatch.newInstance(batch, fileSizeRequester, persistenceCreator, downloader, downloadsPersistence);
+        downloadBatch.persist();
         download(downloadBatch);
         return downloadBatch.getId();
     }
@@ -148,5 +152,24 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
         }
 
         return downloadBatchStatuses;
+    }
+
+    void loadFromPersistence() {
+        List<DownloadsPersistence.BatchPersisted> persistedBatches = downloadsPersistence.loadBatches();
+
+        for (DownloadsPersistence.BatchPersisted persistedBatch : persistedBatches) {
+            DownloadBatchStatus.Status status = persistedBatch.getDownloadBatchStatus();
+            DownloadBatchId downloadBatchId = persistedBatch.getDownloadBatchId();
+            DownloadBatch downloadBatch = DownloadBatch.loadFromPersistance(
+                    downloadBatchId,
+                    status,
+                    fileSizeRequester,
+                    persistenceCreator,
+                    downloader,
+                    downloadsPersistence
+            );
+
+            download(downloadBatch);
+        }
     }
 }

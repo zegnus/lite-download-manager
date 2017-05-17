@@ -12,7 +12,6 @@ interface FilePersistence {
         public boolean isMarkedAsError() {
             return this != SUCCESS;
         }
-
     }
 
     DownloadError.Error convertError(Status status);
