@@ -1,6 +1,6 @@
 package com.novoda.library;
 
-interface Persistence {
+interface FilePersistence {
 
     enum Status {
         SUCCESS,

@@ -29,8 +29,8 @@ class DownloadBatch {
             DownloadFileStatus downloadFileStatus = new DownloadFileStatus(downloadFileId, DownloadFileStatus.Status.QUEUED, fileSize, downloadError);
             FileName fileName = FileName.from(batch, fileUrl);
 
-            Persistence persistence = persistenceCreator.create();
-            DownloadFile downloadFile = new DownloadFile(fileUrl, downloadFileStatus, fileName, fileSize, fileSizeRequester, persistence, downloader);
+            FilePersistence filePersistence = persistenceCreator.create();
+            DownloadFile downloadFile = new DownloadFile(fileUrl, downloadFileStatus, fileName, fileSize, fileSizeRequester, filePersistence, downloader);
             downloadFiles.add(downloadFile);
         }
 

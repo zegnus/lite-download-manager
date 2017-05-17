@@ -13,9 +13,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import static com.novoda.library.DownloadError.Error.*;
-import static com.novoda.library.Persistence.Status.*;
+import static com.novoda.library.FilePersistence.Status.*;
 
-class ExternalPhysicalPersistence implements Persistence {
+class ExternalPhysicalFilePersistence implements FilePersistence {
 
     private static final String UNDEFINED_DIRECTORY_TYPE = null;
     private static final boolean APPEND = true;
@@ -26,7 +26,7 @@ class ExternalPhysicalPersistence implements Persistence {
     @Nullable
     private File file;
 
-    ExternalPhysicalPersistence(Context applicationContext) {
+    ExternalPhysicalFilePersistence(Context applicationContext) {
         this.context = applicationContext.getApplicationContext();
     }
 

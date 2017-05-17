@@ -9,9 +9,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import static com.novoda.library.Persistence.Status.*;
+import static com.novoda.library.FilePersistence.Status.*;
 
-class InternalPhysicalPersistence implements Persistence {
+class InternalPhysicalFilePersistence implements FilePersistence {
 
     private final Context context;
 
@@ -20,7 +20,7 @@ class InternalPhysicalPersistence implements Persistence {
     @Nullable
     private FileName fileName;
 
-    InternalPhysicalPersistence(Context applicationContext) {
+    InternalPhysicalFilePersistence(Context applicationContext) {
         this.context = applicationContext.getApplicationContext();
     }
 

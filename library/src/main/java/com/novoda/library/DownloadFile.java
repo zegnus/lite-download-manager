@@ -8,7 +8,7 @@ class DownloadFile {
     private final DownloadFileStatus downloadFileStatus;
     private final FileName fileName;
     private final FileSizeRequester fileSizeRequester;
-    private final Persistence persistence;
+    private final FilePersistence filePersistence;
     private final Downloader downloader;
 
     private FileSize fileSize;
@@ -18,13 +18,13 @@ class DownloadFile {
                  FileName fileName,
                  FileSize fileSize,
                  FileSizeRequester fileSizeRequester,
-                 Persistence persistence,
+                 FilePersistence filePersistence,
                  Downloader downloader) {
         this.url = url;
         this.downloadFileStatus = downloadFileStatus;
         this.fileName = fileName;
         this.fileSizeRequester = fileSizeRequester;
-        this.persistence = persistence;
+        this.filePersistence = filePersistence;
         this.downloader = downloader;
         this.fileSize = fileSize;
     }
@@ -44,19 +44,19 @@ class DownloadFile {
             return;
         }
 
-        Persistence.Status status = persistence.create(fileName, fileSize);
+        FilePersistence.Status status = filePersistence.create(fileName, fileSize);
         if (status.isMarkedAsError()) {
-            Error error = persistence.convertError(status);
+            Error error = filePersistence.convertError(status);
             updateAndFeedbackWithStatus(error, callback);
             return;
         }
 
-        fileSize.setCurrentSize(persistence.getCurrentSize());
+        fileSize.setCurrentSize(filePersistence.getCurrentSize());
 
         downloader.startDownloading(url, fileSize, new Downloader.Callback() {
             @Override
             public void onBytesRead(byte[] buffer, int bytesRead) {
-                boolean success = persistence.write(buffer, 0, bytesRead);
+                boolean success = filePersistence.write(buffer, 0, bytesRead);
                 if (!success) {
                     updateAndFeedbackWithStatus(Error.FILE_CANNOT_BE_WRITTEN, callback);
                 }
@@ -75,9 +75,9 @@ class DownloadFile {
 
             @Override
             public void onDownloadFinished() {
-                persistence.close();
+                filePersistence.close();
                 if (downloadFileStatus.isMarkedForDeletion()) {
-                    persistence.delete();
+                    filePersistence.delete();
                 }
             }
         });
@@ -121,7 +121,7 @@ class DownloadFile {
             downloadFileStatus.markForDeletion();
             downloader.stopDownloading();
         } else {
-            persistence.delete();
+            filePersistence.delete();
         }
     }
 
