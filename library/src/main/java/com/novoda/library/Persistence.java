@@ -5,13 +5,17 @@ interface Persistence {
     enum Status {
         SUCCESS,
         ERROR_UNKNOWN_TOTAL_FILE_SIZE,
-        ERROR_INSUFFICIENT_SPACE;
+        ERROR_INSUFFICIENT_SPACE,
+        ERROR_EXTERNAL_STORAGE_NON_WRITABLE,
+        ERROR_OPENING_FILE;
 
         public boolean isMarkedAsError() {
-            return this == ERROR_INSUFFICIENT_SPACE || this == ERROR_UNKNOWN_TOTAL_FILE_SIZE;
+            return this != SUCCESS;
         }
 
     }
+
+    DownloadError.Error convertError(Status status);
 
     Status create(FileName fileName, FileSize fileSize);
 

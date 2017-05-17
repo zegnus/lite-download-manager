@@ -22,11 +22,11 @@ public final class LiteDownloadManagerCreator {
     private LiteDownloadManager liteDownloadManager;
 
     private final FileSizeRequester fileSizeRequester;
-    private final Persistence persistence;
+    private final PersistenceCreator persistenceCreator;
     private final Downloader downloader;
 
     public static LiteDownloadManagerCreator newInstance(Context context) {
-        Persistence persistence = PersistenceCreator.createInternalPhysicalPersistence(context);
+        PersistenceCreator persistenceCreator = new PersistenceCreator(context, PersistenceCreator.Type.INTERNAL);
 
         OkHttpClient httpClient = new OkHttpClient();
         httpClient.setConnectTimeout(5, TimeUnit.SECONDS);
@@ -36,13 +36,16 @@ public final class LiteDownloadManagerCreator {
         FileSizeRequester fileSizeRequester = new NetworkFileSizeRequester(httpClient);
         Downloader downloader = new NetworkDownloader(httpClient);
 
-        return new LiteDownloadManagerCreator(context, fileSizeRequester, persistence, downloader);
+        return new LiteDownloadManagerCreator(context, fileSizeRequester, persistenceCreator, downloader);
     }
 
-    private LiteDownloadManagerCreator(Context context, FileSizeRequester fileSizeRequester, Persistence persistence, Downloader downloader) {
+    private LiteDownloadManagerCreator(Context context,
+                                       FileSizeRequester fileSizeRequester,
+                                       PersistenceCreator persistenceCreator,
+                                       Downloader downloader) {
         this.context = context;
         this.fileSizeRequester = fileSizeRequester;
-        this.persistence = persistence;
+        this.persistenceCreator = persistenceCreator;
         this.downloader = downloader;
     }
 
@@ -69,7 +72,7 @@ public final class LiteDownloadManagerCreator {
                 new HashMap<DownloadBatchId, DownloadBatch>(),
                 new ArrayList<DownloadBatchCallback>(),
                 fileSizeRequester,
-                persistence,
+                persistenceCreator,
                 downloader
         );
 

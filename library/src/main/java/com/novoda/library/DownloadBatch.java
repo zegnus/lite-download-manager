@@ -17,7 +17,7 @@ class DownloadBatch {
     private DownloadBatchCallback callback;
     private long totalBatchSizeBytes;
 
-    public static DownloadBatch from(Batch batch, FileSizeRequester fileSizeRequester, Persistence persistence, Downloader downloader) {
+    public static DownloadBatch from(Batch batch, FileSizeRequester fileSizeRequester, PersistenceCreator persistenceCreator, Downloader downloader) {
         DownloadBatchId downloadBatchId = DownloadBatchId.from(batch);
         List<String> fileUrls = batch.getFileUrls();
         List<DownloadFile> downloadFiles = new ArrayList<>(fileUrls.size());
@@ -29,6 +29,7 @@ class DownloadBatch {
             DownloadFileStatus downloadFileStatus = new DownloadFileStatus(downloadFileId, DownloadFileStatus.Status.QUEUED, fileSize, downloadError);
             FileName fileName = FileName.from(batch, fileUrl);
 
+            Persistence persistence = persistenceCreator.create();
             DownloadFile downloadFile = new DownloadFile(fileUrl, downloadFileStatus, fileName, fileSize, fileSizeRequester, persistence, downloader);
             downloadFiles.add(downloadFile);
         }

@@ -16,7 +16,7 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
     private final List<DownloadBatchCallback> callbacks;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final FileSizeRequester fileSizeRequester;
-    private final Persistence persistence;
+    private final PersistenceCreator persistenceCreator;
     private final Downloader downloader;
 
     private DownloadServiceCommands downloadService;
@@ -25,13 +25,13 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
                         Map<DownloadBatchId, DownloadBatch> downloadBatchMap,
                         List<DownloadBatchCallback> callbacks,
                         FileSizeRequester fileSizeRequester,
-                        Persistence persistence,
+                        PersistenceCreator persistenceCreator,
                         Downloader downloader) {
         this.callbackHandler = callbackHandler;
         this.downloadBatchMap = downloadBatchMap;
         this.callbacks = callbacks;
         this.fileSizeRequester = fileSizeRequester;
-        this.persistence = persistence;
+        this.persistenceCreator = persistenceCreator;
         this.downloader = downloader;
     }
 
@@ -44,7 +44,7 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
 
     @Override
     public DownloadBatchId download(Batch batch) {
-        DownloadBatch downloadBatch = DownloadBatch.from(batch, fileSizeRequester, persistence, downloader);
+        DownloadBatch downloadBatch = DownloadBatch.from(batch, fileSizeRequester, persistenceCreator, downloader);
         download(downloadBatch);
         return downloadBatch.getId();
     }

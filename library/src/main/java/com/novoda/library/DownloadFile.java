@@ -2,7 +2,7 @@ package com.novoda.library;
 
 import com.novoda.library.DownloadError.Error;
 
-public class DownloadFile {
+class DownloadFile {
 
     private final String url;
     private final DownloadFileStatus downloadFileStatus;
@@ -46,7 +46,8 @@ public class DownloadFile {
 
         Persistence.Status status = persistence.create(fileName, fileSize);
         if (status.isMarkedAsError()) {
-            updateAndFeedbackWithStatus(Error.FILE_CANNOT_BE_CREATED_LOCALLY_INSUFFICIENT_FREE_SPACE, callback);
+            Error error = persistence.convertError(status);
+            updateAndFeedbackWithStatus(error, callback);
             return;
         }
 
@@ -57,7 +58,7 @@ public class DownloadFile {
             public void onBytesRead(byte[] buffer, int bytesRead) {
                 boolean success = persistence.write(buffer, 0, bytesRead);
                 if (!success) {
-                    updateAndFeedbackWithStatus(Error.CANNOT_WRITE, callback);
+                    updateAndFeedbackWithStatus(Error.FILE_CANNOT_BE_WRITTEN, callback);
                 }
 
                 if (downloadFileStatus.isMarkedAsDownloading()) {
