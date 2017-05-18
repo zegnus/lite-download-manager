@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 
-  package="com.novoda.library">
+  package="com.novoda.litedownloadmanager">
 
   <uses-permission android:name="android.permission.INTERNET" />
 
@@ -13,7 +13,7 @@
     android:label="@string/app_name"
     android:supportsRtl="true">
 
-    <service android:name=".DownloadService" />
+    <service android:name="com.novoda.litedownloadmanager.DownloadService" />
 
   </application>
 
