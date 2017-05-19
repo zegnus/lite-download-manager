@@ -1,5 +1,4 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-
   package="com.novoda.litedownloadmanager">
 
   <uses-permission android:name="android.permission.INTERNET" />
@@ -14,6 +13,12 @@
     android:supportsRtl="true">
 
     <service android:name="com.novoda.litedownloadmanager.DownloadService" />
+
+    <provider
+      android:name="com.novoda.litedownloadmanager.DatabaseDownloadPersistence$ContentProvider"
+      android:authorities="com.novoda.litedownloadmanager"
+      android:exported="false"
+      android:syncable="false" />
 
   </application>
 

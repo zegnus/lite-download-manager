@@ -35,7 +35,7 @@ public final class LiteDownloadManagerCreator {
 
         FileSizeRequester fileSizeRequester = new NetworkFileSizeRequester(httpClient);
         Downloader downloader = new NetworkDownloader(httpClient);
-        DownloadsPersistence downloadsPersistence = new DatabaseDownloadPersistence();
+        DownloadsPersistence downloadsPersistence = DatabaseDownloadPersistence.newInstance(context.getContentResolver());
 
         return new LiteDownloadManagerCreator(context, fileSizeRequester, persistenceCreator, downloader, downloadsPersistence);
     }

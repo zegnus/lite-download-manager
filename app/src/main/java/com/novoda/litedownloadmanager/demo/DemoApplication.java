@@ -4,6 +4,7 @@ import android.app.Application;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.facebook.stetho.Stetho;
 import com.novoda.litedownloadmanager.LiteDownloadManagerCommands;
 import com.novoda.litedownloadmanager.LiteDownloadManagerCreator;
 
@@ -14,7 +15,7 @@ public class DemoApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-
+        Stetho.initializeWithDefaults(this);
         createLiteDownloadManager();
     }
 

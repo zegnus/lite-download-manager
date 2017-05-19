@@ -1,44 +1,33 @@
 package com.novoda.litedownloadmanager;
 
+import com.novoda.notils.logger.simple.Log;
+
 public class DownloadBatchStatus {
 
     private static final long ZERO_BYTES = 0;
 
     enum Status {
-        QUEUED("queued"),
-        DOWNLOADING("downloading"),
-        PAUSED("paused"),
-        ERROR("error"),
-        DELETION("deletion"),
-        DOWNLOADED("downloaded");
-
-        private final String rawValue;
-
-        Status(String rawValue) {
-            this.rawValue = rawValue;
-        }
+        QUEUED,
+        DOWNLOADING,
+        PAUSED,
+        ERROR,
+        DELETION,
+        DOWNLOADED,
+        UNKNOWN;
 
         public String toRawValue() {
-            return rawValue;
+            return this.name();
         }
 
-        public static Status fromRawValue(String rawValue) {
-            switch (rawValue) {
-                case "queued":
-                    return QUEUED;
-                case "downloading":
-                    return DOWNLOADING;
-                case "paused":
-                    return PAUSED;
-                case "error":
-                    return ERROR;
-                case "deletion":
-                    return DELETION;
-                case "downloaded":
-                    return DOWNLOADED;
-                default:
-                    throw new IllegalStateException("Status value " + rawValue + " is not supported");
+        public static Status from(String rawValue) {
+            for (Status status : Status.values()) {
+                if (status.name().equals(rawValue)) {
+                    return status;
+                }
             }
+
+            Log.e("Unsupported status " + rawValue);
+            return UNKNOWN;
         }
     }
 

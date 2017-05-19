@@ -1,5 +1,9 @@
 package com.novoda.litedownloadmanager;
 
+import com.novoda.notils.logger.simple.Log;
+
+import static android.R.attr.name;
+
 class DownloadFileStatus {
 
     enum Status {
@@ -7,7 +11,23 @@ class DownloadFileStatus {
         QUEUED,
         DOWNLOADING,
         DELETION,
-        ERROR
+        ERROR,
+        UNKNOWN;
+
+        public String toRawValue() {
+            return this.name();
+        }
+
+        public static Status from(String rawValue) {
+            for (Status status : Status.values()) {
+                if (status.name().equals(rawValue)) {
+                    return status;
+                }
+            }
+
+            Log.e("Unsupported status " + rawValue);
+            return UNKNOWN;
+        }
     }
 
     private final DownloadFileId downloadFileId;

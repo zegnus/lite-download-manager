@@ -44,7 +44,8 @@ interface DownloadsPersistence {
         private final DownloadFileStatus.Status status;
 
         FilePersisted(DownloadBatchId downloadBatchId,
-                      DownloadFileId downloadFileId, FileName fileName,
+                      DownloadFileId downloadFileId,
+                      FileName fileName,
                       FileSize fileSize,
                       String url,
                       DownloadFileStatus.Status status) {
