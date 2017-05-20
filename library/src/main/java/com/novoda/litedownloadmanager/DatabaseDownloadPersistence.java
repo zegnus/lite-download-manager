@@ -97,7 +97,6 @@ final class DatabaseDownloadPersistence implements DownloadsPersistence {
     }
 
     private static class DatabaseDownloadPersistenceFile {
-
         ContentProviderOperation createInsertOperationFor(FilePersisted filePersisted) {
             ContentValues values = new ContentValues();
             DB.Files.setStatus(filePersisted.getStatus().toRawValue(), values);

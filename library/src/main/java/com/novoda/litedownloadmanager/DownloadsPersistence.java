@@ -35,7 +35,6 @@ interface DownloadsPersistence {
     }
 
     class FilePersisted {
-
         private final DownloadBatchId downloadBatchId;
         private final DownloadFileId downloadFileId;
         private final FileName fileName;
