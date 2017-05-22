@@ -9,6 +9,10 @@ final class DownloadFileId {
         return new DownloadFileId(id.hashCode());
     }
 
+    public static DownloadFileId from(String id) {
+        return new DownloadFileId(Integer.valueOf(id));
+    }
+
     private DownloadFileId(int id) {
         this.id = id;
     }

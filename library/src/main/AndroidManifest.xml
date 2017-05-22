@@ -2,6 +2,7 @@
   package="com.novoda.litedownloadmanager">
 
   <uses-permission android:name="android.permission.INTERNET" />
+  <uses-permission android:name="android.permission.WAKE_LOCK" />
 
   <uses-permission
     android:name="android.permission.WRITE_EXTERNAL_STORAGE"
@@ -13,12 +14,6 @@
     android:supportsRtl="true">
 
     <service android:name="com.novoda.litedownloadmanager.DownloadService" />
-
-    <provider
-      android:name="com.novoda.litedownloadmanager.DatabaseDownloadPersistence$ContentProvider"
-      android:authorities="com.novoda.litedownloadmanager"
-      android:exported="false"
-      android:syncable="false" />
 
   </application>
 

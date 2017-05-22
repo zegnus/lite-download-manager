@@ -9,6 +9,10 @@ public final class DownloadBatchId {
         return new DownloadBatchId(id);
     }
 
+    public static DownloadBatchId from(String id) {
+        return new DownloadBatchId(id);
+    }
+
     private DownloadBatchId(String id) {
         this.id = id;
     }

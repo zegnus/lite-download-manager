@@ -13,7 +13,7 @@ class DownloadBatch {
     private final Map<DownloadFileId, Long> fileBytesDownloadedMap;
     private final DownloadBatchStatus downloadBatchStatus;
     private final List<DownloadFile> downloadFiles;
-    private final DownloadsPersistence downloadsPersistence;
+    private final DownloadsBatchPersistence downloadsBatchPersistence;
 
     private DownloadBatchCallback callback;
     private long totalBatchSizeBytes;
@@ -22,7 +22,8 @@ class DownloadBatch {
                                      FileSizeRequester fileSizeRequester,
                                      PersistenceCreator persistenceCreator,
                                      Downloader downloader,
-                                     DownloadsPersistence downloadsPersistence) {
+                                     DownloadsBatchPersistence downloadsBatchPersistence,
+                                     DownloadsFilePersistence downloadsFilePersistence) {
         DownloadBatchId downloadBatchId = DownloadBatchId.from(batch);
         List<String> fileUrls = batch.getFileUrls();
         List<DownloadFile> downloadFiles = new ArrayList<>(fileUrls.size());
@@ -43,7 +44,7 @@ class DownloadBatch {
                     fileSizeRequester,
                     filePersistence,
                     downloader,
-                    downloadsPersistence
+                    downloadsFilePersistence
             );
             downloadFiles.add(downloadFile);
         }
@@ -55,59 +56,20 @@ class DownloadBatch {
                 downloadFiles,
                 new HashMap<DownloadFileId, Long>(),
                 downloadBatchStatus,
-                downloadsPersistence
-        );
-    }
-
-    public static DownloadBatch loadFromPersistance(DownloadBatchId downloadBatchId,
-                                                    DownloadBatchStatus.Status status,
-                                                    FileSizeRequester fileSizeRequester,
-                                                    PersistenceCreator persistenceCreator,
-                                                    Downloader downloader,
-                                                    DownloadsPersistence downloadsPersistence) {
-        DownloadBatchStatus downloadBatchStatus = new DownloadBatchStatus(downloadBatchId, status);
-
-        List<DownloadsPersistence.FilePersisted> persistedFiles = downloadsPersistence.loadFiles(downloadBatchId);
-        List<DownloadFile> downloadFiles = new ArrayList<>(persistedFiles.size());
-        for (DownloadsPersistence.FilePersisted persistedFile : persistedFiles) {
-            FilePersistence filePersistence = persistenceCreator.create();
-            DownloadFileStatus downloadFileStatus = new DownloadFileStatus(
-                    persistedFile.getDownloadFileId(),
-                    persistedFile.getStatus(),
-                    persistedFile.getFileSize(),
-                    new DownloadError()
-            );
-            DownloadFile downloadFile = new DownloadFile(
-                    persistedFile.getUrl(),
-                    downloadFileStatus,
-                    persistedFile.getFileName(),
-                    persistedFile.getFileSize(),
-                    fileSizeRequester,
-                    filePersistence,
-                    downloader,
-                    downloadsPersistence
-            );
-            downloadFiles.add(downloadFile);
-        }
-
-        return new DownloadBatch(
-                downloadBatchId,
-                downloadFiles,
-                new HashMap<DownloadFileId, Long>(),
-                downloadBatchStatus,
-                downloadsPersistence
+                downloadsBatchPersistence
         );
     }
 
     DownloadBatch(DownloadBatchId downloadBatchId,
                   List<DownloadFile> downloadFiles,
                   Map<DownloadFileId, Long> fileBytesDownloadedMap,
-                  DownloadBatchStatus downloadBatchStatus, DownloadsPersistence downloadsPersistence) {
+                  DownloadBatchStatus downloadBatchStatus,
+                  DownloadsBatchPersistence downloadsBatchPersistence) {
         this.downloadBatchId = downloadBatchId;
         this.downloadFiles = downloadFiles;
         this.fileBytesDownloadedMap = fileBytesDownloadedMap;
         this.downloadBatchStatus = downloadBatchStatus;
-        this.downloadsPersistence = downloadsPersistence;
+        this.downloadsBatchPersistence = downloadsBatchPersistence;
     }
 
     void setCallback(DownloadBatchCallback callback) {
@@ -221,15 +183,6 @@ class DownloadBatch {
     }
 
     void persist() {
-        downloadsPersistence.startTransaction();
-
-        DownloadsPersistence.BatchPersisted batchPersisted = new DownloadsPersistence.BatchPersisted(downloadBatchId, downloadBatchStatus.status());
-        downloadsPersistence.persistBatch(batchPersisted);
-
-        for (DownloadFile downloadFile : downloadFiles) {
-            downloadFile.persistFileWith(downloadBatchId);
-        }
-
-        downloadsPersistence.endAndExecuteTransaction();
+        downloadsBatchPersistence.persistAsync(downloadBatchId, downloadBatchStatus.status(), downloadFiles);
     }
 }

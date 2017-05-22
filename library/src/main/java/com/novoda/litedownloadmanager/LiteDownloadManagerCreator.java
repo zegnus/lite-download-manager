@@ -12,6 +12,8 @@ import com.squareup.okhttp.OkHttpClient;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public final class LiteDownloadManagerCreator {
@@ -20,7 +22,8 @@ public final class LiteDownloadManagerCreator {
     private final FileSizeRequester fileSizeRequester;
     private final PersistenceCreator persistenceCreator;
     private final Downloader downloader;
-    private final DownloadsPersistence downloadsPersistence;
+    private final DownloadsBatchPersistence downloadsBatchPersistence;
+    private final DownloadsFilePersistence downloadsFilePersistence;
 
     private DownloadServiceCommands downloadService;
     private LiteDownloadManager liteDownloadManager;
@@ -35,21 +38,33 @@ public final class LiteDownloadManagerCreator {
 
         FileSizeRequester fileSizeRequester = new NetworkFileSizeRequester(httpClient);
         Downloader downloader = new NetworkDownloader(httpClient);
-        DownloadsPersistence downloadsPersistence = DatabaseDownloadPersistence.newInstance(context.getContentResolver());
+        RoomDownloadsPersistence downloadsPersistence = RoomDownloadsPersistence.newInstance(context);
 
-        return new LiteDownloadManagerCreator(context, fileSizeRequester, persistenceCreator, downloader, downloadsPersistence);
+        Executor executor = Executors.newSingleThreadExecutor();
+        DownloadsFilePersistence downloadsFilePersistence = new DownloadsFilePersistence(downloadsPersistence);
+        DownloadsBatchPersistence downloadsBatchPersistence = new DownloadsBatchPersistence(executor, downloadsFilePersistence, downloadsPersistence);
+
+        return new LiteDownloadManagerCreator(
+                context,
+                fileSizeRequester,
+                persistenceCreator,
+                downloader,
+                downloadsBatchPersistence,
+                downloadsFilePersistence
+        );
     }
 
     private LiteDownloadManagerCreator(Context context,
                                        FileSizeRequester fileSizeRequester,
                                        PersistenceCreator persistenceCreator,
                                        Downloader downloader,
-                                       DownloadsPersistence downloadsPersistence) {
+                                       DownloadsBatchPersistence downloadsBatchPersistence, DownloadsFilePersistence downloadsFilePersistence) {
         this.context = context;
         this.fileSizeRequester = fileSizeRequester;
         this.persistenceCreator = persistenceCreator;
         this.downloader = downloader;
-        this.downloadsPersistence = downloadsPersistence;
+        this.downloadsBatchPersistence = downloadsBatchPersistence;
+        this.downloadsFilePersistence = downloadsFilePersistence;
     }
 
     public LiteDownloadManager create(final Handler callbackHandler) {
@@ -59,8 +74,7 @@ public final class LiteDownloadManagerCreator {
             public void onServiceConnected(ComponentName name, IBinder service) {
                 DownloadService.DownloadServiceBinder binder = (DownloadService.DownloadServiceBinder) service;
                 downloadService = binder.getService();
-                liteDownloadManager.loadFromPersistence();
-                liteDownloadManager.setDownloadService(downloadService);
+                liteDownloadManager.initialise(downloadService);
             }
 
             @Override
@@ -78,7 +92,8 @@ public final class LiteDownloadManagerCreator {
                 fileSizeRequester,
                 persistenceCreator,
                 downloader,
-                downloadsPersistence
+                downloadsBatchPersistence,
+                downloadsFilePersistence
         );
 
         return liteDownloadManager;

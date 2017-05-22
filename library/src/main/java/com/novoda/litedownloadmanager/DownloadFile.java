@@ -9,9 +9,9 @@ class DownloadFile {
     private final FileName fileName;
     private final FileSizeRequester fileSizeRequester;
     private final FilePersistence filePersistence;
-    private final DownloadsPersistence downloadsPersistence;
-
+    private final DownloadsFilePersistence downloadsFilePersistence;
     private final Downloader downloader;
+
     private FileSize fileSize;
 
     DownloadFile(String url,
@@ -21,7 +21,7 @@ class DownloadFile {
                  FileSizeRequester fileSizeRequester,
                  FilePersistence filePersistence,
                  Downloader downloader,
-                 DownloadsPersistence downloadsPersistence) {
+                 DownloadsFilePersistence downloadsFilePersistence) {
         this.url = url;
         this.downloadFileStatus = downloadFileStatus;
         this.fileName = fileName;
@@ -29,7 +29,7 @@ class DownloadFile {
         this.filePersistence = filePersistence;
         this.downloader = downloader;
         this.fileSize = fileSize;
-        this.downloadsPersistence = downloadsPersistence;
+        this.downloadsFilePersistence = downloadsFilePersistence;
     }
 
     void download(final Callback callback) {
@@ -137,16 +137,8 @@ class DownloadFile {
         return fileSize.getTotalSize();
     }
 
-    void persistFileWith(DownloadBatchId downloadBatchId) {
-        DownloadsPersistence.FilePersisted filePersisted = new DownloadsPersistence.FilePersisted(
-                downloadBatchId,
-                downloadFileStatus.getDownloadFileId(),
-                fileName,
-                fileSize,
-                url,
-                downloadFileStatus.getStatus()
-        );
-        downloadsPersistence.persistFile(filePersisted);
+    void persistSync(DownloadBatchId downloadBatchId) {
+        downloadsFilePersistence.persistSync(downloadBatchId, fileName, fileSize, url, downloadFileStatus);
     }
 
     interface Callback {

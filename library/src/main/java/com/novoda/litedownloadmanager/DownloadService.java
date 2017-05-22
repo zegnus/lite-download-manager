@@ -42,10 +42,9 @@ public class DownloadService extends Service implements DownloadServiceCommands 
 
     @Override
     public void download(final DownloadBatch downloadBatch, final DownloadBatchCallback callback) {
-        DownloadBatchStatus downloadBatchStatus = downloadBatch.getDownloadBatchStatus();
-
         startNotification();
 
+        DownloadBatchStatus downloadBatchStatus = downloadBatch.getDownloadBatchStatus();
         downloadBatchStatus.markAsQueued();
         callback.onUpdate(downloadBatchStatus);
 

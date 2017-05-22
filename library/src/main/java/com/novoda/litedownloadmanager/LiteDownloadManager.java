@@ -10,15 +10,17 @@ import java.util.concurrent.Executors;
 
 class LiteDownloadManager implements LiteDownloadManagerCommands {
 
+    private static final Object WAIT_FOR_DOWNLOAD_SERVICE = new Object();
+    private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
+
     private final Handler callbackHandler;
     private final Map<DownloadBatchId, DownloadBatch> downloadBatchMap;
-    private final Object waitForDownloadService = new Object();
     private final List<DownloadBatchCallback> callbacks;
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final FileSizeRequester fileSizeRequester;
     private final PersistenceCreator persistenceCreator;
     private final Downloader downloader;
-    private final DownloadsPersistence downloadsPersistence;
+    private final DownloadsBatchPersistence downloadsBatchPersistence;
+    private final DownloadsFilePersistence downloadsFilePersistence;
 
     private DownloadServiceCommands downloadService;
 
@@ -28,26 +30,52 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
                         FileSizeRequester fileSizeRequester,
                         PersistenceCreator persistenceCreator,
                         Downloader downloader,
-                        DownloadsPersistence downloadsPersistence) {
+                        DownloadsBatchPersistence downloadsBatchPersistence,
+                        DownloadsFilePersistence downloadsFilePersistence) {
         this.callbackHandler = callbackHandler;
         this.downloadBatchMap = downloadBatchMap;
         this.callbacks = callbacks;
         this.fileSizeRequester = fileSizeRequester;
         this.persistenceCreator = persistenceCreator;
         this.downloader = downloader;
-        this.downloadsPersistence = downloadsPersistence;
+        this.downloadsBatchPersistence = downloadsBatchPersistence;
+        this.downloadsFilePersistence = downloadsFilePersistence;
     }
 
-    void setDownloadService(DownloadServiceCommands downloadService) {
+    void initialise(final DownloadServiceCommands downloadService) {
+        downloadsBatchPersistence.loadAsync(
+                fileSizeRequester,
+                persistenceCreator,
+                downloader,
+                new DownloadsBatchPersistence.LoadBatchesCallback() {
+                    @Override
+                    public void onLoaded(List<DownloadBatch> downloadBatches) {
+                        for (DownloadBatch downloadBatch : downloadBatches) {
+                            download(downloadBatch);
+                        }
+
+                        setDownloadService(downloadService);
+                    }
+                }
+        );
+    }
+
+    private void setDownloadService(DownloadServiceCommands downloadService) {
         this.downloadService = downloadService;
-        synchronized (waitForDownloadService) {
-            waitForDownloadService.notifyAll();
+        synchronized (WAIT_FOR_DOWNLOAD_SERVICE) {
+            WAIT_FOR_DOWNLOAD_SERVICE.notifyAll();
         }
     }
 
     @Override
     public DownloadBatchId download(Batch batch) {
-        DownloadBatch downloadBatch = DownloadBatch.newInstance(batch, fileSizeRequester, persistenceCreator, downloader, downloadsPersistence);
+        DownloadBatch downloadBatch = DownloadBatch.newInstance(
+                batch,
+                fileSizeRequester,
+                persistenceCreator,
+                downloader,
+                downloadsBatchPersistence,
+                downloadsFilePersistence);
         downloadBatch.persist();
         download(downloadBatch);
         return downloadBatch.getId();
@@ -63,7 +91,7 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
     }
 
     private void ensureDownloadServiceExistsAndProceed(final DownloadBatch downloadBatch) {
-        executor.submit(new Runnable() {
+        EXECUTOR.submit(new Runnable() {
             @Override
             public void run() {
                 waitForDownloadService();
@@ -91,8 +119,8 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
     private void waitForDownloadService() {
         if (downloadService == null) {
             try {
-                synchronized (waitForDownloadService) {
-                    waitForDownloadService.wait();
+                synchronized (WAIT_FOR_DOWNLOAD_SERVICE) {
+                    WAIT_FOR_DOWNLOAD_SERVICE.wait();
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -152,24 +180,5 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
         }
 
         return downloadBatchStatuses;
-    }
-
-    void loadFromPersistence() {
-        List<DownloadsPersistence.BatchPersisted> persistedBatches = downloadsPersistence.loadBatches();
-
-        for (DownloadsPersistence.BatchPersisted persistedBatch : persistedBatches) {
-            DownloadBatchStatus.Status status = persistedBatch.getDownloadBatchStatus();
-            DownloadBatchId downloadBatchId = persistedBatch.getDownloadBatchId();
-            DownloadBatch downloadBatch = DownloadBatch.loadFromPersistance(
-                    downloadBatchId,
-                    status,
-                    fileSizeRequester,
-                    persistenceCreator,
-                    downloader,
-                    downloadsPersistence
-            );
-
-            download(downloadBatch);
-        }
     }
 }

@@ -27,7 +27,6 @@ class PersistenceCreator {
             case EXTERNAL:
                 return new ExternalPhysicalFilePersistence(context);
             case CUSTOM:
-                // TODO
                 Log.w("Persistence of type CUSTOM is not yet implemented");
                 throw new IllegalStateException("Persistence of type CUSTOM is not yet implemented");
             default:

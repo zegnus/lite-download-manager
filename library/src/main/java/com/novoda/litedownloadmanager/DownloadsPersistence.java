@@ -6,7 +6,9 @@ interface DownloadsPersistence {
 
     void startTransaction();
 
-    void endAndExecuteTransaction();
+    void endTransaction();
+
+    void transactionSuccess();
 
     void persistBatch(BatchPersisted batchPersisted);
 

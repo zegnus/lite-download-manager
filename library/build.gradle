@@ -5,18 +5,11 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:2.3.2'
         classpath 'com.novoda:bintray-release:0.3.4'
-        classpath 'com.novoda:sqlite-analyzer:0.3.2'
     }
 }
 
 apply plugin: 'com.android.library'
 apply plugin: 'bintray-release'
-apply plugin: 'com.novoda.sqlite-analyzer'
-
-sqliteAccess {
-    migrationsDir 'src/main/assets/migrations'
-    packageName 'com.novoda.litedownloadmanager'
-}
 
 android {
     compileSdkVersion 25
@@ -26,7 +19,7 @@ android {
         minSdkVersion 14
         targetSdkVersion 25
         versionCode 1
-        versionName "1.0"
+        versionName "0.1"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -45,8 +38,6 @@ dependencies {
     compile 'com.android.support:support-v4:25.3.1'
     compile 'com.novoda:notils:2.2.13'
     compile 'com.squareup.okhttp:okhttp:2.3.0'
-    compile 'com.evernote:android-job:1.1.7'
-    compile 'com.novoda:sqlite-provider:2.0.0'
     compile 'com.facebook.stetho:stetho:1.5.0'
     compile 'android.arch.persistence.room:runtime:1.0.0-alpha1'
 

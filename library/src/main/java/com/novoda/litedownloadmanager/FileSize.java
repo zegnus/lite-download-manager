@@ -15,7 +15,7 @@ class FileSize {
         return new FileSize(ZERO_BYTES, totalFileSize);
     }
 
-    private FileSize(long currentSize, long totalSize) {
+    FileSize(long currentSize, long totalSize) {
         this.currentSize = currentSize;
         this.totalSize = totalSize;
     }
