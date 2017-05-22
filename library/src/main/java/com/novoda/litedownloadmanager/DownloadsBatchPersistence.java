@@ -79,6 +79,21 @@ class DownloadsBatchPersistence {
         });
     }
 
+    void deleteAsync(final DownloadBatchId downloadBatchId) {
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                downloadsPersistence.startTransaction();
+                try {
+                    downloadsPersistence.delete(downloadBatchId);
+                    downloadsPersistence.transactionSuccess();
+                } finally {
+                    downloadsPersistence.endTransaction();
+                }
+            }
+        });
+    }
+
     interface LoadBatchesCallback {
 
         void onLoaded(List<DownloadBatch> downloadBatches);

@@ -18,6 +18,8 @@ interface DownloadsPersistence {
 
     List<FilePersisted> loadFiles(DownloadBatchId batchId);
 
+    void delete(DownloadBatchId downloadBatchId);
+
     class BatchPersisted {
         private final DownloadBatchId downloadBatchId;
         private final DownloadBatchStatus.Status status;

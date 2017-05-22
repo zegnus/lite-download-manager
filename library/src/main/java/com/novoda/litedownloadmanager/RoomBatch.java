@@ -2,9 +2,10 @@ package com.novoda.litedownloadmanager;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 
-@Entity
+@Entity(indices={@Index("batch_id")})
 class RoomBatch {
 
     @PrimaryKey

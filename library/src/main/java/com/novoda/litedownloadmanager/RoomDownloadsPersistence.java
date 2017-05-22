@@ -78,8 +78,8 @@ class RoomDownloadsPersistence implements DownloadsPersistence {
     }
 
     @Override
-    public List<FilePersisted> loadFiles(DownloadBatchId batchId) {
-        List<RoomFile> roomFiles = database.roomFileDao().loadAllFilesFor(batchId.getId());
+    public List<FilePersisted> loadFiles(DownloadBatchId downloadBatchId) {
+        List<RoomFile> roomFiles = database.roomFileDao().loadAllFilesFor(downloadBatchId.getId());
         List<FilePersisted> filePersistedList = new ArrayList<>(roomFiles.size());
         for (RoomFile roomFile : roomFiles) {
             FilePersisted filePersisted = new FilePersisted(
@@ -94,5 +94,11 @@ class RoomDownloadsPersistence implements DownloadsPersistence {
         }
 
         return filePersistedList;
+    }
+
+    @Override
+    public void delete(DownloadBatchId downloadBatchId) {
+        RoomBatch roomBatch = database.roomBatchDao().load(downloadBatchId.getId());
+        database.roomBatchDao().delete(roomBatch);
     }
 }

@@ -167,6 +167,7 @@ class DownloadBatch {
     }
 
     void delete() {
+        downloadsBatchPersistence.deleteAsync(downloadBatchId);
         downloadBatchStatus.markForDeletion();
         notifyCallback(downloadBatchStatus);
         for (DownloadFile downloadFile : downloadFiles) {
