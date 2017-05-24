@@ -25,4 +25,6 @@ interface FilePersistence {
     long getCurrentSize();
 
     void close();
+
+    FilePersistenceType getType();
 }

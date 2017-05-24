@@ -1,7 +1,6 @@
 package com.novoda.litedownloadmanager;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Executor;
 
@@ -40,7 +39,7 @@ class DownloadsBatchPersistence {
     }
 
     void loadAsync(final FileSizeRequester fileSizeRequester,
-                   final PersistenceCreator persistenceCreator,
+                   final FilePersistenceCreator filePersistenceCreator,
                    final Downloader downloader,
                    final DownloadsBatchPersistence downloadsBatchPersistence,
                    final LoadBatchesCallback callback) {
@@ -58,20 +57,18 @@ class DownloadsBatchPersistence {
                             downloadBatchId,
                             status
                     );
-                    FilePersistence filePersistence = persistenceCreator.create();
 
                     List<DownloadFile> downloadFiles = downloadsFilePersistence.loadSync(
                             downloadBatchId,
                             fileSizeRequester,
-                            filePersistence,
+                            filePersistenceCreator,
                             downloader,
                             downloadsFilePersistence
                     );
 
-                    DownloadBatch downloadBatch = new DownloadBatch(
+                    DownloadBatch downloadBatch = DownloadBatch.newInstance(
                             downloadBatchId,
                             downloadFiles,
-                            new HashMap<DownloadFileId, Long>(),
                             downloadBatchStatus,
                             DownloadsBatchPersistence.this
                     );

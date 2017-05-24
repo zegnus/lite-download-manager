@@ -46,17 +46,20 @@ interface DownloadsPersistence {
         private final FileName fileName;
         private final long totalFileSize;
         private final String url;
+        private final FilePersistenceType filePersistenceType;
 
         FilePersisted(DownloadBatchId downloadBatchId,
                       DownloadFileId downloadFileId,
                       FileName fileName,
                       long totalFileSize,
-                      String url) {
+                      String url,
+                      FilePersistenceType filePersistenceType) {
             this.downloadBatchId = downloadBatchId;
             this.downloadFileId = downloadFileId;
             this.fileName = fileName;
             this.totalFileSize = totalFileSize;
             this.url = url;
+            this.filePersistenceType = filePersistenceType;
         }
 
         DownloadBatchId getDownloadBatchId() {
@@ -77,6 +80,10 @@ interface DownloadsPersistence {
 
         DownloadFileId getDownloadFileId() {
             return downloadFileId;
+        }
+
+        public FilePersistenceType getFilePersistenceType() {
+            return filePersistenceType;
         }
     }
 }

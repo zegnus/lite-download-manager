@@ -9,6 +9,10 @@ final class FileName {
         return new FileName(String.valueOf(name.hashCode()));
     }
 
+    public static FileName from(String name) {
+        return new FileName(name);
+    }
+
     FileName(String name) {
         this.name = name;
     }

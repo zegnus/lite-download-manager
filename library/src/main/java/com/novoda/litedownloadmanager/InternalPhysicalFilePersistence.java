@@ -122,4 +122,9 @@ class InternalPhysicalFilePersistence implements FilePersistence {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public FilePersistenceType getType() {
+        return FilePersistenceType.INTERNAL;
+    }
 }

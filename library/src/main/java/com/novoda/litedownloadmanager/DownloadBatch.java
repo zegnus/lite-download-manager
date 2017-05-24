@@ -20,7 +20,7 @@ class DownloadBatch {
 
     static DownloadBatch newInstance(Batch batch,
                                      FileSizeRequester fileSizeRequester,
-                                     PersistenceCreator persistenceCreator,
+                                     FilePersistenceCreator filePersistenceCreator,
                                      Downloader downloader,
                                      DownloadsBatchPersistence downloadsBatchPersistence,
                                      DownloadsFilePersistence downloadsFilePersistence) {
@@ -35,7 +35,7 @@ class DownloadBatch {
             DownloadFileStatus downloadFileStatus = new DownloadFileStatus(downloadFileId, DownloadFileStatus.Status.QUEUED, fileSize, downloadError);
             FileName fileName = FileName.from(batch, fileUrl);
 
-            FilePersistence filePersistence = persistenceCreator.create();
+            FilePersistence filePersistence = filePersistenceCreator.create();
             DownloadFile downloadFile = new DownloadFile(
                     downloadBatchId,
                     fileUrl,
@@ -56,6 +56,19 @@ class DownloadBatch {
                 DownloadBatchStatus.Status.QUEUED
         );
 
+        return new DownloadBatch(
+                downloadBatchId,
+                downloadFiles,
+                new HashMap<DownloadFileId, Long>(),
+                downloadBatchStatus,
+                downloadsBatchPersistence
+        );
+    }
+
+    static DownloadBatch newInstance(DownloadBatchId downloadBatchId,
+                                     List<DownloadFile> downloadFiles,
+                                     DownloadBatchStatus downloadBatchStatus,
+                                     DownloadsBatchPersistence downloadsBatchPersistence) {
         return new DownloadBatch(
                 downloadBatchId,
                 downloadFiles,

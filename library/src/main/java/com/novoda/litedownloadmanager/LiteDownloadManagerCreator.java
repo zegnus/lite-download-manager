@@ -20,7 +20,7 @@ public final class LiteDownloadManagerCreator {
 
     private final Context context;
     private final FileSizeRequester fileSizeRequester;
-    private final PersistenceCreator persistenceCreator;
+    private final FilePersistenceCreator filePersistenceCreator;
     private final Downloader downloader;
     private final DownloadsBatchPersistence downloadsBatchPersistence;
     private final DownloadsFilePersistence downloadsFilePersistence;
@@ -29,7 +29,7 @@ public final class LiteDownloadManagerCreator {
     private LiteDownloadManager liteDownloadManager;
 
     public static LiteDownloadManagerCreator newInstance(Context context) {
-        PersistenceCreator persistenceCreator = new PersistenceCreator(context, PersistenceCreator.Type.INTERNAL);
+        FilePersistenceCreator filePersistenceCreator = new FilePersistenceCreator(context, FilePersistenceType.INTERNAL);
 
         OkHttpClient httpClient = new OkHttpClient();
         httpClient.setConnectTimeout(5, TimeUnit.SECONDS);
@@ -47,7 +47,7 @@ public final class LiteDownloadManagerCreator {
         return new LiteDownloadManagerCreator(
                 context,
                 fileSizeRequester,
-                persistenceCreator,
+                filePersistenceCreator,
                 downloader,
                 downloadsBatchPersistence,
                 downloadsFilePersistence
@@ -56,12 +56,12 @@ public final class LiteDownloadManagerCreator {
 
     private LiteDownloadManagerCreator(Context context,
                                        FileSizeRequester fileSizeRequester,
-                                       PersistenceCreator persistenceCreator,
+                                       FilePersistenceCreator filePersistenceCreator,
                                        Downloader downloader,
                                        DownloadsBatchPersistence downloadsBatchPersistence, DownloadsFilePersistence downloadsFilePersistence) {
         this.context = context;
         this.fileSizeRequester = fileSizeRequester;
-        this.persistenceCreator = persistenceCreator;
+        this.filePersistenceCreator = filePersistenceCreator;
         this.downloader = downloader;
         this.downloadsBatchPersistence = downloadsBatchPersistence;
         this.downloadsFilePersistence = downloadsFilePersistence;
@@ -90,7 +90,7 @@ public final class LiteDownloadManagerCreator {
                 new HashMap<DownloadBatchId, DownloadBatch>(),
                 new ArrayList<DownloadBatchCallback>(),
                 fileSizeRequester,
-                persistenceCreator,
+                filePersistenceCreator,
                 downloader,
                 downloadsBatchPersistence,
                 downloadsFilePersistence

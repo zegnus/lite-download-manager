@@ -11,13 +11,19 @@ class DownloadsFilePersistence {
         this.downloadsPersistence = downloadsPersistence;
     }
 
-    void persistSync(DownloadBatchId downloadBatchId, FileName fileName, FileSize fileSize, String url, DownloadFileId downloadFileId) {
+    void persistSync(DownloadBatchId downloadBatchId,
+                     FileName fileName,
+                     FileSize fileSize,
+                     String url,
+                     DownloadFileId downloadFileId,
+                     FilePersistenceType filePersistenceType) {
         DownloadsPersistence.FilePersisted filePersisted = new DownloadsPersistence.FilePersisted(
                 downloadBatchId,
                 downloadFileId,
                 fileName,
                 fileSize.getTotalSize(),
-                url
+                url,
+                filePersistenceType
         );
 
         downloadsPersistence.persistFile(filePersisted);
@@ -25,7 +31,7 @@ class DownloadsFilePersistence {
 
     List<DownloadFile> loadSync(DownloadBatchId batchId,
                                 FileSizeRequester fileSizeRequester,
-                                FilePersistence filePersistence,
+                                FilePersistenceCreator filePersistenceCreator,
                                 Downloader downloader,
                                 DownloadsFilePersistence downloadsFilePersistence) {
         List<DownloadsPersistence.FilePersisted> filePersistedList = downloadsPersistence.loadFiles(batchId);
@@ -52,7 +58,7 @@ class DownloadsFilePersistence {
                     fileName,
                     fileSize,
                     fileSizeRequester,
-                    filePersistence,
+                    filePersistenceCreator.create(filePersisted.getFilePersistenceType()),
                     downloader,
                     downloadsFilePersistence
             );

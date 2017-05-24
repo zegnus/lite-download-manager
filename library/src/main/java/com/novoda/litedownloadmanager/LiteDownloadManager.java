@@ -17,7 +17,7 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
     private final Map<DownloadBatchId, DownloadBatch> downloadBatchMap;
     private final List<DownloadBatchCallback> callbacks;
     private final FileSizeRequester fileSizeRequester;
-    private final PersistenceCreator persistenceCreator;
+    private final FilePersistenceCreator filePersistenceCreator;
     private final Downloader downloader;
     private final DownloadsBatchPersistence downloadsBatchPersistence;
     private final DownloadsFilePersistence downloadsFilePersistence;
@@ -28,7 +28,7 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
                         Map<DownloadBatchId, DownloadBatch> downloadBatchMap,
                         List<DownloadBatchCallback> callbacks,
                         FileSizeRequester fileSizeRequester,
-                        PersistenceCreator persistenceCreator,
+                        FilePersistenceCreator filePersistenceCreator,
                         Downloader downloader,
                         DownloadsBatchPersistence downloadsBatchPersistence,
                         DownloadsFilePersistence downloadsFilePersistence) {
@@ -36,7 +36,7 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
         this.downloadBatchMap = downloadBatchMap;
         this.callbacks = callbacks;
         this.fileSizeRequester = fileSizeRequester;
-        this.persistenceCreator = persistenceCreator;
+        this.filePersistenceCreator = filePersistenceCreator;
         this.downloader = downloader;
         this.downloadsBatchPersistence = downloadsBatchPersistence;
         this.downloadsFilePersistence = downloadsFilePersistence;
@@ -45,7 +45,7 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
     void initialise(final DownloadServiceCommands downloadService) {
         downloadsBatchPersistence.loadAsync(
                 fileSizeRequester,
-                persistenceCreator,
+                filePersistenceCreator,
                 downloader,
                 downloadsBatchPersistence,
                 new DownloadsBatchPersistence.LoadBatchesCallback() {
@@ -73,7 +73,7 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
         DownloadBatch downloadBatch = DownloadBatch.newInstance(
                 batch,
                 fileSizeRequester,
-                persistenceCreator,
+                filePersistenceCreator,
                 downloader,
                 downloadsBatchPersistence,
                 downloadsFilePersistence);

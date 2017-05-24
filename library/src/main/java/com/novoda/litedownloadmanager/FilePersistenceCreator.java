@@ -4,23 +4,20 @@ import android.content.Context;
 
 import com.novoda.notils.logger.simple.Log;
 
-class PersistenceCreator {
-
-    enum Type {
-        INTERNAL,
-        EXTERNAL,
-        CUSTOM
-    }
-
+class FilePersistenceCreator {
     private final Context context;
-    private final Type type;
+    private final FilePersistenceType type;
 
-    PersistenceCreator(Context context, Type type) {
+    FilePersistenceCreator(Context context, FilePersistenceType type) {
         this.context = context.getApplicationContext();
         this.type = type;
     }
 
     FilePersistence create() {
+        return create(type);
+    }
+
+    FilePersistence create(FilePersistenceType type) {
         switch (type) {
             case INTERNAL:
                 return new InternalPhysicalFilePersistence(context);

@@ -161,4 +161,9 @@ class ExternalPhysicalFilePersistence implements FilePersistence {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public FilePersistenceType getType() {
+        return FilePersistenceType.EXTERNAL;
+    }
 }

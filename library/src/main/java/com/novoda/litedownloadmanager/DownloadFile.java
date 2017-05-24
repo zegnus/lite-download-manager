@@ -143,7 +143,14 @@ class DownloadFile {
     }
 
     void persistSync() {
-        downloadsFilePersistence.persistSync(downloadBatchId, fileName, fileSize, url, downloadFileStatus.getDownloadFileId());
+        downloadsFilePersistence.persistSync(
+                downloadBatchId,
+                fileName,
+                fileSize,
+                url,
+                downloadFileStatus.getDownloadFileId(),
+                filePersistence.getType()
+        );
     }
 
     interface Callback {

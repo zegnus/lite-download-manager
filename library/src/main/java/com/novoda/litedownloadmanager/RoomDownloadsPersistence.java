@@ -83,9 +83,10 @@ class RoomDownloadsPersistence implements DownloadsPersistence {
             FilePersisted filePersisted = new FilePersisted(
                     DownloadBatchId.from(roomFile.batchId),
                     DownloadFileId.from(roomFile.fileId),
-                    new FileName(roomFile.name),
+                    FileName.from(roomFile.name),
                     roomFile.totalSize,
-                    roomFile.url
+                    roomFile.url,
+                    FilePersistenceType.from(roomFile.persistenceType)
             );
             filePersistedList.add(filePersisted);
         }
