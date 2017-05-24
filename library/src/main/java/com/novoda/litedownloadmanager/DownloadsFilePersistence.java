@@ -11,14 +11,13 @@ class DownloadsFilePersistence {
         this.downloadsPersistence = downloadsPersistence;
     }
 
-    void persistSync(DownloadBatchId downloadBatchId, FileName fileName, FileSize fileSize, String url, DownloadFileStatus downloadFileStatus) {
+    void persistSync(DownloadBatchId downloadBatchId, FileName fileName, FileSize fileSize, String url, DownloadFileId downloadFileId) {
         DownloadsPersistence.FilePersisted filePersisted = new DownloadsPersistence.FilePersisted(
                 downloadBatchId,
-                downloadFileStatus.getDownloadFileId(),
+                downloadFileId,
                 fileName,
-                fileSize,
-                url,
-                downloadFileStatus.getStatus()
+                fileSize.getTotalSize(),
+                url
         );
 
         downloadsPersistence.persistFile(filePersisted);
@@ -34,15 +33,20 @@ class DownloadsFilePersistence {
         List<DownloadFile> downloadFiles = new ArrayList<>(filePersistedList.size());
         for (DownloadsPersistence.FilePersisted filePersisted : filePersistedList) {
 
-            DownloadFileStatus.Status status = filePersisted.getStatus();
             DownloadFileId downloadFileId = filePersisted.getDownloadFileId();
             FileName fileName = filePersisted.getFileName();
-            FileSize fileSize = filePersisted.getFileSize();
+            FileSize fileSize = FileSize.Total(filePersisted.getTotalFileSize());
             String url = filePersisted.getUrl();
 
-            DownloadFileStatus downloadFileStatus = new DownloadFileStatus(downloadFileId, status, fileSize, new DownloadError());
+            DownloadFileStatus downloadFileStatus = new DownloadFileStatus(
+                    downloadFileId,
+                    DownloadFileStatus.Status.QUEUED,
+                    fileSize,
+                    new DownloadError()
+            );
 
             DownloadFile downloadFile = new DownloadFile(
+                    batchId,
                     url,
                     downloadFileStatus,
                     fileName,
@@ -52,10 +56,10 @@ class DownloadsFilePersistence {
                     downloader,
                     downloadsFilePersistence
             );
+
             downloadFiles.add(downloadFile);
         }
 
         return downloadFiles;
-
     }
 }

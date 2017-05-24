@@ -28,7 +28,7 @@ class DownloadsBatchPersistence {
                     downloadsPersistence.persistBatch(batchPersisted);
 
                     for (DownloadFile downloadFile : downloadFiles) {
-                        downloadFile.persistSync(downloadBatchId);
+                        downloadFile.persistSync();
                     }
 
                     downloadsPersistence.transactionSuccess();
@@ -42,6 +42,7 @@ class DownloadsBatchPersistence {
     void loadAsync(final FileSizeRequester fileSizeRequester,
                    final PersistenceCreator persistenceCreator,
                    final Downloader downloader,
+                   final DownloadsBatchPersistence downloadsBatchPersistence,
                    final LoadBatchesCallback callback) {
         executor.execute(new Runnable() {
             @Override
@@ -52,7 +53,11 @@ class DownloadsBatchPersistence {
                 for (DownloadsPersistence.BatchPersisted batchPersisted : batchPersistedList) {
                     DownloadBatchStatus.Status status = batchPersisted.getDownloadBatchStatus();
                     DownloadBatchId downloadBatchId = batchPersisted.getDownloadBatchId();
-                    DownloadBatchStatus downloadBatchStatus = new DownloadBatchStatus(downloadBatchId, status);
+                    DownloadBatchStatus downloadBatchStatus = new DownloadBatchStatus(
+                            downloadsBatchPersistence,
+                            downloadBatchId,
+                            status
+                    );
                     FilePersistence filePersistence = persistenceCreator.create();
 
                     List<DownloadFile> downloadFiles = downloadsFilePersistence.loadSync(
@@ -86,6 +91,21 @@ class DownloadsBatchPersistence {
                 downloadsPersistence.startTransaction();
                 try {
                     downloadsPersistence.delete(downloadBatchId);
+                    downloadsPersistence.transactionSuccess();
+                } finally {
+                    downloadsPersistence.endTransaction();
+                }
+            }
+        });
+    }
+
+    void updateStatusAsync(final DownloadBatchId downloadBatchId, final DownloadBatchStatus.Status status) {
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                downloadsPersistence.startTransaction();
+                try {
+                    downloadsPersistence.update(downloadBatchId, status);
                     downloadsPersistence.transactionSuccess();
                 } finally {
                     downloadsPersistence.endTransaction();

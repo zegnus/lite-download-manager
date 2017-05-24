@@ -20,6 +20,8 @@ interface DownloadsPersistence {
 
     void delete(DownloadBatchId downloadBatchId);
 
+    void update(DownloadBatchId downloadBatchId, DownloadBatchStatus.Status status);
+
     class BatchPersisted {
         private final DownloadBatchId downloadBatchId;
         private final DownloadBatchStatus.Status status;
@@ -42,22 +44,19 @@ interface DownloadsPersistence {
         private final DownloadBatchId downloadBatchId;
         private final DownloadFileId downloadFileId;
         private final FileName fileName;
-        private final FileSize fileSize;
+        private final long totalFileSize;
         private final String url;
-        private final DownloadFileStatus.Status status;
 
         FilePersisted(DownloadBatchId downloadBatchId,
                       DownloadFileId downloadFileId,
                       FileName fileName,
-                      FileSize fileSize,
-                      String url,
-                      DownloadFileStatus.Status status) {
+                      long totalFileSize,
+                      String url) {
             this.downloadBatchId = downloadBatchId;
             this.downloadFileId = downloadFileId;
             this.fileName = fileName;
-            this.fileSize = fileSize;
+            this.totalFileSize = totalFileSize;
             this.url = url;
-            this.status = status;
         }
 
         DownloadBatchId getDownloadBatchId() {
@@ -68,16 +67,12 @@ interface DownloadsPersistence {
             return fileName;
         }
 
-        FileSize getFileSize() {
-            return fileSize;
+        long getTotalFileSize() {
+            return totalFileSize;
         }
 
         String getUrl() {
             return url;
-        }
-
-        DownloadFileStatus.Status getStatus() {
-            return status;
         }
 
         DownloadFileId getDownloadFileId() {

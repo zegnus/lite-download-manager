@@ -20,12 +20,6 @@ class RoomFile {
     @ColumnInfo(name = "file_name")
     String name;
 
-    @ColumnInfo(name = "file_status")
-    String status;
-
-    @ColumnInfo(name = "current_size")
-    long currentSize;
-
     @ColumnInfo(name = "total_size")
     long totalSize;
 

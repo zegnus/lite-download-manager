@@ -4,6 +4,7 @@ import com.novoda.litedownloadmanager.DownloadError.Error;
 
 class DownloadFile {
 
+    private final DownloadBatchId downloadBatchId;
     private final String url;
     private final DownloadFileStatus downloadFileStatus;
     private final FileName fileName;
@@ -14,7 +15,8 @@ class DownloadFile {
 
     private FileSize fileSize;
 
-    DownloadFile(String url,
+    DownloadFile(DownloadBatchId downloadBatchId,
+                 String url,
                  DownloadFileStatus downloadFileStatus,
                  FileName fileName,
                  FileSize fileSize,
@@ -22,6 +24,7 @@ class DownloadFile {
                  FilePersistence filePersistence,
                  Downloader downloader,
                  DownloadsFilePersistence downloadsFilePersistence) {
+        this.downloadBatchId = downloadBatchId;
         this.url = url;
         this.downloadFileStatus = downloadFileStatus;
         this.fileName = fileName;
@@ -42,6 +45,7 @@ class DownloadFile {
         moveStatusToDownloadingIfQueued();
 
         fileSize = requestTotalFileSizeIfNecessary(fileSize);
+
         if (fileSize.isTotalSizeUnknown()) {
             updateAndFeedbackWithStatus(Error.FILE_TOTAL_SIZE_REQUEST_FAILED, callback);
             return;
@@ -132,13 +136,14 @@ class DownloadFile {
         if (fileSize.isTotalSizeUnknown()) {
             FileSize requestFileSize = fileSizeRequester.requestFileSize(url);
             fileSize.setTotalSize(requestFileSize.getTotalSize());
+            persistSync();
         }
 
         return fileSize.getTotalSize();
     }
 
-    void persistSync(DownloadBatchId downloadBatchId) {
-        downloadsFilePersistence.persistSync(downloadBatchId, fileName, fileSize, url, downloadFileStatus);
+    void persistSync() {
+        downloadsFilePersistence.persistSync(downloadBatchId, fileName, fileSize, url, downloadFileStatus.getDownloadFileId());
     }
 
     interface Callback {

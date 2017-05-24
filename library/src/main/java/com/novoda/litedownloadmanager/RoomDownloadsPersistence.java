@@ -66,13 +66,11 @@ class RoomDownloadsPersistence implements DownloadsPersistence {
     @Override
     public void persistFile(FilePersisted filePersisted) {
         RoomFile roomFile = new RoomFile();
-        roomFile.currentSize = filePersisted.getFileSize().getCurrentSize();
-        roomFile.totalSize = filePersisted.getFileSize().getTotalSize();
+        roomFile.totalSize = filePersisted.getTotalFileSize();
         roomFile.batchId = filePersisted.getDownloadBatchId().getId();
         roomFile.url = filePersisted.getUrl();
         roomFile.name = filePersisted.getFileName().getName();
         roomFile.fileId = filePersisted.getDownloadFileId().toRawId();
-        roomFile.status = filePersisted.getStatus().toRawValue();
 
         database.roomFileDao().insert(roomFile);
     }
@@ -86,9 +84,8 @@ class RoomDownloadsPersistence implements DownloadsPersistence {
                     DownloadBatchId.from(roomFile.batchId),
                     DownloadFileId.from(roomFile.fileId),
                     new FileName(roomFile.name),
-                    new FileSize(roomFile.currentSize, roomFile.totalSize),
-                    roomFile.url,
-                    DownloadFileStatus.Status.from(roomFile.status)
+                    roomFile.totalSize,
+                    roomFile.url
             );
             filePersistedList.add(filePersisted);
         }
@@ -100,5 +97,12 @@ class RoomDownloadsPersistence implements DownloadsPersistence {
     public void delete(DownloadBatchId downloadBatchId) {
         RoomBatch roomBatch = database.roomBatchDao().load(downloadBatchId.getId());
         database.roomBatchDao().delete(roomBatch);
+    }
+
+    @Override
+    public void update(DownloadBatchId downloadBatchId, DownloadBatchStatus.Status status) {
+        RoomBatch roomBatch = database.roomBatchDao().load(downloadBatchId.getId());
+        roomBatch.status = status.toRawValue();
+        database.roomBatchDao().update(roomBatch);
     }
 }

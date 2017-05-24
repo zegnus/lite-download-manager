@@ -37,6 +37,7 @@ class DownloadBatch {
 
             FilePersistence filePersistence = persistenceCreator.create();
             DownloadFile downloadFile = new DownloadFile(
+                    downloadBatchId,
                     fileUrl,
                     downloadFileStatus,
                     fileName,
@@ -49,7 +50,11 @@ class DownloadBatch {
             downloadFiles.add(downloadFile);
         }
 
-        DownloadBatchStatus downloadBatchStatus = new DownloadBatchStatus(downloadBatchId, DownloadBatchStatus.Status.QUEUED);
+        DownloadBatchStatus downloadBatchStatus = new DownloadBatchStatus(
+                downloadsBatchPersistence,
+                downloadBatchId,
+                DownloadBatchStatus.Status.QUEUED
+        );
 
         return new DownloadBatch(
                 downloadBatchId,

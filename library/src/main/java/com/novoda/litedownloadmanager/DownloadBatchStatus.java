@@ -32,6 +32,7 @@ public class DownloadBatchStatus {
     }
 
     private final DownloadBatchId downloadBatchId;
+    private final DownloadsBatchPersistence downloadsBatchPersistence;
 
     private long bytesDownloaded;
     private long totalBatchSizeBytes;
@@ -39,7 +40,8 @@ public class DownloadBatchStatus {
     private DownloadError downloadError;
     private Status status;
 
-    DownloadBatchStatus(DownloadBatchId downloadBatchId, Status status) {
+    DownloadBatchStatus(DownloadsBatchPersistence downloadsBatchPersistence, DownloadBatchId downloadBatchId, Status status) {
+        this.downloadsBatchPersistence = downloadsBatchPersistence;
         this.downloadBatchId = downloadBatchId;
         this.status = status;
     }
@@ -80,18 +82,25 @@ public class DownloadBatchStatus {
 
     void markAsDownloading() {
         status = Status.DOWNLOADING;
+        updateStatus(status);
     }
 
     void markAsPaused() {
         status = Status.PAUSED;
+        updateStatus(status);
     }
 
     void markAsQueued() {
         status = Status.QUEUED;
+        updateStatus(status);
     }
 
     void markForDeletion() {
         status = Status.DELETION;
+    }
+
+    private void updateStatus(Status status) {
+        downloadsBatchPersistence.updateStatusAsync(downloadBatchId, status);
     }
 
     public boolean isMarkedAsPaused() {

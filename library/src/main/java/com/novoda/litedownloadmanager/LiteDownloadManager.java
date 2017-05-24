@@ -47,6 +47,7 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
                 fileSizeRequester,
                 persistenceCreator,
                 downloader,
+                downloadsBatchPersistence,
                 new DownloadsBatchPersistence.LoadBatchesCallback() {
                     @Override
                     public void onLoaded(List<DownloadBatch> downloadBatches) {
