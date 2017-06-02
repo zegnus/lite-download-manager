@@ -1,16 +1,31 @@
 package com.novoda.litedownloadmanager;
 
 import android.content.Context;
-
-import com.novoda.notils.logger.simple.Log;
+import android.support.annotation.Nullable;
 
 class FilePersistenceCreator {
+
     private final Context context;
     private final FilePersistenceType type;
+    @Nullable
+    private final Class<? extends FilePersistence> customClass;
 
-    FilePersistenceCreator(Context context, FilePersistenceType type) {
+    static FilePersistenceCreator newInternalFilePersistenceCreator(Context context) {
+        return new FilePersistenceCreator(context, FilePersistenceType.INTERNAL, null);
+    }
+
+    static FilePersistenceCreator newExternalFilePersistenceCreator(Context context) {
+        return new FilePersistenceCreator(context, FilePersistenceType.EXTERNAL, null);
+    }
+
+    static FilePersistenceCreator newCustomFilePersistenceCreator(Context context, Class<? extends FilePersistence> customClass) {
+        return new FilePersistenceCreator(context, FilePersistenceType.CUSTOM, customClass);
+    }
+
+    FilePersistenceCreator(Context context, FilePersistenceType type, @Nullable Class<? extends FilePersistence> customClass) {
         this.context = context.getApplicationContext();
         this.type = type;
+        this.customClass = customClass;
     }
 
     FilePersistence create() {
@@ -18,17 +33,51 @@ class FilePersistenceCreator {
     }
 
     FilePersistence create(FilePersistenceType type) {
+        FilePersistence filePersistence;
+
         switch (type) {
             case INTERNAL:
-                return new InternalPhysicalFilePersistence(context);
+                filePersistence = new InternalPhysicalFilePersistence();
+                break;
             case EXTERNAL:
-                return new ExternalPhysicalFilePersistence(context);
+                filePersistence = new ExternalPhysicalFilePersistence();
+                break;
             case CUSTOM:
-                Log.w("Persistence of type CUSTOM is not yet implemented");
-                throw new IllegalStateException("Persistence of type CUSTOM is not yet implemented");
+                filePersistence = getCustomFilePersistence();
+                break;
             default:
-                Log.e("Persistence of type " + type + " is not supported");
                 throw new IllegalStateException("Persistence of type " + type + " is not supported");
+        }
+
+        filePersistence.initialiseWith(context);
+        return filePersistence;
+    }
+
+    private FilePersistence getCustomFilePersistence() {
+        if (customClass == null) {
+            throw new CustomFilePersistenceException("Class cannot be accessed, is it public?");
+        }
+
+        try {
+            ClassLoader systemClassLoader = getClass().getClassLoader();
+            Class<?> customFilePersistenceClass = systemClassLoader.loadClass(customClass.getCanonicalName());
+            return (FilePersistence) customFilePersistenceClass.newInstance();
+        } catch (IllegalAccessException e) {
+            throw new CustomFilePersistenceException(customClass, "Class cannot be accessed, is it public?", e);
+        } catch (ClassNotFoundException e) {
+            throw new CustomFilePersistenceException(customClass, "Class does not exist", e);
+        } catch (InstantiationException e) {
+            throw new CustomFilePersistenceException(customClass, "Class cannot be instantiated", e);
+        }
+    }
+
+    private static class CustomFilePersistenceException extends RuntimeException {
+        CustomFilePersistenceException(Class customClass, String message, Exception cause) {
+            super(customClass.getSimpleName() + ": " + message, cause);
+        }
+
+        CustomFilePersistenceException(String message) {
+            super(message);
         }
     }
 }

@@ -60,6 +60,7 @@ class DownloadsBatchPersistence {
 
                     List<DownloadFile> downloadFiles = downloadsFilePersistence.loadSync(
                             downloadBatchId,
+                            status,
                             fileSizeRequester,
                             filePersistenceCreator,
                             downloader,

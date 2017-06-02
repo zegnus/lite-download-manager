@@ -1,6 +1,6 @@
 package com.novoda.litedownloadmanager;
 
-class FileSize {
+public class FileSize {
 
     private static final int ZERO_BYTES = 0;
 
@@ -54,5 +54,13 @@ class FileSize {
 
     FileSize copy() {
         return new FileSize(currentSize, totalSize);
+    }
+
+    @Override
+    public String toString() {
+        return "FileSize{" +
+                "currentSize=" + currentSize +
+                ", totalSize=" + totalSize +
+                '}';
     }
 }

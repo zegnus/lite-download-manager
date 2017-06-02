@@ -2,7 +2,7 @@ package com.novoda.litedownloadmanager;
 
 import java.security.InvalidParameterException;
 
-enum FilePersistenceType {
+public enum FilePersistenceType {
     INTERNAL("internal"),
     EXTERNAL("external"),
     CUSTOM("custom");

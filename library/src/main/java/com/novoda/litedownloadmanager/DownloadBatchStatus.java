@@ -1,6 +1,6 @@
 package com.novoda.litedownloadmanager;
 
-import com.novoda.notils.logger.simple.Log;
+import java.security.InvalidParameterException;
 
 public class DownloadBatchStatus {
 
@@ -12,8 +12,7 @@ public class DownloadBatchStatus {
         PAUSED,
         ERROR,
         DELETION,
-        DOWNLOADED,
-        UNKNOWN;
+        DOWNLOADED;
 
         public String toRawValue() {
             return this.name();
@@ -26,8 +25,7 @@ public class DownloadBatchStatus {
                 }
             }
 
-            Log.e("Unsupported status " + rawValue);
-            return UNKNOWN;
+            throw new InvalidParameterException("Batch status " + rawValue + " not supported");
         }
     }
 

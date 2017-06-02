@@ -71,6 +71,7 @@ class RoomDownloadsPersistence implements DownloadsPersistence {
         roomFile.url = filePersisted.getUrl();
         roomFile.name = filePersisted.getFileName().getName();
         roomFile.fileId = filePersisted.getDownloadFileId().toRawId();
+        roomFile.persistenceType = filePersisted.getFilePersistenceType().toRawValue();
 
         database.roomFileDao().insert(roomFile);
     }

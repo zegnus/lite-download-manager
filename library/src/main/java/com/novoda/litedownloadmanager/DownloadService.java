@@ -44,10 +44,7 @@ public class DownloadService extends Service implements DownloadServiceCommands 
     public void download(final DownloadBatch downloadBatch, final DownloadBatchCallback callback) {
         startNotification();
 
-        DownloadBatchStatus downloadBatchStatus = downloadBatch.getDownloadBatchStatus();
-        downloadBatchStatus.markAsQueued();
-        callback.onUpdate(downloadBatchStatus);
-
+        updateStatusToQueuedIfNeeded(downloadBatch, callback);
         downloadBatch.setCallback(callback);
 
         executor.execute(new Runnable() {
@@ -58,6 +55,16 @@ public class DownloadService extends Service implements DownloadServiceCommands 
                 releaseCpuWakeLock();
             }
         });
+    }
+
+    private void updateStatusToQueuedIfNeeded(DownloadBatch downloadBatch, DownloadBatchCallback callback) {
+        DownloadBatchStatus downloadBatchStatus = downloadBatch.getDownloadBatchStatus();
+
+        if (!downloadBatchStatus.isMarkedAsPaused()) {
+            downloadBatchStatus.markAsQueued();
+        }
+
+        callback.onUpdate(downloadBatchStatus);
     }
 
     private void acquireCpuWakeLock() {
@@ -78,7 +85,7 @@ public class DownloadService extends Service implements DownloadServiceCommands 
                 .setContentText("content")  // the contents of the entry
                 .setContentIntent(null)  // The intent to send when the entry is clicked
                 .build();
-        startForeground(1, notification);
+        //startForeground(1, notification);
     }
 
     @Override

@@ -13,38 +13,16 @@ import static com.novoda.litedownloadmanager.FilePersistence.Status.*;
 
 class InternalPhysicalFilePersistence implements FilePersistence {
 
-    private final Context context;
+    private Context context;
 
     @Nullable
     private FileOutputStream file;
     @Nullable
     private FileName fileName;
 
-    InternalPhysicalFilePersistence(Context applicationContext) {
-        this.context = applicationContext.getApplicationContext();
-    }
-
     @Override
-    public DownloadError.Error convertError(Status status) {
-        switch (status) {
-
-            case SUCCESS:
-                Log.e("Cannot convert success status to any DownloadError type");
-                break;
-            case ERROR_UNKNOWN_TOTAL_FILE_SIZE:
-                return DownloadError.Error.FILE_TOTAL_SIZE_REQUEST_FAILED;
-            case ERROR_INSUFFICIENT_SPACE:
-                return DownloadError.Error.FILE_CANNOT_BE_CREATED_LOCALLY_INSUFFICIENT_FREE_SPACE;
-            case ERROR_EXTERNAL_STORAGE_NON_WRITABLE:
-                return DownloadError.Error.STORAGE_UNAVAILABLE;
-            case ERROR_OPENING_FILE:
-                return DownloadError.Error.FILE_CANNOT_BE_WRITTEN;
-            default:
-                Log.e("Status " + status + " missing to be processed");
-                break;
-        }
-
-        return DownloadError.Error.UNKNOWN;
+    public void initialiseWith(Context context) {
+        this.context = context.getApplicationContext();
     }
 
     @Override
@@ -88,7 +66,7 @@ class InternalPhysicalFilePersistence implements FilePersistence {
     @Override
     public void delete() {
         if (fileName == null) {
-            Log.e("Cannot delete, you must create the file first");
+            Log.w("Cannot delete, you must create the file first");
             return;
         }
 

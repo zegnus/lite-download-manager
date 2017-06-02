@@ -82,7 +82,7 @@ interface DownloadsPersistence {
             return downloadFileId;
         }
 
-        public FilePersistenceType getFilePersistenceType() {
+        FilePersistenceType getFilePersistenceType() {
             return filePersistenceType;
         }
     }

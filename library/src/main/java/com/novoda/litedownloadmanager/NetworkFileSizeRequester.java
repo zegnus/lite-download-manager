@@ -31,7 +31,7 @@ class NetworkFileSizeRequester implements FileSizeRequester {
                 return FileSize.Total(totalFileSize);
             }
         } catch (IOException e) {
-            Log.e("Error requesting file size", e);
+            Log.e(e, "Error requesting file size for " + url);
         }
 
         return FileSize.Unknown();

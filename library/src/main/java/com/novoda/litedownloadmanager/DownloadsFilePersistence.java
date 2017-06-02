@@ -1,5 +1,6 @@
 package com.novoda.litedownloadmanager;
 
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +31,7 @@ class DownloadsFilePersistence {
     }
 
     List<DownloadFile> loadSync(DownloadBatchId batchId,
+                                DownloadBatchStatus.Status batchStatus,
                                 FileSizeRequester fileSizeRequester,
                                 FilePersistenceCreator filePersistenceCreator,
                                 Downloader downloader,
@@ -46,7 +48,7 @@ class DownloadsFilePersistence {
 
             DownloadFileStatus downloadFileStatus = new DownloadFileStatus(
                     downloadFileId,
-                    DownloadFileStatus.Status.QUEUED,
+                    getFileStatusFrom(batchStatus),
                     fileSize,
                     new DownloadError()
             );
@@ -67,5 +69,24 @@ class DownloadsFilePersistence {
         }
 
         return downloadFiles;
+    }
+
+    private DownloadFileStatus.Status getFileStatusFrom(DownloadBatchStatus.Status batchStatus) {
+        switch (batchStatus) {
+            case QUEUED:
+                return DownloadFileStatus.Status.QUEUED;
+            case DOWNLOADING:
+                return DownloadFileStatus.Status.DOWNLOADING;
+            case PAUSED:
+                return DownloadFileStatus.Status.PAUSED;
+            case ERROR:
+                return DownloadFileStatus.Status.ERROR;
+            case DELETION:
+                return DownloadFileStatus.Status.DELETION;
+            case DOWNLOADED:
+                return DownloadFileStatus.Status.DOWNLOADING;
+        }
+
+        throw new InvalidParameterException("Batch status " + batchStatus + " is unsupported");
     }
 }

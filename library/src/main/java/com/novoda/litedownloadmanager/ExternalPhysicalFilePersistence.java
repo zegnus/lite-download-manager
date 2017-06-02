@@ -12,44 +12,23 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import static com.novoda.litedownloadmanager.DownloadError.Error.*;
 import static com.novoda.litedownloadmanager.FilePersistence.Status.*;
 
 class ExternalPhysicalFilePersistence implements FilePersistence {
 
     private static final String UNDEFINED_DIRECTORY_TYPE = null;
     private static final boolean APPEND = true;
-    private final Context context;
+
+    private Context context;
 
     @Nullable
     private FileOutputStream fileOutputStream;
     @Nullable
     private File file;
 
-    ExternalPhysicalFilePersistence(Context applicationContext) {
-        this.context = applicationContext.getApplicationContext();
-    }
-
     @Override
-    public DownloadError.Error convertError(Status status) {
-        switch (status) {
-            case SUCCESS:
-                Log.e("Cannot convert success status to any DownloadError type");
-                break;
-            case ERROR_UNKNOWN_TOTAL_FILE_SIZE:
-                return FILE_TOTAL_SIZE_REQUEST_FAILED;
-            case ERROR_INSUFFICIENT_SPACE:
-                return FILE_CANNOT_BE_CREATED_LOCALLY_INSUFFICIENT_FREE_SPACE;
-            case ERROR_EXTERNAL_STORAGE_NON_WRITABLE:
-                return STORAGE_UNAVAILABLE;
-            case ERROR_OPENING_FILE:
-                return FILE_CANNOT_BE_WRITTEN;
-            default:
-                Log.e("Status " + status + " missing to be processed");
-                break;
-        }
-
-        return UNKNOWN;
+    public void initialiseWith(Context context) {
+        this.context = context.getApplicationContext();
     }
 
     @Override
@@ -126,12 +105,11 @@ class ExternalPhysicalFilePersistence implements FilePersistence {
     @Override
     public void delete() {
         if (file == null) {
-            Log.e("Cannot delete, you must create the file first");
+            Log.w("Cannot delete, you must create the file first");
             return;
         }
 
-        boolean success = file.delete();
-        Log.v("File " + file.getAbsolutePath() + " deleted successfully: " + success);
+        file.delete();
     }
 
     @Override

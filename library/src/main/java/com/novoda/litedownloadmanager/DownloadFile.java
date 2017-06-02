@@ -1,6 +1,7 @@
 package com.novoda.litedownloadmanager;
 
 import com.novoda.litedownloadmanager.DownloadError.Error;
+import com.novoda.notils.logger.simple.Log;
 
 class DownloadFile {
 
@@ -53,7 +54,7 @@ class DownloadFile {
 
         FilePersistence.Status status = filePersistence.create(fileName, fileSize);
         if (status.isMarkedAsError()) {
-            Error error = filePersistence.convertError(status);
+            Error error = convertError(status);
             updateAndFeedbackWithStatus(error, callback);
             return;
         }
@@ -88,6 +89,28 @@ class DownloadFile {
                 }
             }
         });
+    }
+
+    private Error convertError(FilePersistence.Status status) {
+        switch (status) {
+
+            case SUCCESS:
+                Log.e("Cannot convert success status to any DownloadError type");
+                break;
+            case ERROR_UNKNOWN_TOTAL_FILE_SIZE:
+                return DownloadError.Error.FILE_TOTAL_SIZE_REQUEST_FAILED;
+            case ERROR_INSUFFICIENT_SPACE:
+                return DownloadError.Error.FILE_CANNOT_BE_CREATED_LOCALLY_INSUFFICIENT_FREE_SPACE;
+            case ERROR_EXTERNAL_STORAGE_NON_WRITABLE:
+                return DownloadError.Error.STORAGE_UNAVAILABLE;
+            case ERROR_OPENING_FILE:
+                return DownloadError.Error.FILE_CANNOT_BE_WRITTEN;
+            default:
+                Log.e("Status " + status + " missing to be processed");
+                break;
+        }
+
+        return DownloadError.Error.UNKNOWN;
     }
 
     private FileSize requestTotalFileSizeIfNecessary(FileSize fileSize) {

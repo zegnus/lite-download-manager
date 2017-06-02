@@ -1,6 +1,6 @@
 package com.novoda.litedownloadmanager;
 
-final class FileName {
+public final class FileName {
 
     private final String name;
 
@@ -19,5 +19,12 @@ final class FileName {
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String toString() {
+        return "FileName{" +
+                "name='" + name + '\'' +
+                '}';
     }
 }

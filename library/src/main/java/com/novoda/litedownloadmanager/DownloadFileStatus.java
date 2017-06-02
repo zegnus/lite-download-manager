@@ -7,7 +7,8 @@ class DownloadFileStatus {
         QUEUED,
         DOWNLOADING,
         DELETION,
-        ERROR
+        ERROR,
+        DOWNLOADED
     }
 
     private final DownloadFileId downloadFileId;

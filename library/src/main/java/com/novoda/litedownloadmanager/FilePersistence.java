@@ -1,6 +1,10 @@
 package com.novoda.litedownloadmanager;
 
-interface FilePersistence {
+import android.content.Context;
+
+public interface FilePersistence {
+
+    void initialiseWith(Context context);
 
     enum Status {
         SUCCESS,
@@ -14,11 +18,9 @@ interface FilePersistence {
         }
     }
 
-    DownloadError.Error convertError(Status status);
-
     Status create(FileName fileName, FileSize fileSize);
 
-    boolean write(byte[] buffer, int i, int readLast);
+    boolean write(byte[] buffer, int offset, int numberOfBytesToWrite);
 
     void delete();
 
