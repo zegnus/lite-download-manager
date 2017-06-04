@@ -2,7 +2,7 @@ package com.novoda.litedownloadmanager;
 
 import java.util.List;
 
-interface DownloadsPersistence {
+public interface DownloadsPersistence {
 
     void startTransaction();
 
@@ -31,11 +31,11 @@ interface DownloadsPersistence {
             this.status = status;
         }
 
-        DownloadBatchId getDownloadBatchId() {
+        public DownloadBatchId getDownloadBatchId() {
             return downloadBatchId;
         }
 
-        DownloadBatchStatus.Status getDownloadBatchStatus() {
+        public DownloadBatchStatus.Status getDownloadBatchStatus() {
             return status;
         }
     }
@@ -62,23 +62,23 @@ interface DownloadsPersistence {
             this.filePersistenceType = filePersistenceType;
         }
 
-        DownloadBatchId getDownloadBatchId() {
+        public DownloadBatchId getDownloadBatchId() {
             return downloadBatchId;
         }
 
-        FileName getFileName() {
+        public FileName getFileName() {
             return fileName;
         }
 
-        long getTotalFileSize() {
+        public long getTotalFileSize() {
             return totalFileSize;
         }
 
-        String getUrl() {
+        public String getUrl() {
             return url;
         }
 
-        DownloadFileId getDownloadFileId() {
+        public DownloadFileId getDownloadFileId() {
             return downloadFileId;
         }
 

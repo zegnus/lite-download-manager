@@ -21,7 +21,7 @@ class DownloadBatch {
     static DownloadBatch newInstance(Batch batch,
                                      FileSizeRequester fileSizeRequester,
                                      FilePersistenceCreator filePersistenceCreator,
-                                     Downloader downloader,
+                                     FileDownloader fileDownloader,
                                      DownloadsBatchPersistence downloadsBatchPersistence,
                                      DownloadsFilePersistence downloadsFilePersistence) {
         DownloadBatchId downloadBatchId = DownloadBatchId.from(batch);
@@ -44,7 +44,7 @@ class DownloadBatch {
                     fileSize,
                     fileSizeRequester,
                     filePersistence,
-                    downloader,
+                    fileDownloader,
                     downloadsFilePersistence
             );
             downloadFiles.add(downloadFile);

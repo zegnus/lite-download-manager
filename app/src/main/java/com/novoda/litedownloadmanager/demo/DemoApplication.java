@@ -5,8 +5,10 @@ import android.os.Handler;
 import android.os.Looper;
 
 import com.facebook.stetho.Stetho;
-import com.novoda.litedownloadmanager.LiteDownloadManagerCommands;
+import com.novoda.litedownloadmanager.FileDownloader;
+import com.novoda.litedownloadmanager.FileSizeRequester;
 import com.novoda.litedownloadmanager.LiteDownloadManagerBuilder;
+import com.novoda.litedownloadmanager.LiteDownloadManagerCommands;
 
 public class DemoApplication extends Application {
 
@@ -20,11 +22,16 @@ public class DemoApplication extends Application {
     }
 
     private void createLiteDownloadManager() {
+        FileSizeRequester fileSizeRequester = new CustomFileSizeRequester();
+        FileDownloader fileDownloader = new CustomFileDownloader();
+        //DownloadsPersistence downloadsPersistence = new CustomDownloadsPersistence();
+
         Handler handler = new Handler(Looper.getMainLooper());
         liteDownloadManagerCommands = LiteDownloadManagerBuilder
-                .newInstance(handler, getApplicationContext())
-                .withNetworkDownloader()
-                .withCustomFilePersistence(CustomFilePersistence.class)
+                .newInstance(handler, this)
+                .withFileDownloaderCustom(fileSizeRequester, fileDownloader)
+                .withFilePersistenceCustom(CustomFilePersistence.class)
+                //.withDownloadsPersistenceCustom(downloadsPersistence)
                 .build();
     }
 

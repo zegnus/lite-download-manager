@@ -14,7 +14,7 @@ import java.io.IOException;
 
 import static com.novoda.litedownloadmanager.FilePersistence.Status.*;
 
-class ExternalPhysicalFilePersistence implements FilePersistence {
+class ExternalFilePersistence implements FilePersistence {
 
     private static final String UNDEFINED_DIRECTORY_TYPE = null;
     private static final boolean APPEND = true;

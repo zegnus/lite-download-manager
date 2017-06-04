@@ -11,7 +11,7 @@ public class FileSize {
         return new FileSize(ZERO_BYTES, ZERO_BYTES);
     }
 
-    static FileSize Total(long totalFileSize) {
+    public static FileSize Total(long totalFileSize) {
         return new FileSize(ZERO_BYTES, totalFileSize);
     }
 
@@ -32,11 +32,11 @@ public class FileSize {
         return currentSize > ZERO_BYTES;
     }
 
-    long getCurrentSize() {
+    public long getCurrentSize() {
         return currentSize;
     }
 
-    long getTotalSize() {
+    public long getTotalSize() {
         return totalSize;
     }
 

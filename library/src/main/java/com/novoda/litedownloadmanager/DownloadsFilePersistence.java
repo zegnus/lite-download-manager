@@ -34,7 +34,7 @@ class DownloadsFilePersistence {
                                 DownloadBatchStatus.Status batchStatus,
                                 FileSizeRequester fileSizeRequester,
                                 FilePersistenceCreator filePersistenceCreator,
-                                Downloader downloader,
+                                FileDownloader fileDownloader,
                                 DownloadsFilePersistence downloadsFilePersistence) {
         List<DownloadsPersistence.FilePersisted> filePersistedList = downloadsPersistence.loadFiles(batchId);
 
@@ -61,7 +61,7 @@ class DownloadsFilePersistence {
                     fileSize,
                     fileSizeRequester,
                     filePersistenceCreator.create(filePersisted.getFilePersistenceType()),
-                    downloader,
+                    fileDownloader,
                     downloadsFilePersistence
             );
 

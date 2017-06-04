@@ -11,7 +11,7 @@ import java.io.IOException;
 
 import static com.novoda.litedownloadmanager.FilePersistence.Status.*;
 
-class InternalPhysicalFilePersistence implements FilePersistence {
+class InternalFilePersistence implements FilePersistence {
 
     private Context context;
 

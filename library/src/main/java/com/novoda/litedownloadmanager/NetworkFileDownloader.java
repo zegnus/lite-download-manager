@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 
-class NetworkDownloader implements Downloader {
+class NetworkFileDownloader implements FileDownloader {
 
     private static final int BUFFER_SIZE = 8 * 512;
 
@@ -18,7 +18,7 @@ class NetworkDownloader implements Downloader {
 
     private boolean canDownload;
 
-    NetworkDownloader(OkHttpClient httpClient) {
+    NetworkFileDownloader(OkHttpClient httpClient) {
         this.httpClient = httpClient;
     }
 

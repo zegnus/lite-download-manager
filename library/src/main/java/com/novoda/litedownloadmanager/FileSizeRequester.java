@@ -1,6 +1,6 @@
 package com.novoda.litedownloadmanager;
 
-interface FileSizeRequester {
+public interface FileSizeRequester {
 
     FileSize requestFileSize(String url);
 }

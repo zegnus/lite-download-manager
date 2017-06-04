@@ -18,7 +18,7 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
     private final List<DownloadBatchCallback> callbacks;
     private final FileSizeRequester fileSizeRequester;
     private final FilePersistenceCreator filePersistenceCreator;
-    private final Downloader downloader;
+    private final FileDownloader fileDownloader;
     private final DownloadsBatchPersistence downloadsBatchPersistence;
     private final DownloadsFilePersistence downloadsFilePersistence;
 
@@ -29,7 +29,7 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
                         List<DownloadBatchCallback> callbacks,
                         FileSizeRequester fileSizeRequester,
                         FilePersistenceCreator filePersistenceCreator,
-                        Downloader downloader,
+                        FileDownloader fileDownloader,
                         DownloadsBatchPersistence downloadsBatchPersistence,
                         DownloadsFilePersistence downloadsFilePersistence) {
         this.callbackHandler = callbackHandler;
@@ -37,7 +37,7 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
         this.callbacks = callbacks;
         this.fileSizeRequester = fileSizeRequester;
         this.filePersistenceCreator = filePersistenceCreator;
-        this.downloader = downloader;
+        this.fileDownloader = fileDownloader;
         this.downloadsBatchPersistence = downloadsBatchPersistence;
         this.downloadsFilePersistence = downloadsFilePersistence;
     }
@@ -46,7 +46,7 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
         downloadsBatchPersistence.loadAsync(
                 fileSizeRequester,
                 filePersistenceCreator,
-                downloader,
+                fileDownloader,
                 downloadsBatchPersistence,
                 new DownloadsBatchPersistence.LoadBatchesCallback() {
                     @Override
@@ -74,7 +74,7 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
                 batch,
                 fileSizeRequester,
                 filePersistenceCreator,
-                downloader,
+                fileDownloader,
                 downloadsBatchPersistence,
                 downloadsFilePersistence);
         downloadBatch.persist();

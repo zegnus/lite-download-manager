@@ -6,7 +6,7 @@ public class DownloadBatchStatus {
 
     private static final long ZERO_BYTES = 0;
 
-    enum Status {
+    public enum Status {
         QUEUED,
         DOWNLOADING,
         PAUSED,

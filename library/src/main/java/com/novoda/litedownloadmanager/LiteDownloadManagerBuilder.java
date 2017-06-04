@@ -19,13 +19,13 @@ import java.util.concurrent.TimeUnit;
 public final class LiteDownloadManagerBuilder {
 
     private final Context context;
-    private final DownloadsBatchPersistence downloadsBatchPersistence;
-    private final DownloadsFilePersistence downloadsFilePersistence;
     private final Handler callbackHandler;
 
+    private DownloadsBatchPersistence downloadsBatchPersistence;
+    private DownloadsFilePersistence downloadsFilePersistence;
     private FilePersistenceCreator filePersistenceCreator;
     private FileSizeRequester fileSizeRequester;
-    private Downloader downloader;
+    private FileDownloader fileDownloader;
     private DownloadServiceCommands downloadService;
     private LiteDownloadManager liteDownloadManager;
 
@@ -34,7 +34,7 @@ public final class LiteDownloadManagerBuilder {
         FilePersistenceCreator filePersistenceCreator = FilePersistenceCreator.newInternalFilePersistenceCreator(context);
 
         // Downloads information persistence
-        RoomDownloadsPersistence downloadsPersistence = RoomDownloadsPersistence.newInstance(context);
+        DownloadsPersistence downloadsPersistence = RoomDownloadsPersistence.newInstance(context);
 
         Executor executor = Executors.newSingleThreadExecutor();
         DownloadsFilePersistence downloadsFilePersistence = new DownloadsFilePersistence(downloadsPersistence);
@@ -47,7 +47,7 @@ public final class LiteDownloadManagerBuilder {
         httpClient.setReadTimeout(5, TimeUnit.SECONDS);
 
         FileSizeRequester fileSizeRequester = new NetworkFileSizeRequester(httpClient);
-        Downloader downloader = new NetworkDownloader(httpClient);
+        FileDownloader fileDownloader = new NetworkFileDownloader(httpClient);
 
         return new LiteDownloadManagerBuilder(
                 context,
@@ -56,7 +56,7 @@ public final class LiteDownloadManagerBuilder {
                 downloadsBatchPersistence,
                 downloadsFilePersistence,
                 fileSizeRequester,
-                downloader
+                fileDownloader
         );
     }
 
@@ -67,38 +67,52 @@ public final class LiteDownloadManagerBuilder {
         httpClient.setReadTimeout(5, TimeUnit.SECONDS);
 
         fileSizeRequester = new NetworkFileSizeRequester(httpClient);
-        downloader = new NetworkDownloader(httpClient);
+        fileDownloader = new NetworkFileDownloader(httpClient);
         return this;
     }
 
-    public LiteDownloadManagerBuilder withInternalFilePersistence() {
+    public LiteDownloadManagerBuilder withFilePersistenceInternal() {
         filePersistenceCreator = FilePersistenceCreator.newInternalFilePersistenceCreator(context);
         return this;
     }
 
-    public LiteDownloadManagerBuilder withExternalFilePersistence() {
+    public LiteDownloadManagerBuilder withFilePersistenceExternal() {
         filePersistenceCreator = FilePersistenceCreator.newExternalFilePersistenceCreator(context);
         return this;
     }
 
-    public LiteDownloadManagerBuilder withCustomFilePersistence(Class<? extends FilePersistence> customFilePersistenceClass) {
+    public LiteDownloadManagerBuilder withFileDownloaderCustom(FileSizeRequester fileSizeRequester, FileDownloader fileDownloader) {
+        this.fileSizeRequester = fileSizeRequester;
+        this.fileDownloader = fileDownloader;
+        return this;
+    }
+
+    public LiteDownloadManagerBuilder withFilePersistenceCustom(Class<? extends FilePersistence> customFilePersistenceClass) {
         filePersistenceCreator = FilePersistenceCreator.newCustomFilePersistenceCreator(context, customFilePersistenceClass);
         return this;
     }
 
+    public LiteDownloadManagerBuilder withDownloadsPersistenceCustom(DownloadsPersistence downloadsPersistence) {
+        Executor executor = Executors.newSingleThreadExecutor();
+        this.downloadsFilePersistence = new DownloadsFilePersistence(downloadsPersistence);
+        this.downloadsBatchPersistence = new DownloadsBatchPersistence(executor, downloadsFilePersistence, downloadsPersistence);
+        return this;
+    }
+
     private LiteDownloadManagerBuilder(Context context,
-                                       Handler callbackHandler, FilePersistenceCreator filePersistenceCreator,
+                                       Handler callbackHandler,
+                                       FilePersistenceCreator filePersistenceCreator,
                                        DownloadsBatchPersistence downloadsBatchPersistence,
                                        DownloadsFilePersistence downloadsFilePersistence,
                                        FileSizeRequester fileSizeRequester,
-                                       Downloader downloader) {
+                                       FileDownloader fileDownloader) {
         this.context = context;
         this.callbackHandler = callbackHandler;
         this.filePersistenceCreator = filePersistenceCreator;
         this.downloadsBatchPersistence = downloadsBatchPersistence;
         this.downloadsFilePersistence = downloadsFilePersistence;
         this.fileSizeRequester = fileSizeRequester;
-        this.downloader = downloader;
+        this.fileDownloader = fileDownloader;
     }
 
     public LiteDownloadManager build() {
@@ -125,7 +139,7 @@ public final class LiteDownloadManagerBuilder {
                 new ArrayList<DownloadBatchCallback>(),
                 fileSizeRequester,
                 filePersistenceCreator,
-                downloader,
+                fileDownloader,
                 downloadsBatchPersistence,
                 downloadsFilePersistence
         );

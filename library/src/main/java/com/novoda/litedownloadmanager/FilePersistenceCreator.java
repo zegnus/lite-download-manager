@@ -37,10 +37,10 @@ class FilePersistenceCreator {
 
         switch (type) {
             case INTERNAL:
-                filePersistence = new InternalPhysicalFilePersistence();
+                filePersistence = new InternalFilePersistence();
                 break;
             case EXTERNAL:
-                filePersistence = new ExternalPhysicalFilePersistence();
+                filePersistence = new ExternalFilePersistence();
                 break;
             case CUSTOM:
                 filePersistence = getCustomFilePersistence();

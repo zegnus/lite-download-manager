@@ -1,6 +1,6 @@
 package com.novoda.litedownloadmanager;
 
-interface Downloader {
+public interface FileDownloader {
 
     void startDownloading(String url, FileSize fileSize, Callback callback);
 

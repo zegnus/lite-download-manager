@@ -12,7 +12,7 @@ class DownloadFile {
     private final FileSizeRequester fileSizeRequester;
     private final FilePersistence filePersistence;
     private final DownloadsFilePersistence downloadsFilePersistence;
-    private final Downloader downloader;
+    private final FileDownloader fileDownloader;
 
     private FileSize fileSize;
 
@@ -23,7 +23,7 @@ class DownloadFile {
                  FileSize fileSize,
                  FileSizeRequester fileSizeRequester,
                  FilePersistence filePersistence,
-                 Downloader downloader,
+                 FileDownloader fileDownloader,
                  DownloadsFilePersistence downloadsFilePersistence) {
         this.downloadBatchId = downloadBatchId;
         this.url = url;
@@ -31,7 +31,7 @@ class DownloadFile {
         this.fileName = fileName;
         this.fileSizeRequester = fileSizeRequester;
         this.filePersistence = filePersistence;
-        this.downloader = downloader;
+        this.fileDownloader = fileDownloader;
         this.fileSize = fileSize;
         this.downloadsFilePersistence = downloadsFilePersistence;
     }
@@ -61,7 +61,7 @@ class DownloadFile {
 
         fileSize.setCurrentSize(filePersistence.getCurrentSize());
 
-        downloader.startDownloading(url, fileSize, new Downloader.Callback() {
+        fileDownloader.startDownloading(url, fileSize, new FileDownloader.Callback() {
             @Override
             public void onBytesRead(byte[] buffer, int bytesRead) {
                 boolean success = filePersistence.write(buffer, 0, bytesRead);
@@ -139,7 +139,7 @@ class DownloadFile {
 
     void pause() {
         downloadFileStatus.isMarkedAsPaused();
-        downloader.stopDownloading();
+        fileDownloader.stopDownloading();
     }
 
     void resume() {
@@ -149,7 +149,7 @@ class DownloadFile {
     void delete() {
         if (downloadFileStatus.isMarkedAsDownloading()) {
             downloadFileStatus.markForDeletion();
-            downloader.stopDownloading();
+            fileDownloader.stopDownloading();
         } else {
             filePersistence.delete();
         }

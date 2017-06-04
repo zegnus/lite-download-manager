@@ -40,7 +40,7 @@ class DownloadsBatchPersistence {
 
     void loadAsync(final FileSizeRequester fileSizeRequester,
                    final FilePersistenceCreator filePersistenceCreator,
-                   final Downloader downloader,
+                   final FileDownloader fileDownloader,
                    final DownloadsBatchPersistence downloadsBatchPersistence,
                    final LoadBatchesCallback callback) {
         executor.execute(new Runnable() {
@@ -63,7 +63,7 @@ class DownloadsBatchPersistence {
                             status,
                             fileSizeRequester,
                             filePersistenceCreator,
-                            downloader,
+                            fileDownloader,
                             downloadsFilePersistence
                     );
 
