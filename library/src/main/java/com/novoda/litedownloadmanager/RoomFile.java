@@ -15,7 +15,7 @@ class RoomFile {
     String fileId;
 
     @ColumnInfo(name = "batch_id")
-    String batchId;
+    int batchId;
 
     @ColumnInfo(name = "file_name")
     String name;

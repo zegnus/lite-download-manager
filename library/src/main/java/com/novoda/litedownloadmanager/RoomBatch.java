@@ -10,7 +10,7 @@ class RoomBatch {
 
     @PrimaryKey
     @ColumnInfo(name = "batch_id")
-    public String downloadBatchId;
+    public int downloadBatchId;
 
     @ColumnInfo(name = "batch_status")
     public String status;

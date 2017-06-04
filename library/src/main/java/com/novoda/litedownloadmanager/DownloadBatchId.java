@@ -2,22 +2,23 @@ package com.novoda.litedownloadmanager;
 
 public final class DownloadBatchId {
 
-    private final String id;
+    private final int id;
 
     public static DownloadBatchId from(Batch batch) {
-        String id = batch.getId();
+        String title = batch.getTitle();
+        int id = title.hashCode();
         return new DownloadBatchId(id);
     }
 
-    public static DownloadBatchId from(String id) {
+    public static DownloadBatchId from(int id) {
         return new DownloadBatchId(id);
     }
 
-    private DownloadBatchId(String id) {
+    private DownloadBatchId(int id) {
         this.id = id;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
@@ -32,12 +33,12 @@ public final class DownloadBatchId {
 
         DownloadBatchId that = (DownloadBatchId) o;
 
-        return id != null ? id.equals(that.id) : that.id == null;
+        return id == that.id;
 
     }
 
     @Override
     public int hashCode() {
-        return id != null ? id.hashCode() : 0;
+        return id;
     }
 }

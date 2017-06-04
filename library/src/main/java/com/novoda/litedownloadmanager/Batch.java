@@ -5,16 +5,16 @@ import java.util.List;
 
 public final class Batch {
 
-    private final String id;
+    private final String title;
     private final List<String> fileUrls;
 
-    private Batch(String id, List<String> fileUrls) {
-        this.id = id;
+    private Batch(String title, List<String> fileUrls) {
+        this.title = title;
         this.fileUrls = fileUrls;
     }
 
-    String getId() {
-        return id;
+    String getTitle() {
+        return title;
     }
 
     List<String> getFileUrls() {
@@ -23,11 +23,11 @@ public final class Batch {
 
     public static class Builder {
 
-        private final String id;
+        private final String title;
         private final List<String> fileUrls = new ArrayList<>();
 
-        public Builder(String id) {
-            this.id = id;
+        public Builder(String title) {
+            this.title = title;
         }
 
         public Builder addFile(String fileUrl) {
@@ -36,7 +36,7 @@ public final class Batch {
         }
 
         public Batch build() {
-            return new Batch(id, fileUrls);
+            return new Batch(title, fileUrls);
         }
     }
 }

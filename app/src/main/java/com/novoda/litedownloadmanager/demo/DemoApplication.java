@@ -30,7 +30,7 @@ public class DemoApplication extends Application {
         liteDownloadManagerCommands = LiteDownloadManagerBuilder
                 .newInstance(handler, this)
                 .withFileDownloaderCustom(fileSizeRequester, fileDownloader)
-                .withFilePersistenceCustom(CustomFilePersistence.class)
+                //.withFilePersistenceCustom(CustomFilePersistence.class)
                 //.withDownloadsPersistenceCustom(downloadsPersistence)
                 .build();
     }

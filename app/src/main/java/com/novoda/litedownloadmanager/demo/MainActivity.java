@@ -47,13 +47,13 @@ public class MainActivity extends AppCompatActivity {
                 buttonDownload.setVisibility(View.GONE);
                 buttonDeleteAll.setVisibility(View.VISIBLE);
 
-                Batch batch = new Batch.Builder("made-in-chelsea")
+                Batch batch = new Batch.Builder("Made in chelsea")
                         .addFile("http://ipv4.download.thinkbroadband.com/10MB.zip")
                         .addFile("http://ipv4.download.thinkbroadband.com/10MB.zip")
                         .build();
                 downloadBatchId1 = liteDownloadManagerCommands.download(batch);
 
-                batch = new Batch.Builder("hollyoaks")
+                batch = new Batch.Builder("Hollyoaks")
                         .addFile("http://ipv4.download.thinkbroadband.com/10MB.zip")
                         .addFile("http://ipv4.download.thinkbroadband.com/10MB.zip")
                         .build();
@@ -170,13 +170,11 @@ public class MainActivity extends AppCompatActivity {
                     + status
                     + "\n";
 
-            switch (downloadBatchStatus.getDownloadBatchId().getId()) {
-                case "made-in-chelsea":
-                    textViewBatch1.setText(message);
-                    break;
-                case "hollyoaks":
-                    textViewBatch2.setText(message);
-                    break;
+            DownloadBatchId downloadBatchId = downloadBatchStatus.getDownloadBatchId();
+            if (downloadBatchId.equals(downloadBatchId1)) {
+                textViewBatch1.setText(message);
+            } else if (downloadBatchId.equals(downloadBatchId2)) {
+                textViewBatch2.setText(message);
             }
 
             List<DownloadBatchStatus> allDownloadBatchStatuses = liteDownloadManagerCommands.getAllDownloadBatchStatuses();
