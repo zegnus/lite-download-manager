@@ -7,7 +7,6 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -15,6 +14,7 @@ import java.util.concurrent.Executors;
 public class DownloadService extends Service implements DownloadServiceCommands {
 
     private static final String WAKELOCK_TAG = "WakelockTag";
+    private static final int ID = 1;
 
     private ExecutorService executor;
     private IBinder binder;
@@ -42,8 +42,6 @@ public class DownloadService extends Service implements DownloadServiceCommands 
 
     @Override
     public void download(final DownloadBatch downloadBatch, final DownloadBatchCallback callback) {
-        startNotification();
-
         updateStatusToQueuedIfNeeded(downloadBatch, callback);
         downloadBatch.setCallback(callback);
 
@@ -55,6 +53,11 @@ public class DownloadService extends Service implements DownloadServiceCommands 
                 releaseCpuWakeLock();
             }
         });
+    }
+
+    @Override
+    public void updateNotification(Notification notification) {
+        startForeground(ID, notification);
     }
 
     private void updateStatusToQueuedIfNeeded(DownloadBatch downloadBatch, DownloadBatchCallback callback) {
@@ -75,17 +78,6 @@ public class DownloadService extends Service implements DownloadServiceCommands 
 
     private void releaseCpuWakeLock() {
         wakeLock.release();
-    }
-
-    private void startNotification() {
-        Notification notification = new NotificationCompat.Builder(this)
-                .setTicker("ticker")  // the status text
-                .setWhen(System.currentTimeMillis())  // the time stamp
-                .setContentTitle("content title")  // the label of the entry
-                .setContentText("content")  // the contents of the entry
-                .setContentIntent(null)  // The intent to send when the entry is clicked
-                .build();
-        //startForeground(1, notification);
     }
 
     @Override

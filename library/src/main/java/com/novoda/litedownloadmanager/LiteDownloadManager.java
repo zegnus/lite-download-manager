@@ -1,5 +1,6 @@
 package com.novoda.litedownloadmanager;
 
+import android.app.Notification;
 import android.os.Handler;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
     private final FileDownloader fileDownloader;
     private final DownloadsBatchPersistence downloadsBatchPersistence;
     private final DownloadsFilePersistence downloadsFilePersistence;
+    private final DownloadBatchNotification downloadBatchNotification;
 
     private DownloadServiceCommands downloadService;
 
@@ -31,7 +33,8 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
                         FilePersistenceCreator filePersistenceCreator,
                         FileDownloader fileDownloader,
                         DownloadsBatchPersistence downloadsBatchPersistence,
-                        DownloadsFilePersistence downloadsFilePersistence) {
+                        DownloadsFilePersistence downloadsFilePersistence,
+                        DownloadBatchNotification downloadBatchNotification) {
         this.callbackHandler = callbackHandler;
         this.downloadBatchMap = downloadBatchMap;
         this.callbacks = callbacks;
@@ -40,6 +43,7 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
         this.fileDownloader = fileDownloader;
         this.downloadsBatchPersistence = downloadsBatchPersistence;
         this.downloadsFilePersistence = downloadsFilePersistence;
+        this.downloadBatchNotification = downloadBatchNotification;
     }
 
     void initialise(final DownloadServiceCommands downloadService) {
@@ -57,7 +61,7 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
 
                         setDownloadService(downloadService);
                     }
-                }
+                }, downloadBatchNotification
         );
     }
 
@@ -70,13 +74,14 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
 
     @Override
     public DownloadBatchId download(Batch batch) {
-        DownloadBatch downloadBatch = DownloadBatch.newInstance(
+        DownloadBatch downloadBatch = DownloadBatchFactory.newInstance(
                 batch,
                 fileSizeRequester,
                 filePersistenceCreator,
                 fileDownloader,
                 downloadsBatchPersistence,
-                downloadsFilePersistence);
+                downloadsFilePersistence,
+                downloadBatchNotification);
         downloadBatch.persist();
         download(downloadBatch);
         return downloadBatch.getId();
@@ -105,6 +110,8 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
         downloadService.download(downloadBatch, new DownloadBatchCallback() {
             @Override
             public void onUpdate(final DownloadBatchStatus downloadBatchStatus) {
+                Notification notification = downloadBatchStatus.createNotification();
+                downloadService.updateNotification(notification);
                 callbackHandler.post(new Runnable() {
                     @Override
                     public void run() {

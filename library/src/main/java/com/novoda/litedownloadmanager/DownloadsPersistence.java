@@ -23,10 +23,12 @@ public interface DownloadsPersistence {
     void update(DownloadBatchId downloadBatchId, DownloadBatchStatus.Status status);
 
     class BatchPersisted {
+        private final DownloadBatchTitle downloadBatchTitle;
         private final DownloadBatchId downloadBatchId;
         private final DownloadBatchStatus.Status status;
 
-        BatchPersisted(DownloadBatchId downloadBatchId, DownloadBatchStatus.Status status) {
+        BatchPersisted(DownloadBatchTitle downloadBatchTitle, DownloadBatchId downloadBatchId, DownloadBatchStatus.Status status) {
+            this.downloadBatchTitle = downloadBatchTitle;
             this.downloadBatchId = downloadBatchId;
             this.status = status;
         }
@@ -37,6 +39,10 @@ public interface DownloadsPersistence {
 
         public DownloadBatchStatus.Status getDownloadBatchStatus() {
             return status;
+        }
+
+        public DownloadBatchTitle getDownloadBatchTitle() {
+            return downloadBatchTitle;
         }
     }
 

@@ -1,5 +1,7 @@
 package com.novoda.litedownloadmanager;
 
+import android.app.Notification;
+
 import java.security.InvalidParameterException;
 
 public class DownloadBatchStatus {
@@ -29,8 +31,10 @@ public class DownloadBatchStatus {
         }
     }
 
+    private final DownloadBatchTitle downloadBatchTitle;
     private final DownloadBatchId downloadBatchId;
     private final DownloadsBatchPersistence downloadsBatchPersistence;
+    private final DownloadBatchNotification downloadBatchNotification;
 
     private long bytesDownloaded;
     private long totalBatchSizeBytes;
@@ -38,7 +42,12 @@ public class DownloadBatchStatus {
     private DownloadError downloadError;
     private Status status;
 
-    DownloadBatchStatus(DownloadsBatchPersistence downloadsBatchPersistence, DownloadBatchId downloadBatchId, Status status) {
+    DownloadBatchStatus(DownloadsBatchPersistence downloadsBatchPersistence,
+                        DownloadBatchNotification downloadBatchNotification, DownloadBatchId downloadBatchId,
+                        DownloadBatchTitle downloadBatchTitle,
+                        Status status) {
+        this.downloadBatchNotification = downloadBatchNotification;
+        this.downloadBatchTitle = downloadBatchTitle;
         this.downloadsBatchPersistence = downloadsBatchPersistence;
         this.downloadBatchId = downloadBatchId;
         this.status = status;
@@ -72,6 +81,15 @@ public class DownloadBatchStatus {
 
     public DownloadBatchId getDownloadBatchId() {
         return downloadBatchId;
+    }
+
+    public Notification createNotification() {
+        return downloadBatchNotification.createNotification(
+                downloadBatchTitle,
+                percentageDownloaded,
+                (int) totalBatchSizeBytes,
+                (int) bytesDownloaded
+        );
     }
 
     public Status status() {

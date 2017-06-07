@@ -12,6 +12,9 @@ class RoomBatch {
     @ColumnInfo(name = "batch_id")
     public int downloadBatchId;
 
+    @ColumnInfo(name = "batch_title")
+    public String downloadBatchTitle;
+
     @ColumnInfo(name = "batch_status")
     public String status;
 }

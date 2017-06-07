@@ -16,14 +16,21 @@ class DownloadsBatchPersistence {
         this.downloadsPersistence = downloadsPersistence;
     }
 
-    void persistAsync(final DownloadBatchId downloadBatchId, final DownloadBatchStatus.Status status, final List<DownloadFile> downloadFiles) {
+    void persistAsync(final DownloadBatchTitle downloadBatchTitle,
+                      final DownloadBatchId downloadBatchId,
+                      final DownloadBatchStatus.Status status,
+                      final List<DownloadFile> downloadFiles) {
         executor.execute(new Runnable() {
             @Override
             public void run() {
                 downloadsPersistence.startTransaction();
 
                 try {
-                    DownloadsPersistence.BatchPersisted batchPersisted = new DownloadsPersistence.BatchPersisted(downloadBatchId, status);
+                    DownloadsPersistence.BatchPersisted batchPersisted = new DownloadsPersistence.BatchPersisted(
+                            downloadBatchTitle,
+                            downloadBatchId,
+                            status
+                    );
                     downloadsPersistence.persistBatch(batchPersisted);
 
                     for (DownloadFile downloadFile : downloadFiles) {
@@ -42,7 +49,8 @@ class DownloadsBatchPersistence {
                    final FilePersistenceCreator filePersistenceCreator,
                    final FileDownloader fileDownloader,
                    final DownloadsBatchPersistence downloadsBatchPersistence,
-                   final LoadBatchesCallback callback) {
+                   final LoadBatchesCallback callback,
+                   final DownloadBatchNotification downloadBatchNotification) {
         executor.execute(new Runnable() {
             @Override
             public void run() {
@@ -52,9 +60,12 @@ class DownloadsBatchPersistence {
                 for (DownloadsPersistence.BatchPersisted batchPersisted : batchPersistedList) {
                     DownloadBatchStatus.Status status = batchPersisted.getDownloadBatchStatus();
                     DownloadBatchId downloadBatchId = batchPersisted.getDownloadBatchId();
+                    DownloadBatchTitle downloadBatchTitle = batchPersisted.getDownloadBatchTitle();
                     DownloadBatchStatus downloadBatchStatus = new DownloadBatchStatus(
                             downloadsBatchPersistence,
+                            downloadBatchNotification,
                             downloadBatchId,
+                            downloadBatchTitle,
                             status
                     );
 
@@ -67,7 +78,8 @@ class DownloadsBatchPersistence {
                             downloadsFilePersistence
                     );
 
-                    DownloadBatch downloadBatch = DownloadBatch.newInstance(
+                    DownloadBatch downloadBatch = DownloadBatchFactory.newInstance(
+                            downloadBatchTitle,
                             downloadBatchId,
                             downloadFiles,
                             downloadBatchStatus,

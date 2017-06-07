@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.annotation.DrawableRes;
 
 import com.squareup.okhttp.OkHttpClient;
 
@@ -28,8 +29,9 @@ public final class LiteDownloadManagerBuilder {
     private FileDownloader fileDownloader;
     private DownloadServiceCommands downloadService;
     private LiteDownloadManager liteDownloadManager;
+    private DownloadBatchNotification downloadBatchNotification;
 
-    public static LiteDownloadManagerBuilder newInstance(Handler callbackHandler, Context context) {
+    public static LiteDownloadManagerBuilder newInstance(Context context, Handler callbackHandler, @DrawableRes int notificationIcon) {
         // File persistence
         FilePersistenceCreator filePersistenceCreator = FilePersistenceCreator.newInternalFilePersistenceCreator(context);
 
@@ -49,6 +51,8 @@ public final class LiteDownloadManagerBuilder {
         FileSizeRequester fileSizeRequester = new NetworkFileSizeRequester(httpClient);
         FileDownloader fileDownloader = new NetworkFileDownloader(httpClient);
 
+        DownloadBatchNotification downloadBatchNotification = new DownloadBatchNotification(context, notificationIcon);
+
         return new LiteDownloadManagerBuilder(
                 context,
                 callbackHandler,
@@ -56,7 +60,8 @@ public final class LiteDownloadManagerBuilder {
                 downloadsBatchPersistence,
                 downloadsFilePersistence,
                 fileSizeRequester,
-                fileDownloader
+                fileDownloader,
+                downloadBatchNotification
         );
     }
 
@@ -105,7 +110,8 @@ public final class LiteDownloadManagerBuilder {
                                        DownloadsBatchPersistence downloadsBatchPersistence,
                                        DownloadsFilePersistence downloadsFilePersistence,
                                        FileSizeRequester fileSizeRequester,
-                                       FileDownloader fileDownloader) {
+                                       FileDownloader fileDownloader,
+                                       DownloadBatchNotification downloadBatchNotification) {
         this.context = context;
         this.callbackHandler = callbackHandler;
         this.filePersistenceCreator = filePersistenceCreator;
@@ -113,6 +119,7 @@ public final class LiteDownloadManagerBuilder {
         this.downloadsFilePersistence = downloadsFilePersistence;
         this.fileSizeRequester = fileSizeRequester;
         this.fileDownloader = fileDownloader;
+        this.downloadBatchNotification = downloadBatchNotification;
     }
 
     public LiteDownloadManager build() {
@@ -141,7 +148,8 @@ public final class LiteDownloadManagerBuilder {
                 filePersistenceCreator,
                 fileDownloader,
                 downloadsBatchPersistence,
-                downloadsFilePersistence
+                downloadsFilePersistence,
+                downloadBatchNotification
         );
 
         return liteDownloadManager;

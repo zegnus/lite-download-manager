@@ -54,6 +54,7 @@ class RoomDownloadsPersistence implements DownloadsPersistence {
         List<BatchPersisted> batchPersistedList = new ArrayList<>(roomBatches.size());
         for (RoomBatch roomBatch : roomBatches) {
             BatchPersisted batchPersisted = new BatchPersisted(
+                    DownloadBatchTitle.from(roomBatch.downloadBatchTitle),
                     DownloadBatchId.from(roomBatch.downloadBatchId),
                     DownloadBatchStatus.Status.from(roomBatch.status)
             );
