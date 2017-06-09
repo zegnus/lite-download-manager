@@ -1,6 +1,6 @@
 package com.novoda.litedownloadmanager;
 
-class DownloadBatchTitle {
+public class DownloadBatchTitle {
 
     private final String title;
 

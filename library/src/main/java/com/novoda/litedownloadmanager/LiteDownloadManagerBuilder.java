@@ -29,7 +29,7 @@ public final class LiteDownloadManagerBuilder {
     private FileDownloader fileDownloader;
     private DownloadServiceCommands downloadService;
     private LiteDownloadManager liteDownloadManager;
-    private DownloadBatchNotification downloadBatchNotification;
+    private NotificationCreator notificationCreator;
 
     public static LiteDownloadManagerBuilder newInstance(Context context, Handler callbackHandler, @DrawableRes int notificationIcon) {
         // File persistence
@@ -104,6 +104,11 @@ public final class LiteDownloadManagerBuilder {
         return this;
     }
 
+    public LiteDownloadManagerBuilder withNotification(NotificationCreator notificationCreator) {
+        this.notificationCreator = notificationCreator;
+        return this;
+    }
+
     private LiteDownloadManagerBuilder(Context context,
                                        Handler callbackHandler,
                                        FilePersistenceCreator filePersistenceCreator,
@@ -111,7 +116,7 @@ public final class LiteDownloadManagerBuilder {
                                        DownloadsFilePersistence downloadsFilePersistence,
                                        FileSizeRequester fileSizeRequester,
                                        FileDownloader fileDownloader,
-                                       DownloadBatchNotification downloadBatchNotification) {
+                                       NotificationCreator notificationCreator) {
         this.context = context;
         this.callbackHandler = callbackHandler;
         this.filePersistenceCreator = filePersistenceCreator;
@@ -119,7 +124,7 @@ public final class LiteDownloadManagerBuilder {
         this.downloadsFilePersistence = downloadsFilePersistence;
         this.fileSizeRequester = fileSizeRequester;
         this.fileDownloader = fileDownloader;
-        this.downloadBatchNotification = downloadBatchNotification;
+        this.notificationCreator = notificationCreator;
     }
 
     public LiteDownloadManager build() {
@@ -149,7 +154,7 @@ public final class LiteDownloadManagerBuilder {
                 fileDownloader,
                 downloadsBatchPersistence,
                 downloadsFilePersistence,
-                downloadBatchNotification
+                notificationCreator
         );
 
         return liteDownloadManager;

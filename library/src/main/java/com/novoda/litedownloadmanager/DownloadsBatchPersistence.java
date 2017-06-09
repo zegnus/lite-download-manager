@@ -49,8 +49,8 @@ class DownloadsBatchPersistence {
                    final FilePersistenceCreator filePersistenceCreator,
                    final FileDownloader fileDownloader,
                    final DownloadsBatchPersistence downloadsBatchPersistence,
-                   final LoadBatchesCallback callback,
-                   final DownloadBatchNotification downloadBatchNotification) {
+                   final NotificationCreator notificationCreator,
+                   final LoadBatchesCallback callback) {
         executor.execute(new Runnable() {
             @Override
             public void run() {
@@ -63,7 +63,7 @@ class DownloadsBatchPersistence {
                     DownloadBatchTitle downloadBatchTitle = batchPersisted.getDownloadBatchTitle();
                     DownloadBatchStatus downloadBatchStatus = new DownloadBatchStatus(
                             downloadsBatchPersistence,
-                            downloadBatchNotification,
+                            notificationCreator,
                             downloadBatchId,
                             downloadBatchTitle,
                             status

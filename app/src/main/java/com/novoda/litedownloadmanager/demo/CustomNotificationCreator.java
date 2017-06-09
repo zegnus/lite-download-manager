@@ -1,20 +1,23 @@
-package com.novoda.litedownloadmanager;
+package com.novoda.litedownloadmanager.demo;
 
 import android.app.Notification;
 import android.content.Context;
-import android.support.annotation.DrawableRes;
 import android.support.v4.app.NotificationCompat;
 
-public class DownloadBatchNotification implements NotificationCreator {
+import com.novoda.litedownloadmanager.DownloadBatchTitle;
+import com.novoda.litedownloadmanager.NotificationCreator;
+import com.novoda.litedownloadmanager.NotificationInformation;
+import com.novoda.notils.logger.simple.Log;
 
+public class CustomNotificationCreator implements NotificationCreator {
     private static final int ID = 1;
     private static final boolean NOT_INDETERMINATE = false;
 
     private final Context context;
     private final int iconDrawable;
 
-    public DownloadBatchNotification(Context context, @DrawableRes int iconDrawable) {
-        this.context = context.getApplicationContext();
+    public CustomNotificationCreator(Context context, int iconDrawable) {
+        this.context = context;
         this.iconDrawable = iconDrawable;
     }
 
@@ -26,20 +29,23 @@ public class DownloadBatchNotification implements NotificationCreator {
         String title = downloadBatchTitle.toString();
         String content = percentageDownloaded + "% downloaded";
 
+        Log.v("Create notification for " + title + ", " + content);
+
         Notification notification = new NotificationCompat.Builder(context)
                 .setProgress(bytesFileSize, bytesDownloaded, NOT_INDETERMINATE)
                 .setSmallIcon(iconDrawable)
                 .setContentTitle(title)
                 .setContentText(content)
                 .build();
-        return new DownloadBatchNotificationInformation(ID, notification);
+        return new CustomNotificationInformation(ID, notification);
     }
 
-    private static class DownloadBatchNotificationInformation implements NotificationInformation {
+    private static class CustomNotificationInformation implements NotificationInformation {
+
         private final int id;
         private final Notification notification;
 
-        DownloadBatchNotificationInformation(int id, Notification notification) {
+        CustomNotificationInformation(int id, Notification notification) {
             this.id = id;
             this.notification = notification;
         }

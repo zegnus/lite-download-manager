@@ -16,7 +16,7 @@ final class DownloadBatchFactory {
                                      FileDownloader fileDownloader,
                                      DownloadsBatchPersistence downloadsBatchPersistence,
                                      DownloadsFilePersistence downloadsFilePersistence,
-                                     DownloadBatchNotification downloadBatchNotification) {
+                                     NotificationCreator notificationCreator) {
         DownloadBatchTitle downloadBatchTitle = DownloadBatchTitle.from(batch);
         DownloadBatchId downloadBatchId = DownloadBatchId.from(batch);
         List<String> fileUrls = batch.getFileUrls();
@@ -51,7 +51,7 @@ final class DownloadBatchFactory {
 
         DownloadBatchStatus downloadBatchStatus = new DownloadBatchStatus(
                 downloadsBatchPersistence,
-                downloadBatchNotification,
+                notificationCreator,
                 downloadBatchId,
                 downloadBatchTitle,
                 DownloadBatchStatus.Status.QUEUED

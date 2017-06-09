@@ -1,7 +1,5 @@
 package com.novoda.litedownloadmanager;
 
-import android.app.Notification;
-
 import java.security.InvalidParameterException;
 
 public class DownloadBatchStatus {
@@ -34,7 +32,7 @@ public class DownloadBatchStatus {
     private final DownloadBatchTitle downloadBatchTitle;
     private final DownloadBatchId downloadBatchId;
     private final DownloadsBatchPersistence downloadsBatchPersistence;
-    private final DownloadBatchNotification downloadBatchNotification;
+    private final NotificationCreator notificationCreator;
 
     private long bytesDownloaded;
     private long totalBatchSizeBytes;
@@ -43,10 +41,11 @@ public class DownloadBatchStatus {
     private Status status;
 
     DownloadBatchStatus(DownloadsBatchPersistence downloadsBatchPersistence,
-                        DownloadBatchNotification downloadBatchNotification, DownloadBatchId downloadBatchId,
+                        NotificationCreator notificationCreator,
+                        DownloadBatchId downloadBatchId,
                         DownloadBatchTitle downloadBatchTitle,
                         Status status) {
-        this.downloadBatchNotification = downloadBatchNotification;
+        this.notificationCreator = notificationCreator;
         this.downloadBatchTitle = downloadBatchTitle;
         this.downloadsBatchPersistence = downloadsBatchPersistence;
         this.downloadBatchId = downloadBatchId;
@@ -83,8 +82,12 @@ public class DownloadBatchStatus {
         return downloadBatchId;
     }
 
-    public Notification createNotification() {
-        return downloadBatchNotification.createNotification(
+    public DownloadBatchTitle getDownloadBatchTitle() {
+        return downloadBatchTitle;
+    }
+
+    NotificationInformation createNotification() {
+        return notificationCreator.createNotification(
                 downloadBatchTitle,
                 percentageDownloaded,
                 (int) totalBatchSizeBytes,
@@ -134,6 +137,10 @@ public class DownloadBatchStatus {
 
     public boolean isMarkedAsError() {
         return status == Status.ERROR;
+    }
+
+    public boolean isMarkedAsDownloading() {
+        return status == Status.DOWNLOADING;
     }
 
     public DownloadError.Error getDownloadErrorType() {

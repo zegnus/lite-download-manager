@@ -9,6 +9,7 @@ import com.novoda.litedownloadmanager.FileDownloader;
 import com.novoda.litedownloadmanager.FileSizeRequester;
 import com.novoda.litedownloadmanager.LiteDownloadManagerBuilder;
 import com.novoda.litedownloadmanager.LiteDownloadManagerCommands;
+import com.novoda.litedownloadmanager.NotificationCreator;
 
 public class DemoApplication extends Application {
 
@@ -25,6 +26,7 @@ public class DemoApplication extends Application {
         FileSizeRequester fileSizeRequester = new CustomFileSizeRequester();
         FileDownloader fileDownloader = new CustomFileDownloader();
         //DownloadsPersistence downloadsPersistence = new CustomDownloadsPersistence();
+        NotificationCreator notificationCreator = new CustomNotificationCreator(this, R.mipmap.ic_launcher_round);
 
         Handler handler = new Handler(Looper.getMainLooper());
         liteDownloadManagerCommands = LiteDownloadManagerBuilder
@@ -32,6 +34,7 @@ public class DemoApplication extends Application {
                 .withFileDownloaderCustom(fileSizeRequester, fileDownloader)
                 //.withFilePersistenceCustom(CustomFilePersistence.class)
                 //.withDownloadsPersistenceCustom(downloadsPersistence)
+                .withNotification(notificationCreator)
                 .build();
     }
 

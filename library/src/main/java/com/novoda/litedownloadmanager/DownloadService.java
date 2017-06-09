@@ -1,6 +1,5 @@
 package com.novoda.litedownloadmanager;
 
-import android.app.Notification;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
@@ -14,7 +13,7 @@ import java.util.concurrent.Executors;
 public class DownloadService extends Service implements DownloadServiceCommands {
 
     private static final String WAKELOCK_TAG = "WakelockTag";
-    private static final int ID = 1;
+    private static final boolean DO_NOT_REMOVE_NOTIFICATION = false;
 
     private ExecutorService executor;
     private IBinder binder;
@@ -56,8 +55,13 @@ public class DownloadService extends Service implements DownloadServiceCommands 
     }
 
     @Override
-    public void updateNotification(Notification notification) {
-        startForeground(ID, notification);
+    public void updateNotification(NotificationInformation notificationInformation) {
+        startForeground(notificationInformation.getId(), notificationInformation.getNotification());
+    }
+
+    @Override
+    public void makeNotificationDismissible(NotificationInformation notificationInformation) {
+        stopForeground(DO_NOT_REMOVE_NOTIFICATION);
     }
 
     private void updateStatusToQueuedIfNeeded(DownloadBatch downloadBatch, DownloadBatchCallback callback) {

@@ -1,10 +1,10 @@
 package com.novoda.litedownloadmanager;
 
-import android.app.Notification;
-
 interface DownloadServiceCommands {
 
     void download(DownloadBatch downloadBatch, DownloadBatchCallback callback);
 
-    void updateNotification(Notification notification);
+    void updateNotification(NotificationInformation notification);
+
+    void makeNotificationDismissible(NotificationInformation notificationInformation);
 }
