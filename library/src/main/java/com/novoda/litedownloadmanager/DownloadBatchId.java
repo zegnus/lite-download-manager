@@ -41,4 +41,11 @@ public final class DownloadBatchId {
     public int hashCode() {
         return id;
     }
+
+    @Override
+    public String toString() {
+        return "DownloadBatchId{" +
+                "id=" + id +
+                '}';
+    }
 }

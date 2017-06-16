@@ -91,5 +91,17 @@ public interface DownloadsPersistence {
         FilePersistenceType getFilePersistenceType() {
             return filePersistenceType;
         }
+
+        @Override
+        public String toString() {
+            return "FilePersisted{" +
+                    "downloadBatchId=" + downloadBatchId +
+                    ", downloadFileId=" + downloadFileId +
+                    ", fileName=" + fileName +
+                    ", totalFileSize=" + totalFileSize +
+                    ", url='" + url + '\'' +
+                    ", filePersistenceType=" + filePersistenceType +
+                    '}';
+        }
     }
 }

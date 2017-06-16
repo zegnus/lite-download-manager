@@ -3,7 +3,7 @@
   xmlns:tools="http://schemas.android.com/tools"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
-  tools:context="com.novoda.demo.MainActivity"
+  tools:context="com.novoda.litedownloadmanager.demo.MainActivity"
   android:orientation="vertical">
 
   <LinearLayout
@@ -29,8 +29,7 @@
       android:id="@+id/button_resume_downloading_1"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:text="Resume"
-      android:visibility="gone"/>
+      android:text="Resume"/>
 
   </LinearLayout>
 
@@ -58,8 +57,7 @@
       android:id="@+id/button_resume_downloading_2"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:text="Resume"
-      android:visibility="gone" />
+      android:text="Resume"/>
 
   </LinearLayout>
 
@@ -73,7 +71,6 @@
     android:id="@+id/button_delete_all"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:text="Delete all"
-    android:visibility="gone"/>
+    android:text="Delete all"/>
 
 </LinearLayout>

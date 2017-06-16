@@ -46,6 +46,11 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
     }
 
     void initialise(final DownloadServiceCommands downloadService) {
+        setDownloadService(downloadService);
+    }
+
+    @Override
+    public void submitAllStoredDownloads(final AllStoredDownloadsSubmittedCallback callback) {
         downloadsBatchPersistence.loadAsync(
                 fileSizeRequester,
                 filePersistenceCreator,
@@ -56,10 +61,15 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
                     @Override
                     public void onLoaded(List<DownloadBatch> downloadBatches) {
                         for (DownloadBatch downloadBatch : downloadBatches) {
-                            download(downloadBatch);
+                            DownloadBatchId id = downloadBatch.getId();
+                            if (downloadBatchMap.containsKey(id)) {
+                                resume(id);
+                            } else {
+                                download(downloadBatch);
+                            }
                         }
 
-                        setDownloadService(downloadService);
+                        callback.onAllDownloadsSubmited();
                     }
                 }
         );
@@ -91,13 +101,13 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
     private void download(DownloadBatch downloadBatch) {
         downloadBatchMap.put(downloadBatch.getId(), downloadBatch);
         if (downloadService == null) {
-            ensureDownloadServiceExistsAndProceed(downloadBatch);
+            ensureDownloadServiceExistsAndDownload(downloadBatch);
         } else {
             executeDownload(downloadBatch);
         }
     }
 
-    private void ensureDownloadServiceExistsAndProceed(final DownloadBatch downloadBatch) {
+    private void ensureDownloadServiceExistsAndDownload(final DownloadBatch downloadBatch) {
         EXECUTOR.submit(new Runnable() {
             @Override
             public void run() {
@@ -189,13 +199,31 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
     }
 
     @Override
-    public List<DownloadBatchStatus> getAllDownloadBatchStatuses() {
+    public void getAllDownloadBatchStatuses(AllBatchStatusesCallback callback) {
+        if (downloadService == null) {
+            ensureDownloadServiceExistsAndGetAllDownloadBatchStatuses(callback);
+        } else {
+            executeGetAllDownloadBatchStatuses(callback);
+        }
+    }
+
+    private void ensureDownloadServiceExistsAndGetAllDownloadBatchStatuses(final AllBatchStatusesCallback callback) {
+        EXECUTOR.submit(new Runnable() {
+            @Override
+            public void run() {
+                waitForDownloadService();
+                executeGetAllDownloadBatchStatuses(callback);
+            }
+        });
+    }
+
+    private void executeGetAllDownloadBatchStatuses(AllBatchStatusesCallback callback) {
         List<DownloadBatchStatus> downloadBatchStatuses = new ArrayList<>(downloadBatchMap.size());
 
         for (DownloadBatch downloadBatch : downloadBatchMap.values()) {
             downloadBatchStatuses.add(downloadBatch.getDownloadBatchStatus());
         }
 
-        return downloadBatchStatuses;
+        callback.onReceived(downloadBatchStatuses);
     }
 }

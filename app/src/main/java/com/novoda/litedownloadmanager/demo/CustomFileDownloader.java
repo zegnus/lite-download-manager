@@ -25,7 +25,6 @@ class CustomFileDownloader implements FileDownloader {
                 e.printStackTrace();
             }
             callback.onBytesRead(buffer, BYTES_READ);
-            Log.v("New bytes downloaded: " + fileSize);
         }
 
         Log.v("Download finished");

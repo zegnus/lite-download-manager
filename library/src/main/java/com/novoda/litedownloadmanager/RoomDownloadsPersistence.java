@@ -3,6 +3,8 @@ package com.novoda.litedownloadmanager;
 import android.arch.persistence.room.Room;
 import android.content.Context;
 
+import com.novoda.notils.logger.simple.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,6 +45,7 @@ class RoomDownloadsPersistence implements DownloadsPersistence {
         RoomBatch roomBatch = new RoomBatch();
         roomBatch.downloadBatchId = batchPersisted.getDownloadBatchId().getId();
         roomBatch.status = batchPersisted.getDownloadBatchStatus().toRawValue();
+        roomBatch.downloadBatchTitle = batchPersisted.getDownloadBatchTitle().toString();
 
         database.roomBatchDao().insert(roomBatch);
     }
@@ -66,6 +69,7 @@ class RoomDownloadsPersistence implements DownloadsPersistence {
 
     @Override
     public void persistFile(FilePersisted filePersisted) {
+        Log.v("persist file: " + filePersisted);
         RoomFile roomFile = new RoomFile();
         roomFile.totalSize = filePersisted.getTotalFileSize();
         roomFile.batchId = filePersisted.getDownloadBatchId().getId();

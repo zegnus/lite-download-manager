@@ -134,7 +134,12 @@ public final class LiteDownloadManagerBuilder {
             public void onServiceConnected(ComponentName name, IBinder service) {
                 DownloadService.DownloadServiceBinder binder = (DownloadService.DownloadServiceBinder) service;
                 downloadService = binder.getService();
-                liteDownloadManager.initialise(downloadService);
+                liteDownloadManager.submitAllStoredDownloads(new AllStoredDownloadsSubmittedCallback() {
+                    @Override
+                    public void onAllDownloadsSubmited() {
+                        liteDownloadManager.initialise(downloadService);
+                    }
+                });
             }
 
             @Override

@@ -39,10 +39,6 @@ class DownloadFile {
     void download(final Callback callback) {
         callback.onUpdate(downloadFileStatus);
 
-        if (fileSize.getCurrentSize() == fileSize.getTotalSize()) {
-            return;
-        }
-
         moveStatusToDownloadingIfQueued();
 
         fileSize = requestTotalFileSizeIfNecessary(fileSize);
@@ -60,6 +56,12 @@ class DownloadFile {
         }
 
         fileSize.setCurrentSize(filePersistence.getCurrentSize());
+
+        if (fileSize.getCurrentSize() == fileSize.getTotalSize()) {
+            downloadFileStatus.update(fileSize);
+            callback.onUpdate(downloadFileStatus);
+            return;
+        }
 
         fileDownloader.startDownloading(url, fileSize, new FileDownloader.Callback() {
             @Override

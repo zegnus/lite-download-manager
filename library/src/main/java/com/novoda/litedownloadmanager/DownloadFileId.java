@@ -40,4 +40,11 @@ final class DownloadFileId {
     public int hashCode() {
         return id;
     }
+
+    @Override
+    public String toString() {
+        return "DownloadFileId{" +
+                "id=" + id +
+                '}';
+    }
 }
