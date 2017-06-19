@@ -83,7 +83,12 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
     }
 
     @Override
-    public String download(Batch batch) {
+    public void download(Batch batch) {
+        DownloadBatch runningDownloadBatch = downloadBatchMap.get(batch.getDownloadBatchId());
+        if (runningDownloadBatch != null) {
+            return;
+        }
+
         DownloadBatch downloadBatch = DownloadBatchFactory.newInstance(
                 batch,
                 fileSizeRequester,
@@ -95,8 +100,6 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
         );
         downloadBatch.persist();
         download(downloadBatch);
-        DownloadBatchId downloadBatchId = downloadBatch.getId();
-        return downloadBatchId.stringValue();
     }
 
     private void download(DownloadBatch downloadBatch) {
