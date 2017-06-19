@@ -9,10 +9,9 @@ class DownloadFile {
     private final String url;
     private final DownloadFileStatus downloadFileStatus;
     private final FileName fileName;
-    private final FileSizeRequester fileSizeRequester;
+    private final FileOperations fileOperations;
     private final FilePersistence filePersistence;
     private final DownloadsFilePersistence downloadsFilePersistence;
-    private final FileDownloader fileDownloader;
 
     private FileSize fileSize;
 
@@ -21,17 +20,15 @@ class DownloadFile {
                  DownloadFileStatus downloadFileStatus,
                  FileName fileName,
                  FileSize fileSize,
-                 FileSizeRequester fileSizeRequester,
+                 FileOperations fileOperations,
                  FilePersistence filePersistence,
-                 FileDownloader fileDownloader,
                  DownloadsFilePersistence downloadsFilePersistence) {
         this.downloadBatchId = downloadBatchId;
         this.url = url;
         this.downloadFileStatus = downloadFileStatus;
         this.fileName = fileName;
-        this.fileSizeRequester = fileSizeRequester;
+        this.fileOperations = fileOperations;
         this.filePersistence = filePersistence;
-        this.fileDownloader = fileDownloader;
         this.fileSize = fileSize;
         this.downloadsFilePersistence = downloadsFilePersistence;
     }
@@ -63,7 +60,7 @@ class DownloadFile {
             return;
         }
 
-        fileDownloader.startDownloading(url, fileSize, new FileDownloader.Callback() {
+        fileOperations.startDownloading(url, fileSize, new FileDownloader.Callback() {
             @Override
             public void onBytesRead(byte[] buffer, int bytesRead) {
                 boolean success = filePersistence.write(buffer, 0, bytesRead);
@@ -119,7 +116,7 @@ class DownloadFile {
         FileSize updatedFileSize = fileSize.copy();
 
         if (fileSize.isTotalSizeUnknown()) {
-            FileSize requestFileSize = fileSizeRequester.requestFileSize(url);
+            FileSize requestFileSize = fileOperations.requestFileSize(url);
             if (requestFileSize.isTotalSizeKnown()) {
                 updatedFileSize.setTotalSize(requestFileSize.getTotalSize());
             }
@@ -141,7 +138,7 @@ class DownloadFile {
 
     void pause() {
         downloadFileStatus.isMarkedAsPaused();
-        fileDownloader.stopDownloading();
+        fileOperations.stopDownloading();
     }
 
     void resume() {
@@ -151,7 +148,7 @@ class DownloadFile {
     void delete() {
         if (downloadFileStatus.isMarkedAsDownloading()) {
             downloadFileStatus.markForDeletion();
-            fileDownloader.stopDownloading();
+            fileOperations.stopDownloading();
         } else {
             filePersistence.delete();
         }
@@ -159,7 +156,7 @@ class DownloadFile {
 
     long getTotalSize() {
         if (fileSize.isTotalSizeUnknown()) {
-            FileSize requestFileSize = fileSizeRequester.requestFileSize(url);
+            FileSize requestFileSize = fileOperations.requestFileSize(url);
             fileSize.setTotalSize(requestFileSize.getTotalSize());
             persistSync();
         }

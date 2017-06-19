@@ -16,9 +16,7 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
     private final Handler callbackHandler;
     private final Map<DownloadBatchId, DownloadBatch> downloadBatchMap;
     private final List<DownloadBatchCallback> callbacks;
-    private final FileSizeRequester fileSizeRequester;
-    private final FilePersistenceCreator filePersistenceCreator;
-    private final FileDownloader fileDownloader;
+    private final FileOperations fileOperations;
     private final DownloadsBatchPersistence downloadsBatchPersistence;
     private final DownloadsFilePersistence downloadsFilePersistence;
     private final NotificationCreator notificationCreator;
@@ -28,18 +26,14 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
     LiteDownloadManager(Handler callbackHandler,
                         Map<DownloadBatchId, DownloadBatch> downloadBatchMap,
                         List<DownloadBatchCallback> callbacks,
-                        FileSizeRequester fileSizeRequester,
-                        FilePersistenceCreator filePersistenceCreator,
-                        FileDownloader fileDownloader,
+                        FileOperations fileOperations,
                         DownloadsBatchPersistence downloadsBatchPersistence,
                         DownloadsFilePersistence downloadsFilePersistence,
                         NotificationCreator notificationCreator) {
         this.callbackHandler = callbackHandler;
         this.downloadBatchMap = downloadBatchMap;
         this.callbacks = callbacks;
-        this.fileSizeRequester = fileSizeRequester;
-        this.filePersistenceCreator = filePersistenceCreator;
-        this.fileDownloader = fileDownloader;
+        this.fileOperations = fileOperations;
         this.downloadsBatchPersistence = downloadsBatchPersistence;
         this.downloadsFilePersistence = downloadsFilePersistence;
         this.notificationCreator = notificationCreator;
@@ -49,12 +43,17 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
         setDownloadService(downloadService);
     }
 
+    private void setDownloadService(DownloadServiceCommands downloadService) {
+        this.downloadService = downloadService;
+        synchronized (WAIT_FOR_DOWNLOAD_SERVICE) {
+            WAIT_FOR_DOWNLOAD_SERVICE.notifyAll();
+        }
+    }
+
     @Override
     public void submitAllStoredDownloads(final AllStoredDownloadsSubmittedCallback callback) {
         downloadsBatchPersistence.loadAsync(
-                fileSizeRequester,
-                filePersistenceCreator,
-                fileDownloader,
+                fileOperations,
                 downloadsBatchPersistence,
                 notificationCreator,
                 new DownloadsBatchPersistence.LoadBatchesCallback() {
@@ -75,13 +74,6 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
         );
     }
 
-    private void setDownloadService(DownloadServiceCommands downloadService) {
-        this.downloadService = downloadService;
-        synchronized (WAIT_FOR_DOWNLOAD_SERVICE) {
-            WAIT_FOR_DOWNLOAD_SERVICE.notifyAll();
-        }
-    }
-
     @Override
     public void download(Batch batch) {
         DownloadBatch runningDownloadBatch = downloadBatchMap.get(batch.getDownloadBatchId());
@@ -91,9 +83,7 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
 
         DownloadBatch downloadBatch = DownloadBatchFactory.newInstance(
                 batch,
-                fileSizeRequester,
-                filePersistenceCreator,
-                fileDownloader,
+                fileOperations,
                 downloadsBatchPersistence,
                 downloadsFilePersistence,
                 notificationCreator
@@ -125,13 +115,13 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
         downloadService.download(downloadBatch, new DownloadBatchCallback() {
             @Override
             public void onUpdate(final DownloadBatchStatus downloadBatchStatus) {
-                updateNotification(downloadBatchStatus);
                 callbackHandler.post(new Runnable() {
                     @Override
                     public void run() {
                         for (DownloadBatchCallback callback : callbacks) {
                             callback.onUpdate(downloadBatchStatus);
                         }
+                        updateNotification(downloadBatchStatus);
                     }
                 });
             }

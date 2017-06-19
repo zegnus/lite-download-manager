@@ -45,9 +45,7 @@ class DownloadsBatchPersistence {
         });
     }
 
-    void loadAsync(final FileSizeRequester fileSizeRequester,
-                   final FilePersistenceCreator filePersistenceCreator,
-                   final FileDownloader fileDownloader,
+    void loadAsync(final FileOperations fileOperations,
                    final DownloadsBatchPersistence downloadsBatchPersistence,
                    final NotificationCreator notificationCreator,
                    final LoadBatchesCallback callback) {
@@ -72,9 +70,7 @@ class DownloadsBatchPersistence {
                     List<DownloadFile> downloadFiles = downloadsFilePersistence.loadSync(
                             downloadBatchId,
                             status,
-                            fileSizeRequester,
-                            filePersistenceCreator,
-                            fileDownloader,
+                            fileOperations,
                             downloadsFilePersistence
                     );
 

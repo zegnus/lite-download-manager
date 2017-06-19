@@ -150,13 +150,13 @@ public final class LiteDownloadManagerBuilder {
 
         context.bindService(intent, serviceConnection, Service.BIND_AUTO_CREATE);
 
+        FileOperations fileOperations = new FileOperations(filePersistenceCreator, fileSizeRequester, fileDownloader);
+
         liteDownloadManager = new LiteDownloadManager(
                 callbackHandler,
                 new HashMap<DownloadBatchId, DownloadBatch>(),
                 new ArrayList<DownloadBatchCallback>(),
-                fileSizeRequester,
-                filePersistenceCreator,
-                fileDownloader,
+                fileOperations,
                 downloadsBatchPersistence,
                 downloadsFilePersistence,
                 notificationCreator

@@ -11,9 +11,7 @@ final class DownloadBatchFactory {
     }
 
     static DownloadBatch newInstance(Batch batch,
-                                     FileSizeRequester fileSizeRequester,
-                                     FilePersistenceCreator filePersistenceCreator,
-                                     FileDownloader fileDownloader,
+                                     FileOperations fileOperations,
                                      DownloadsBatchPersistence downloadsBatchPersistence,
                                      DownloadsFilePersistence downloadsFilePersistence,
                                      NotificationCreator notificationCreator) {
@@ -34,16 +32,15 @@ final class DownloadBatchFactory {
             );
             FileName fileName = FileName.from(batch, fileUrl);
 
-            FilePersistence filePersistence = filePersistenceCreator.create();
+            FilePersistence filePersistence = fileOperations.createPersistence();
             DownloadFile downloadFile = new DownloadFile(
                     downloadBatchId,
                     fileUrl,
                     downloadFileStatus,
                     fileName,
                     fileSize,
-                    fileSizeRequester,
+                    fileOperations,
                     filePersistence,
-                    fileDownloader,
                     downloadsFilePersistence
             );
             downloadFiles.add(downloadFile);

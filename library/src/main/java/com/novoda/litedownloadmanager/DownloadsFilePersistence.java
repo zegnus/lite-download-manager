@@ -32,9 +32,7 @@ class DownloadsFilePersistence {
 
     List<DownloadFile> loadSync(DownloadBatchId batchId,
                                 DownloadBatchStatus.Status batchStatus,
-                                FileSizeRequester fileSizeRequester,
-                                FilePersistenceCreator filePersistenceCreator,
-                                FileDownloader fileDownloader,
+                                FileOperations fileOperations,
                                 DownloadsFilePersistence downloadsFilePersistence) {
         List<DownloadsPersistence.FilePersisted> filePersistedList = downloadsPersistence.loadFiles(batchId);
 
@@ -59,9 +57,8 @@ class DownloadsFilePersistence {
                     downloadFileStatus,
                     fileName,
                     fileSize,
-                    fileSizeRequester,
-                    filePersistenceCreator.create(filePersisted.getFilePersistenceType()),
-                    fileDownloader,
+                    fileOperations,
+                    fileOperations.createPersistence(filePersisted.getFilePersistenceType()),
                     downloadsFilePersistence
             );
 
