@@ -52,25 +52,25 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
 
     @Override
     public void submitAllStoredDownloads(final AllStoredDownloadsSubmittedCallback callback) {
-        downloadsBatchPersistence.loadAsync(
-                fileOperations,
-                notificationCreator,
-                new DownloadsBatchPersistence.LoadBatchesCallback() {
-                    @Override
-                    public void onLoaded(List<DownloadBatch> downloadBatches) {
-                        for (DownloadBatch downloadBatch : downloadBatches) {
-                            DownloadBatchId id = downloadBatch.getId();
-                            if (downloadBatchMap.containsKey(id)) {
-                                resume(id);
-                            } else {
-                                download(downloadBatch);
-                            }
-                        }
+        downloadsBatchPersistence.loadAsync(fileOperations, notificationCreator, loadBatchesCallback(callback));
+    }
 
-                        callback.onAllDownloadsSubmited();
+    private DownloadsBatchPersistence.LoadBatchesCallback loadBatchesCallback(final AllStoredDownloadsSubmittedCallback callback) {
+        return new DownloadsBatchPersistence.LoadBatchesCallback() {
+            @Override
+            public void onLoaded(List<DownloadBatch> downloadBatches) {
+                for (DownloadBatch downloadBatch : downloadBatches) {
+                    DownloadBatchId id = downloadBatch.getId();
+                    if (downloadBatchMap.containsKey(id)) {
+                        resume(id);
+                    } else {
+                        download(downloadBatch);
                     }
                 }
-        );
+
+                callback.onAllDownloadsSubmited();
+            }
+        };
     }
 
     @Override
@@ -112,7 +112,11 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
 
     private void executeDownload(final DownloadBatch downloadBatch) {
         updateStatusToQueuedIfNeeded(downloadBatch);
-        downloadService.download(downloadBatch, new DownloadBatchCallback() {
+        downloadService.download(downloadBatch, downloadBatchCallback());
+    }
+
+    private DownloadBatchCallback downloadBatchCallback() {
+        return new DownloadBatchCallback() {
             @Override
             public void onUpdate(final DownloadBatchStatus downloadBatchStatus) {
                 callbackHandler.post(new Runnable() {
@@ -125,7 +129,7 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
                     }
                 });
             }
-        });
+        };
     }
 
     private void updateStatusToQueuedIfNeeded(DownloadBatch downloadBatch) {
