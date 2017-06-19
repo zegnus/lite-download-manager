@@ -51,14 +51,19 @@ class DownloadsFilePersistence {
                     new DownloadError()
             );
 
+            FileSizeRequester fileSizeRequester = fileOperations.fileSizeRequester();
+            FileDownloader fileDownloader = fileOperations.fileDownloader();
+            FilePersistenceCreator filePersistenceCreator = fileOperations.filePersistenceCreator();
+
             DownloadFile downloadFile = new DownloadFile(
                     batchId,
                     url,
                     downloadFileStatus,
                     fileName,
                     fileSize,
-                    fileOperations,
-                    fileOperations.createPersistence(filePersisted.getFilePersistenceType()),
+                    fileDownloader,
+                    fileSizeRequester,
+                    filePersistenceCreator.create(filePersisted.getFilePersistenceType()),
                     downloadsFilePersistence
             );
 

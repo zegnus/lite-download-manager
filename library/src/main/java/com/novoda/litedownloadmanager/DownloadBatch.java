@@ -44,7 +44,7 @@ class DownloadBatch {
             return;
         }
 
-        downloadBatchStatus.markAsDownloading();
+        downloadBatchStatus.markAsDownloading(downloadsBatchPersistence);
         notifyCallback(downloadBatchStatus);
 
         totalBatchSizeBytes = getTotalSize(downloadFiles);
@@ -113,7 +113,7 @@ class DownloadBatch {
         if (downloadBatchStatus.isMarkedAsPaused()) {
             return;
         }
-        downloadBatchStatus.markAsPaused();
+        downloadBatchStatus.markAsPaused(downloadsBatchPersistence);
         notifyCallback(downloadBatchStatus);
         for (DownloadFile downloadFile : downloadFiles) {
             downloadFile.pause();
@@ -124,7 +124,7 @@ class DownloadBatch {
         if (downloadBatchStatus.isMarkedAsResume() || downloadBatchStatus.isMarkedAsDownloading()) {
             return;
         }
-        downloadBatchStatus.markAsQueued();
+        downloadBatchStatus.markAsQueued(downloadsBatchPersistence);
         notifyCallback(downloadBatchStatus);
         for (DownloadFile downloadFile : downloadFiles) {
             downloadFile.resume();
@@ -144,7 +144,7 @@ class DownloadBatch {
         return downloadBatchId;
     }
 
-    DownloadBatchStatus getDownloadBatchStatus() {
+    DownloadBatchStatus status() {
         return downloadBatchStatus;
     }
 

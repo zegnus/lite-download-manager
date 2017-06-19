@@ -54,7 +54,6 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
     public void submitAllStoredDownloads(final AllStoredDownloadsSubmittedCallback callback) {
         downloadsBatchPersistence.loadAsync(
                 fileOperations,
-                downloadsBatchPersistence,
                 notificationCreator,
                 new DownloadsBatchPersistence.LoadBatchesCallback() {
                     @Override
@@ -112,6 +111,7 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
     }
 
     private void executeDownload(final DownloadBatch downloadBatch) {
+        updateStatusToQueuedIfNeeded(downloadBatch);
         downloadService.download(downloadBatch, new DownloadBatchCallback() {
             @Override
             public void onUpdate(final DownloadBatchStatus downloadBatchStatus) {
@@ -126,6 +126,14 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
                 });
             }
         });
+    }
+
+    private void updateStatusToQueuedIfNeeded(DownloadBatch downloadBatch) {
+        DownloadBatchStatus downloadBatchStatus = downloadBatch.status();
+
+        if (!downloadBatchStatus.isMarkedAsPaused()) {
+            downloadBatchStatus.markAsQueued(downloadsBatchPersistence);
+        }
     }
 
     private void updateNotification(DownloadBatchStatus downloadBatchStatus) {
@@ -215,7 +223,7 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
         List<DownloadBatchStatus> downloadBatchStatuses = new ArrayList<>(downloadBatchMap.size());
 
         for (DownloadBatch downloadBatch : downloadBatchMap.values()) {
-            downloadBatchStatuses.add(downloadBatch.getDownloadBatchStatus());
+            downloadBatchStatuses.add(downloadBatch.status());
         }
 
         callback.onReceived(downloadBatchStatuses);

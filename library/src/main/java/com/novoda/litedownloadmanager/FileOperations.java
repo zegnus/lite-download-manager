@@ -12,23 +12,15 @@ class FileOperations {
         this.fileDownloader = fileDownloader;
     }
 
-    FilePersistence createPersistence() {
-        return filePersistenceCreator.create();
+    public FilePersistenceCreator filePersistenceCreator() {
+        return filePersistenceCreator;
     }
 
-    FilePersistence createPersistence(FilePersistenceType filePersistenceType) {
-        return filePersistenceCreator.create(filePersistenceType);
+    public FileSizeRequester fileSizeRequester() {
+        return fileSizeRequester;
     }
 
-    void startDownloading(String url, FileSize fileSize, FileDownloader.Callback callback) {
-        fileDownloader.startDownloading(url, fileSize, callback);
-    }
-
-    void stopDownloading() {
-        fileDownloader.stopDownloading();
-    }
-
-    FileSize requestFileSize(String url) {
-        return fileSizeRequester.requestFileSize(url);
+    public FileDownloader fileDownloader() {
+        return fileDownloader;
     }
 }

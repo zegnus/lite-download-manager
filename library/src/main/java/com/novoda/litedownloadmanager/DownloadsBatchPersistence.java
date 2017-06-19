@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 
-class DownloadsBatchPersistence {
+class DownloadsBatchPersistence implements DownloadsBatchStatusPersistence {
 
     private final Executor executor;
     private final DownloadsFilePersistence downloadsFilePersistence;
@@ -46,7 +46,6 @@ class DownloadsBatchPersistence {
     }
 
     void loadAsync(final FileOperations fileOperations,
-                   final DownloadsBatchPersistence downloadsBatchPersistence,
                    final NotificationCreator notificationCreator,
                    final LoadBatchesCallback callback) {
         executor.execute(new Runnable() {
@@ -60,7 +59,6 @@ class DownloadsBatchPersistence {
                     DownloadBatchId downloadBatchId = batchPersisted.getDownloadBatchId();
                     DownloadBatchTitle downloadBatchTitle = batchPersisted.getDownloadBatchTitle();
                     DownloadBatchStatus downloadBatchStatus = new DownloadBatchStatus(
-                            downloadsBatchPersistence,
                             notificationCreator,
                             downloadBatchId,
                             downloadBatchTitle,
@@ -105,7 +103,8 @@ class DownloadsBatchPersistence {
         });
     }
 
-    void updateStatusAsync(final DownloadBatchId downloadBatchId, final DownloadBatchStatus.Status status) {
+    @Override
+    public void updateStatusAsync(final DownloadBatchId downloadBatchId, final DownloadBatchStatus.Status status) {
         executor.execute(new Runnable() {
             @Override
             public void run() {

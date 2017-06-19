@@ -41,7 +41,8 @@ public class DownloadService extends Service implements DownloadServiceCommands 
 
     @Override
     public void download(final DownloadBatch downloadBatch, final DownloadBatchCallback callback) {
-        updateStatusToQueuedIfNeeded(downloadBatch, callback);
+        callback.onUpdate(downloadBatch.status());
+
         downloadBatch.setCallback(callback);
 
         executor.execute(new Runnable() {
@@ -62,16 +63,6 @@ public class DownloadService extends Service implements DownloadServiceCommands 
     @Override
     public void makeNotificationDismissible(NotificationInformation notificationInformation) {
         stopForeground(DO_NOT_REMOVE_NOTIFICATION);
-    }
-
-    private void updateStatusToQueuedIfNeeded(DownloadBatch downloadBatch, DownloadBatchCallback callback) {
-        DownloadBatchStatus downloadBatchStatus = downloadBatch.getDownloadBatchStatus();
-
-        if (!downloadBatchStatus.isMarkedAsPaused()) {
-            downloadBatchStatus.markAsQueued();
-        }
-
-        callback.onUpdate(downloadBatchStatus);
     }
 
     private void acquireCpuWakeLock() {

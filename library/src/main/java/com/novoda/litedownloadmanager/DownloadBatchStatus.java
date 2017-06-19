@@ -31,7 +31,6 @@ public class DownloadBatchStatus {
 
     private final DownloadBatchTitle downloadBatchTitle;
     private final DownloadBatchId downloadBatchId;
-    private final DownloadsBatchPersistence downloadsBatchPersistence;
     private final NotificationCreator notificationCreator;
 
     private long bytesDownloaded;
@@ -40,14 +39,12 @@ public class DownloadBatchStatus {
     private DownloadError downloadError;
     private Status status;
 
-    DownloadBatchStatus(DownloadsBatchPersistence downloadsBatchPersistence,
-                        NotificationCreator notificationCreator,
+    DownloadBatchStatus(NotificationCreator notificationCreator,
                         DownloadBatchId downloadBatchId,
                         DownloadBatchTitle downloadBatchTitle,
                         Status status) {
         this.notificationCreator = notificationCreator;
         this.downloadBatchTitle = downloadBatchTitle;
-        this.downloadsBatchPersistence = downloadsBatchPersistence;
         this.downloadBatchId = downloadBatchId;
         this.status = status;
     }
@@ -99,27 +96,27 @@ public class DownloadBatchStatus {
         return status;
     }
 
-    void markAsDownloading() {
+    void markAsDownloading(DownloadsBatchStatusPersistence persistence) {
         status = Status.DOWNLOADING;
-        updateStatus(status);
+        updateStatus(status, persistence);
     }
 
-    void markAsPaused() {
+    void markAsPaused(DownloadsBatchStatusPersistence persistence) {
         status = Status.PAUSED;
-        updateStatus(status);
+        updateStatus(status, persistence);
     }
 
-    void markAsQueued() {
+    void markAsQueued(DownloadsBatchStatusPersistence persistence) {
         status = Status.QUEUED;
-        updateStatus(status);
+        updateStatus(status, persistence);
     }
 
     void markForDeletion() {
         status = Status.DELETION;
     }
 
-    private void updateStatus(Status status) {
-        downloadsBatchPersistence.updateStatusAsync(downloadBatchId, status);
+    private void updateStatus(Status status, DownloadsBatchStatusPersistence persistence) {
+        persistence.updateStatusAsync(downloadBatchId, status);
     }
 
     void markAsError(DownloadError downloadError) {
