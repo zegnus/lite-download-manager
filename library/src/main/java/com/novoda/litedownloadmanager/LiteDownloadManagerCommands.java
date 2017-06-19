@@ -2,7 +2,7 @@ package com.novoda.litedownloadmanager;
 
 public interface LiteDownloadManagerCommands {
 
-    DownloadBatchId download(Batch batch);
+    String download(Batch batch);
 
     void pause(DownloadBatchId downloadBatchId);
 

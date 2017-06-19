@@ -18,8 +18,9 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private DownloadBatchId downloadBatchId1;
-    private DownloadBatchId downloadBatchId2;
+    private static final DownloadBatchId BATCH_ID_1 = DownloadBatchId.from("batch_id_1");
+    private static final DownloadBatchId BATCH_ID_2 = DownloadBatchId.from("batch_id_2");
+
     private TextView textViewBatch1;
     private TextView textViewBatch2;
 
@@ -39,19 +40,17 @@ public class MainActivity extends AppCompatActivity {
         buttonDownload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Batch batch = new Batch.Builder("Made in chelsea")
+                Batch batch = new Batch.Builder(BATCH_ID_1, "Made in chelsea")
                         .addFile("http://ipv4.download.thinkbroadband.com/10MB.zip")
                         .addFile("http://ipv4.download.thinkbroadband.com/10MB.zip")
                         .build();
-                downloadBatchId1 = liteDownloadManagerCommands.download(batch);
+                liteDownloadManagerCommands.download(batch);
 
-                batch = new Batch.Builder("Hollyoaks")
+                batch = new Batch.Builder(BATCH_ID_2, "Hollyoaks")
                         .addFile("http://ipv4.download.thinkbroadband.com/10MB.zip")
                         .addFile("http://ipv4.download.thinkbroadband.com/10MB.zip")
                         .build();
-                downloadBatchId2 = liteDownloadManagerCommands.download(batch);
-
-                bindViews(downloadBatchId1, downloadBatchId2);
+                liteDownloadManagerCommands.download(batch);
             }
         });
 
@@ -59,8 +58,8 @@ public class MainActivity extends AppCompatActivity {
         buttonDeleteAll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                liteDownloadManagerCommands.delete(downloadBatchId1);
-                liteDownloadManagerCommands.delete(downloadBatchId2);
+                liteDownloadManagerCommands.delete(BATCH_ID_1);
+                liteDownloadManagerCommands.delete(BATCH_ID_2);
             }
         });
 
@@ -71,34 +70,26 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onReceived(List<DownloadBatchStatus> downloadBatchStatuses) {
                 for (DownloadBatchStatus downloadBatchStatus : downloadBatchStatuses) {
-                    String title = downloadBatchStatus.getDownloadBatchTitle().toString();
-                    DownloadBatchId downloadBatchId = downloadBatchStatus.getDownloadBatchId();
-                    if (title.equals("Made in chelsea")) {
-                        downloadBatchId1 = downloadBatchId;
-                    } else if (title.equals("Hollyoaks")) {
-                        downloadBatchId2 = downloadBatchId;
-                    }
-
-                    bindViews(downloadBatchId1, downloadBatchId2);
-
                     callback.onUpdate(downloadBatchStatus);
                 }
             }
         });
+
+        bindViews();
     }
 
-    private void bindViews(DownloadBatchId downloadBatchId1, DownloadBatchId downloadBatchId2) {
+    private void bindViews() {
         View buttonPauseDownload1 = findViewById(R.id.button_pause_downloading_1);
-        setPause(buttonPauseDownload1, downloadBatchId1);
+        setPause(buttonPauseDownload1, BATCH_ID_1);
 
         View buttonPauseDownload2 = findViewById(R.id.button_pause_downloading_2);
-        setPause(buttonPauseDownload2, downloadBatchId2);
+        setPause(buttonPauseDownload2, BATCH_ID_2);
 
         View buttonResumeDownload1 = findViewById(R.id.button_resume_downloading_1);
-        setResume(buttonResumeDownload1, downloadBatchId1);
+        setResume(buttonResumeDownload1, BATCH_ID_1);
 
         View buttonResumeDownload2 = findViewById(R.id.button_resume_downloading_2);
-        setResume(buttonResumeDownload2, downloadBatchId2);
+        setResume(buttonResumeDownload2, BATCH_ID_2);
     }
 
     private void setPause(View button, final DownloadBatchId downloadBatchId) {
@@ -131,9 +122,9 @@ public class MainActivity extends AppCompatActivity {
                     + "\n";
 
             DownloadBatchId downloadBatchId = downloadBatchStatus.getDownloadBatchId();
-            if (downloadBatchId.equals(downloadBatchId1)) {
+            if (downloadBatchId.equals(BATCH_ID_1)) {
                 textViewBatch1.setText(message);
-            } else if (downloadBatchId.equals(downloadBatchId2)) {
+            } else if (downloadBatchId.equals(BATCH_ID_2)) {
                 textViewBatch2.setText(message);
             }
         }

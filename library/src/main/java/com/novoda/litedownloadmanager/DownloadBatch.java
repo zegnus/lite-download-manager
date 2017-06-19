@@ -110,6 +110,9 @@ class DownloadBatch {
     }
 
     void pause() {
+        if (downloadBatchStatus.isMarkedAsPaused()) {
+            return;
+        }
         downloadBatchStatus.markAsPaused();
         notifyCallback(downloadBatchStatus);
         for (DownloadFile downloadFile : downloadFiles) {
@@ -118,6 +121,9 @@ class DownloadBatch {
     }
 
     void resume() {
+        if (downloadBatchStatus.isMarkedAsResume() || downloadBatchStatus.isMarkedAsDownloading()) {
+            return;
+        }
         downloadBatchStatus.markAsQueued();
         notifyCallback(downloadBatchStatus);
         for (DownloadFile downloadFile : downloadFiles) {

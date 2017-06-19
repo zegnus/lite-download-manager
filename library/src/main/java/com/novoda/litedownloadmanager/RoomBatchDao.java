@@ -19,7 +19,7 @@ interface RoomBatchDao {
     List<RoomBatch> loadAll();
 
     @Query("SELECT * FROM RoomBatch WHERE RoomBatch.batch_id = :batchId")
-    RoomBatch load(int batchId);
+    RoomBatch load(String batchId);
 
     @Delete
     void delete(RoomBatch... roomBatches);

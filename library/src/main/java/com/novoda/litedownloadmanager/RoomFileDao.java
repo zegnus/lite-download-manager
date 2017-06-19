@@ -14,5 +14,5 @@ interface RoomFileDao {
     void insert(RoomFile roomFile);
 
     @Query("SELECT * FROM RoomFile WHERE RoomFile.batch_id = :batchId")
-    List<RoomFile> loadAllFilesFor(int batchId);
+    List<RoomFile> loadAllFilesFor(String batchId);
 }

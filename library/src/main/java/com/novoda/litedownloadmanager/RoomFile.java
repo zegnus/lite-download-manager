@@ -16,10 +16,10 @@ class RoomFile {
 
     @PrimaryKey
     @ColumnInfo(name = "file_id")
-    String fileId;
+    String id;
 
     @ColumnInfo(name = "batch_id")
-    int batchId;
+    String batchId;
 
     @ColumnInfo(name = "file_name")
     String name;

@@ -5,12 +5,18 @@ import java.util.List;
 
 public final class Batch {
 
+    private final DownloadBatchId downloadBatchId;
     private final String title;
     private final List<String> fileUrls;
 
-    private Batch(String title, List<String> fileUrls) {
+    private Batch(DownloadBatchId downloadBatchId, String title, List<String> fileUrls) {
+        this.downloadBatchId = downloadBatchId;
         this.title = title;
         this.fileUrls = fileUrls;
+    }
+
+    public DownloadBatchId getDownloadBatchId() {
+        return downloadBatchId;
     }
 
     String getTitle() {
@@ -23,10 +29,12 @@ public final class Batch {
 
     public static class Builder {
 
+        private final DownloadBatchId downloadBatchId;
         private final String title;
         private final List<String> fileUrls = new ArrayList<>();
 
-        public Builder(String title) {
+        public Builder(DownloadBatchId downloadBatchId, String title) {
+            this.downloadBatchId = downloadBatchId;
             this.title = title;
         }
 
@@ -36,7 +44,7 @@ public final class Batch {
         }
 
         public Batch build() {
-            return new Batch(title, fileUrls);
+            return new Batch(downloadBatchId, title, fileUrls);
         }
     }
 }

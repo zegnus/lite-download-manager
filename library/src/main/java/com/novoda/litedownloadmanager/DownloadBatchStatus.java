@@ -122,13 +122,13 @@ public class DownloadBatchStatus {
         downloadsBatchPersistence.updateStatusAsync(downloadBatchId, status);
     }
 
-    public boolean isMarkedAsPaused() {
-        return status == Status.PAUSED;
-    }
-
     void markAsError(DownloadError downloadError) {
         this.status = Status.ERROR;
         this.downloadError = downloadError;
+    }
+
+    public boolean isMarkedAsPaused() {
+        return status == Status.PAUSED;
     }
 
     boolean isMarkedForDeletion() {
@@ -141,6 +141,10 @@ public class DownloadBatchStatus {
 
     public boolean isMarkedAsDownloading() {
         return status == Status.DOWNLOADING;
+    }
+
+    public boolean isMarkedAsResume() {
+        return status == Status.QUEUED;
     }
 
     public DownloadError.Error getDownloadErrorType() {

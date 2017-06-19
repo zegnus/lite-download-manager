@@ -18,9 +18,9 @@ final class DownloadBatchFactory {
                                      DownloadsFilePersistence downloadsFilePersistence,
                                      NotificationCreator notificationCreator) {
         DownloadBatchTitle downloadBatchTitle = DownloadBatchTitle.from(batch);
-        DownloadBatchId downloadBatchId = DownloadBatchId.from(batch);
         List<String> fileUrls = batch.getFileUrls();
         List<DownloadFile> downloadFiles = new ArrayList<>(fileUrls.size());
+        DownloadBatchId downloadBatchId = batch.getDownloadBatchId();
 
         for (String fileUrl : fileUrls) {
             FileSize fileSize = FileSize.Unknown();

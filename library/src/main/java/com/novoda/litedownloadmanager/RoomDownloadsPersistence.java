@@ -3,8 +3,6 @@ package com.novoda.litedownloadmanager;
 import android.arch.persistence.room.Room;
 import android.content.Context;
 
-import com.novoda.notils.logger.simple.Log;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,9 +41,9 @@ class RoomDownloadsPersistence implements DownloadsPersistence {
     @Override
     public void persistBatch(final BatchPersisted batchPersisted) {
         RoomBatch roomBatch = new RoomBatch();
-        roomBatch.downloadBatchId = batchPersisted.getDownloadBatchId().getId();
+        roomBatch.id = batchPersisted.getDownloadBatchId().stringValue();
         roomBatch.status = batchPersisted.getDownloadBatchStatus().toRawValue();
-        roomBatch.downloadBatchTitle = batchPersisted.getDownloadBatchTitle().toString();
+        roomBatch.title = batchPersisted.getDownloadBatchTitle().toString();
 
         database.roomBatchDao().insert(roomBatch);
     }
@@ -57,8 +55,8 @@ class RoomDownloadsPersistence implements DownloadsPersistence {
         List<BatchPersisted> batchPersistedList = new ArrayList<>(roomBatches.size());
         for (RoomBatch roomBatch : roomBatches) {
             BatchPersisted batchPersisted = new BatchPersisted(
-                    DownloadBatchTitle.from(roomBatch.downloadBatchTitle),
-                    DownloadBatchId.from(roomBatch.downloadBatchId),
+                    DownloadBatchTitle.from(roomBatch.title),
+                    DownloadBatchId.from(roomBatch.id),
                     DownloadBatchStatus.Status.from(roomBatch.status)
             );
             batchPersistedList.add(batchPersisted);
@@ -69,13 +67,12 @@ class RoomDownloadsPersistence implements DownloadsPersistence {
 
     @Override
     public void persistFile(FilePersisted filePersisted) {
-        Log.v("persist file: " + filePersisted);
         RoomFile roomFile = new RoomFile();
         roomFile.totalSize = filePersisted.getTotalFileSize();
-        roomFile.batchId = filePersisted.getDownloadBatchId().getId();
+        roomFile.batchId = filePersisted.getDownloadBatchId().stringValue();
         roomFile.url = filePersisted.getUrl();
         roomFile.name = filePersisted.getFileName().getName();
-        roomFile.fileId = filePersisted.getDownloadFileId().toRawId();
+        roomFile.id = filePersisted.getDownloadFileId().toRawId();
         roomFile.persistenceType = filePersisted.getFilePersistenceType().toRawValue();
 
         database.roomFileDao().insert(roomFile);
@@ -83,12 +80,12 @@ class RoomDownloadsPersistence implements DownloadsPersistence {
 
     @Override
     public List<FilePersisted> loadFiles(DownloadBatchId downloadBatchId) {
-        List<RoomFile> roomFiles = database.roomFileDao().loadAllFilesFor(downloadBatchId.getId());
+        List<RoomFile> roomFiles = database.roomFileDao().loadAllFilesFor(downloadBatchId.stringValue());
         List<FilePersisted> filePersistedList = new ArrayList<>(roomFiles.size());
         for (RoomFile roomFile : roomFiles) {
             FilePersisted filePersisted = new FilePersisted(
                     DownloadBatchId.from(roomFile.batchId),
-                    DownloadFileId.from(roomFile.fileId),
+                    DownloadFileId.from(roomFile.id),
                     FileName.from(roomFile.name),
                     roomFile.totalSize,
                     roomFile.url,
@@ -102,13 +99,13 @@ class RoomDownloadsPersistence implements DownloadsPersistence {
 
     @Override
     public void delete(DownloadBatchId downloadBatchId) {
-        RoomBatch roomBatch = database.roomBatchDao().load(downloadBatchId.getId());
+        RoomBatch roomBatch = database.roomBatchDao().load(downloadBatchId.stringValue());
         database.roomBatchDao().delete(roomBatch);
     }
 
     @Override
     public void update(DownloadBatchId downloadBatchId, DownloadBatchStatus.Status status) {
-        RoomBatch roomBatch = database.roomBatchDao().load(downloadBatchId.getId());
+        RoomBatch roomBatch = database.roomBatchDao().load(downloadBatchId.stringValue());
         roomBatch.status = status.toRawValue();
         database.roomBatchDao().update(roomBatch);
     }
