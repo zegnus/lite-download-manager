@@ -38,10 +38,15 @@ class DownloadsFilePersistence {
 
         List<DownloadFile> downloadFiles = new ArrayList<>(filePersistedList.size());
         for (DownloadsPersistence.FilePersisted filePersisted : filePersistedList) {
-
             DownloadFileId downloadFileId = filePersisted.getDownloadFileId();
             FileName fileName = filePersisted.getFileName();
-            FileSize fileSize = FileSize.Total(filePersisted.getTotalFileSize());
+
+            FilePersistenceCreator filePersistenceCreator = fileOperations.filePersistenceCreator();
+            FilePersistence filePersistence = filePersistenceCreator.create(filePersisted.getFilePersistenceType());
+
+            long currentSize = filePersistence.getCurrentSize(fileName);
+            long totalFileSize = filePersisted.getTotalFileSize();
+            FileSize fileSize = new FileSize(currentSize, totalFileSize);
             String url = filePersisted.getUrl();
 
             DownloadFileStatus downloadFileStatus = new DownloadFileStatus(
@@ -53,7 +58,6 @@ class DownloadsFilePersistence {
 
             FileSizeRequester fileSizeRequester = fileOperations.fileSizeRequester();
             FileDownloader fileDownloader = fileOperations.fileDownloader();
-            FilePersistenceCreator filePersistenceCreator = fileOperations.filePersistenceCreator();
 
             DownloadFile downloadFile = new DownloadFile(
                     batchId,
@@ -63,7 +67,7 @@ class DownloadsFilePersistence {
                     fileSize,
                     fileDownloader,
                     fileSizeRequester,
-                    filePersistenceCreator.create(filePersisted.getFilePersistenceType()),
+                    filePersistence,
                     downloadsFilePersistence
             );
 

@@ -72,6 +72,14 @@ class DownloadsBatchPersistence implements DownloadsBatchStatusPersistence {
                             downloadsFilePersistence
                     );
 
+                    long currentBytesDownloaded = 0;
+                    long totalBatchSizeBytes = 0;
+                    for (DownloadFile downloadFile : downloadFiles) {
+                        currentBytesDownloaded += downloadFile.getCurrentDownloadedBytes();
+                        totalBatchSizeBytes += downloadFile.getTotalSize();
+                    }
+                    downloadBatchStatus.update(currentBytesDownloaded, totalBatchSizeBytes);
+
                     DownloadBatch downloadBatch = DownloadBatchFactory.newInstance(
                             downloadBatchTitle,
                             downloadBatchId,

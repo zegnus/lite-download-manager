@@ -178,6 +178,10 @@ class DownloadFile {
         );
     }
 
+    long getCurrentDownloadedBytes() {
+        return fileSize.getCurrentSize();
+    }
+
     interface Callback {
 
         void onUpdate(DownloadFileStatus downloadFileStatus);

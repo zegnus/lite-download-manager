@@ -128,6 +128,12 @@ class ExternalFilePersistence implements FilePersistence {
     }
 
     @Override
+    public long getCurrentSize(FileName fileName) {
+        // TODO: 04/07/2017
+        return 0;
+    }
+
+    @Override
     public void close() {
         if (fileOutputStream == null) {
             return;

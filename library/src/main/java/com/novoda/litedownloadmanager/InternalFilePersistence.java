@@ -89,6 +89,26 @@ class InternalFilePersistence implements FilePersistence {
     }
 
     @Override
+    public long getCurrentSize(FileName fileName) {
+        FileOutputStream file = null;
+        try {
+            file = context.openFileOutput(fileName.getName(), Context.MODE_APPEND);
+            return file.getChannel().size();
+        } catch (IOException e) {
+            Log.e(e, "Error requesting file size for " + fileName);
+            return 0;
+        } finally {
+            if (file != null) {
+                try {
+                    file.close();
+                } catch (IOException e) {
+                    Log.e(e, "Error requesting file size for " + fileName);
+                }
+            }
+        }
+    }
+
+    @Override
     public void close() {
         if (file == null) {
             return;

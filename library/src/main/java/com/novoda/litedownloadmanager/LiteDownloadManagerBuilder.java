@@ -140,7 +140,7 @@ public final class LiteDownloadManagerBuilder {
                 downloadService = binder.getService();
                 liteDownloadManager.submitAllStoredDownloads(new AllStoredDownloadsSubmittedCallback() {
                     @Override
-                    public void onAllDownloadsSubmited() {
+                    public void onAllDownloadsSubmitted() {
                         liteDownloadManager.initialise(downloadService);
                     }
                 });

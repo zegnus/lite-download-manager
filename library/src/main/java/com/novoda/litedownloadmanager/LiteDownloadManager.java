@@ -66,7 +66,7 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
                     }
                 }
 
-                callback.onAllDownloadsSubmited();
+                callback.onAllDownloadsSubmitted();
             }
         };
     }
