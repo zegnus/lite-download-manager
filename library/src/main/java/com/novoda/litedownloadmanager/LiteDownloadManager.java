@@ -36,7 +36,7 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
         this.downloader = downloader;
     }
 
-    void initialise(final DownloadServiceCommands downloadService) {
+    void initialise(DownloadServiceCommands downloadService) {
         setDownloadService(downloadService);
     }
 
@@ -49,7 +49,7 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
     }
 
     @Override
-    public void submitAllStoredDownloads(final AllStoredDownloadsSubmittedCallback callback) {
+    public void submitAllStoredDownloads(AllStoredDownloadsSubmittedCallback callback) {
         downloadsBatchPersistence.loadAsync(fileOperations, notificationCreator, loadBatchesCallback(callback));
     }
 

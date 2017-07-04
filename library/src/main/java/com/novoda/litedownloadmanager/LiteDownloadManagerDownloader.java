@@ -77,7 +77,9 @@ class LiteDownloadManagerDownloader {
     private void waitForDownloadService() {
         try {
             synchronized (waitForDownloadService) {
-                waitForDownloadService.wait();
+                if (downloadService == null) {
+                    waitForDownloadService.wait();
+                }
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
