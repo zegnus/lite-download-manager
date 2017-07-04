@@ -5,7 +5,7 @@ import android.content.Context;
 import android.support.annotation.DrawableRes;
 import android.support.v4.app.NotificationCompat;
 
-public class DownloadBatchNotification implements NotificationCreator {
+class DownloadBatchNotification implements NotificationCreator {
 
     private static final int ID = 1;
     private static final boolean NOT_INDETERMINATE = false;
@@ -13,7 +13,7 @@ public class DownloadBatchNotification implements NotificationCreator {
     private final Context context;
     private final int iconDrawable;
 
-    public DownloadBatchNotification(Context context, @DrawableRes int iconDrawable) {
+    DownloadBatchNotification(Context context, @DrawableRes int iconDrawable) {
         this.context = context.getApplicationContext();
         this.iconDrawable = iconDrawable;
     }

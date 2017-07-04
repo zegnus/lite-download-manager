@@ -1,42 +1,39 @@
 package com.novoda.litedownloadmanager;
 
-import android.os.Handler;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 class LiteDownloadManager implements LiteDownloadManagerCommands {
 
-    private static final Object WAIT_FOR_DOWNLOAD_SERVICE = new Object();
-    private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
-
-    private final Handler callbackHandler;
+    private final Object waitForDownloadService;
+    private final ExecutorService executor;
     private final Map<DownloadBatchId, DownloadBatch> downloadBatchMap;
     private final List<DownloadBatchCallback> callbacks;
     private final FileOperations fileOperations;
     private final DownloadsBatchPersistence downloadsBatchPersistence;
-    private final DownloadsFilePersistence downloadsFilePersistence;
     private final NotificationCreator notificationCreator;
+    private final LiteDownloadManagerDownloader downloader;
 
     private DownloadServiceCommands downloadService;
 
-    LiteDownloadManager(Handler callbackHandler,
+    LiteDownloadManager(Object waitForDownloadService,
+                        ExecutorService executor,
                         Map<DownloadBatchId, DownloadBatch> downloadBatchMap,
                         List<DownloadBatchCallback> callbacks,
                         FileOperations fileOperations,
                         DownloadsBatchPersistence downloadsBatchPersistence,
-                        DownloadsFilePersistence downloadsFilePersistence,
-                        NotificationCreator notificationCreator) {
-        this.callbackHandler = callbackHandler;
+                        NotificationCreator notificationCreator,
+                        LiteDownloadManagerDownloader downloader) {
+        this.waitForDownloadService = waitForDownloadService;
+        this.executor = executor;
         this.downloadBatchMap = downloadBatchMap;
         this.callbacks = callbacks;
         this.fileOperations = fileOperations;
         this.downloadsBatchPersistence = downloadsBatchPersistence;
-        this.downloadsFilePersistence = downloadsFilePersistence;
         this.notificationCreator = notificationCreator;
+        this.downloader = downloader;
     }
 
     void initialise(final DownloadServiceCommands downloadService) {
@@ -45,8 +42,9 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
 
     private void setDownloadService(DownloadServiceCommands downloadService) {
         this.downloadService = downloadService;
-        synchronized (WAIT_FOR_DOWNLOAD_SERVICE) {
-            WAIT_FOR_DOWNLOAD_SERVICE.notifyAll();
+        downloader.setDownloadService(downloadService);
+        synchronized (waitForDownloadService) {
+            waitForDownloadService.notifyAll();
         }
     }
 
@@ -64,7 +62,7 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
                     if (downloadBatchMap.containsKey(id)) {
                         resume(id);
                     } else {
-                        download(downloadBatch);
+                        downloader.download(downloadBatch, downloadBatchMap);
                     }
                 }
 
@@ -75,90 +73,7 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
 
     @Override
     public void download(Batch batch) {
-        DownloadBatch runningDownloadBatch = downloadBatchMap.get(batch.getDownloadBatchId());
-        if (runningDownloadBatch != null) {
-            return;
-        }
-
-        DownloadBatch downloadBatch = DownloadBatchFactory.newInstance(
-                batch,
-                fileOperations,
-                downloadsBatchPersistence,
-                downloadsFilePersistence,
-                notificationCreator
-        );
-        downloadBatch.persist();
-        download(downloadBatch);
-    }
-
-    private void download(DownloadBatch downloadBatch) {
-        downloadBatchMap.put(downloadBatch.getId(), downloadBatch);
-        if (downloadService == null) {
-            ensureDownloadServiceExistsAndDownload(downloadBatch);
-        } else {
-            executeDownload(downloadBatch);
-        }
-    }
-
-    private void ensureDownloadServiceExistsAndDownload(final DownloadBatch downloadBatch) {
-        EXECUTOR.submit(new Runnable() {
-            @Override
-            public void run() {
-                waitForDownloadService();
-                executeDownload(downloadBatch);
-            }
-        });
-    }
-
-    private void executeDownload(final DownloadBatch downloadBatch) {
-        updateStatusToQueuedIfNeeded(downloadBatch);
-        downloadService.download(downloadBatch, downloadBatchCallback());
-    }
-
-    private DownloadBatchCallback downloadBatchCallback() {
-        return new DownloadBatchCallback() {
-            @Override
-            public void onUpdate(final DownloadBatchStatus downloadBatchStatus) {
-                callbackHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        for (DownloadBatchCallback callback : callbacks) {
-                            callback.onUpdate(downloadBatchStatus);
-                        }
-                        updateNotification(downloadBatchStatus);
-                    }
-                });
-            }
-        };
-    }
-
-    private void updateStatusToQueuedIfNeeded(DownloadBatch downloadBatch) {
-        DownloadBatchStatus downloadBatchStatus = downloadBatch.status();
-
-        if (!downloadBatchStatus.isMarkedAsPaused()) {
-            downloadBatchStatus.markAsQueued(downloadsBatchPersistence);
-        }
-    }
-
-    private void updateNotification(DownloadBatchStatus downloadBatchStatus) {
-        NotificationInformation notificationInformation = downloadBatchStatus.createNotification();
-        if (downloadBatchStatus.isMarkedAsDownloading()) {
-            downloadService.updateNotification(notificationInformation);
-        } else {
-            downloadService.makeNotificationDismissible(notificationInformation);
-        }
-    }
-
-    private void waitForDownloadService() {
-        if (downloadService == null) {
-            try {
-                synchronized (WAIT_FOR_DOWNLOAD_SERVICE) {
-                    WAIT_FOR_DOWNLOAD_SERVICE.wait();
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+        downloader.download(batch, downloadBatchMap);
     }
 
     @Override
@@ -179,7 +94,7 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
         downloadBatchMap.remove(downloadBatchId);
         downloadBatch.resume();
 
-        download(downloadBatch);
+        downloader.download(downloadBatch, downloadBatchMap);
     }
 
     @Override
@@ -214,13 +129,23 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
     }
 
     private void ensureDownloadServiceExistsAndGetAllDownloadBatchStatuses(final AllBatchStatusesCallback callback) {
-        EXECUTOR.submit(new Runnable() {
+        executor.submit(new Runnable() {
             @Override
             public void run() {
                 waitForDownloadService();
                 executeGetAllDownloadBatchStatuses(callback);
             }
         });
+    }
+
+    private void waitForDownloadService() {
+        try {
+            synchronized (waitForDownloadService) {
+                waitForDownloadService.wait();
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private void executeGetAllDownloadBatchStatuses(AllBatchStatusesCallback callback) {

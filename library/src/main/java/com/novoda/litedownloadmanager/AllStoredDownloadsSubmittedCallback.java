@@ -1,6 +1,6 @@
 package com.novoda.litedownloadmanager;
 
-public interface AllStoredDownloadsSubmittedCallback {
+interface AllStoredDownloadsSubmittedCallback {
 
     void onAllDownloadsSubmited();
 }

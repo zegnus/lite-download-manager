@@ -14,10 +14,14 @@ import com.squareup.okhttp.OkHttpClient;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public final class LiteDownloadManagerBuilder {
+
+    private static final Object LOCK = new Object();
+    private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
 
     private final Context context;
     private final Handler callbackHandler;
@@ -151,15 +155,28 @@ public final class LiteDownloadManagerBuilder {
         context.bindService(intent, serviceConnection, Service.BIND_AUTO_CREATE);
 
         FileOperations fileOperations = new FileOperations(filePersistenceCreator, fileSizeRequester, fileDownloader);
+        ArrayList<DownloadBatchCallback> callbacks = new ArrayList<>();
 
-        liteDownloadManager = new LiteDownloadManager(
+        LiteDownloadManagerDownloader downloader = new LiteDownloadManagerDownloader(
+                LOCK,
+                EXECUTOR,
                 callbackHandler,
-                new HashMap<DownloadBatchId, DownloadBatch>(),
-                new ArrayList<DownloadBatchCallback>(),
                 fileOperations,
                 downloadsBatchPersistence,
                 downloadsFilePersistence,
-                notificationCreator
+                notificationCreator,
+                callbacks
+        );
+
+        liteDownloadManager = new LiteDownloadManager(
+                LOCK,
+                EXECUTOR,
+                new HashMap<DownloadBatchId, DownloadBatch>(),
+                callbacks,
+                fileOperations,
+                downloadsBatchPersistence,
+                notificationCreator,
+                downloader
         );
 
         return liteDownloadManager;
