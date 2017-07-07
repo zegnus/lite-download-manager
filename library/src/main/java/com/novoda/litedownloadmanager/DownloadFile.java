@@ -15,11 +15,13 @@ class DownloadFile {
     private final DownloadsFilePersistence downloadsFilePersistence;
 
     private FileSize fileSize;
+    private FilePath filePath;
 
     DownloadFile(DownloadBatchId downloadBatchId,
                  String url,
                  DownloadFileStatus downloadFileStatus,
                  FileName fileName,
+                 FilePath filePath,
                  FileSize fileSize,
                  FileDownloader fileDownloader,
                  FileSizeRequester fileSizeRequester,
@@ -29,6 +31,7 @@ class DownloadFile {
         this.url = url;
         this.downloadFileStatus = downloadFileStatus;
         this.fileName = fileName;
+        this.filePath = filePath;
         this.fileDownloader = fileDownloader;
         this.fileSizeRequester = fileSizeRequester;
         this.filePersistence = filePersistence;
@@ -48,13 +51,14 @@ class DownloadFile {
             return;
         }
 
-        FilePersistence.Status status = filePersistence.create(fileName, fileSize);
-        if (status.isMarkedAsError()) {
-            Error error = convertError(status);
+        FilePersistenceResult result = createFile();
+        if (result.isMarkedAsError()) {
+            Error error = convertError(result.status());
             updateAndFeedbackWithStatus(error, callback);
             return;
         }
 
+        filePath = result.filePath();
         fileSize.setCurrentSize(filePersistence.getCurrentSize());
 
         if (fileSize.getCurrentSize() == fileSize.getTotalSize()) {
@@ -93,9 +97,16 @@ class DownloadFile {
         });
     }
 
-    private Error convertError(FilePersistence.Status status) {
-        switch (status) {
+    private FilePersistenceResult createFile() {
+        if (filePath.isUnknown()) {
+            return filePersistence.create(fileName, fileSize);
+        } else {
+            return filePersistence.create(filePath);
+        }
+    }
 
+    private Error convertError(FilePersistenceResult.Status status) {
+        switch (status) {
             case SUCCESS:
                 Log.e("Cannot convert success status to any DownloadError type");
                 break;
@@ -171,6 +182,7 @@ class DownloadFile {
         downloadsFilePersistence.persistSync(
                 downloadBatchId,
                 fileName,
+                filePath,
                 fileSize,
                 url,
                 downloadFileStatus.getDownloadFileId(),

@@ -24,6 +24,9 @@ class RoomFile {
     @ColumnInfo(name = "file_name")
     String name;
 
+    @ColumnInfo(name = "file_path")
+    String path;
+
     @ColumnInfo(name = "total_size")
     long totalSize;
 

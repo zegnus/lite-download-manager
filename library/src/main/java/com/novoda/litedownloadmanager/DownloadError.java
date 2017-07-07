@@ -1,8 +1,8 @@
 package com.novoda.litedownloadmanager;
 
-public class DownloadError {
+class DownloadError {
 
-    public enum Error {
+    enum Error {
         FILE_TOTAL_SIZE_REQUEST_FAILED,
         FILE_CANNOT_BE_CREATED_LOCALLY_INSUFFICIENT_FREE_SPACE,
         FILE_CANNOT_BE_WRITTEN,

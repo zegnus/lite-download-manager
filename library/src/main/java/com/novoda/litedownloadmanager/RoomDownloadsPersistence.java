@@ -68,12 +68,14 @@ class RoomDownloadsPersistence implements DownloadsPersistence {
     @Override
     public void persistFile(FilePersisted filePersisted) {
         RoomFile roomFile = new RoomFile();
-        roomFile.totalSize = filePersisted.getTotalFileSize();
-        roomFile.batchId = filePersisted.getDownloadBatchId().stringValue();
-        roomFile.url = filePersisted.getUrl();
-        roomFile.name = filePersisted.getFileName().getName();
-        roomFile.id = filePersisted.getDownloadFileId().toRawId();
-        roomFile.persistenceType = filePersisted.getFilePersistenceType().toRawValue();
+        roomFile.totalSize = filePersisted.totalFileSize();
+        roomFile.batchId = filePersisted.downloadBatchId().stringValue();
+        roomFile.url = filePersisted.url();
+        roomFile.name = filePersisted.fileName().getName();
+        roomFile.path = filePersisted.filePath().path();
+        roomFile.path = filePersisted.filePath().path();
+        roomFile.id = filePersisted.downloadFileId().toRawId();
+        roomFile.persistenceType = filePersisted.filePersistenceType().toRawValue();
 
         database.roomFileDao().insert(roomFile);
     }
@@ -87,6 +89,7 @@ class RoomDownloadsPersistence implements DownloadsPersistence {
                     DownloadBatchId.from(roomFile.batchId),
                     DownloadFileId.from(roomFile.id),
                     FileName.from(roomFile.name),
+                    FilePath.newInstance(roomFile.path),
                     roomFile.totalSize,
                     roomFile.url,
                     FilePersistenceType.from(roomFile.persistenceType)

@@ -9,7 +9,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import static com.novoda.litedownloadmanager.FilePersistence.Status.*;
+import static com.novoda.litedownloadmanager.FilePersistenceResult.Status.*;
 
 class InternalFilePersistence implements FilePersistence {
 
@@ -26,25 +26,31 @@ class InternalFilePersistence implements FilePersistence {
     }
 
     @Override
-    public Status create(FileName fileName, FileSize fileSize) {
+    public FilePersistenceResult create(FileName fileName, FileSize fileSize) {
         if (fileSize.isTotalSizeUnknown()) {
-            return ERROR_UNKNOWN_TOTAL_FILE_SIZE;
+            return FilePersistenceResult.newInstance(ERROR_UNKNOWN_TOTAL_FILE_SIZE);
         }
 
         long usableSpace = context.getFilesDir().getUsableSpace();
         if (usableSpace < fileSize.getTotalSize()) {
-            return ERROR_INSUFFICIENT_SPACE;
+            return FilePersistenceResult.newInstance(ERROR_INSUFFICIENT_SPACE);
         }
 
+        FilePath filePath = FilePath.newInstance(fileName.getName());
+        return create(filePath);
+    }
+
+    @Override
+    public FilePersistenceResult create(FilePath filePath) {
         try {
-            this.fileName = fileName;
-            this.file = context.openFileOutput(fileName.getName(), Context.MODE_APPEND);
+            file = context.openFileOutput(filePath.path(), Context.MODE_APPEND);
         } catch (FileNotFoundException e) {
             Log.e(e, "File could not be opened");
-            return ERROR_OPENING_FILE;
+            return FilePersistenceResult.newInstance(ERROR_OPENING_FILE);
         }
 
-        return SUCCESS;
+        fileName = FileName.from(filePath.path());
+        return FilePersistenceResult.newInstance(SUCCESS, filePath);
     }
 
     @Override

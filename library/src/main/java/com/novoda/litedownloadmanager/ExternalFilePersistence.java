@@ -12,7 +12,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import static com.novoda.litedownloadmanager.FilePersistence.Status.*;
+import static com.novoda.litedownloadmanager.FilePersistenceResult.Status.*;
 
 class ExternalFilePersistence implements FilePersistence {
 
@@ -32,33 +32,44 @@ class ExternalFilePersistence implements FilePersistence {
     }
 
     @Override
-    public Status create(FileName fileName, FileSize fileSize) {
+    public FilePersistenceResult create(FileName fileName, FileSize fileSize) {
         if (fileSize.isTotalSizeUnknown()) {
-            return ERROR_UNKNOWN_TOTAL_FILE_SIZE;
+            return FilePersistenceResult.newInstance(ERROR_UNKNOWN_TOTAL_FILE_SIZE);
         }
 
         if (!isExternalStorageWritable()) {
-            return ERROR_EXTERNAL_STORAGE_NON_WRITABLE;
+            return FilePersistenceResult.newInstance(ERROR_EXTERNAL_STORAGE_NON_WRITABLE);
         }
 
         File externalFileDir = getExternalFileDirWithBiggerAvailableSpace();
 
         long usableSpace = externalFileDir.getUsableSpace();
         if (usableSpace < fileSize.getTotalSize()) {
-            return ERROR_INSUFFICIENT_SPACE;
+            return FilePersistenceResult.newInstance(ERROR_INSUFFICIENT_SPACE);
         }
 
         String absolutePath = externalFileDir.getAbsolutePath() + File.separatorChar + fileName.getName();
+        FilePath filePath = FilePath.newInstance(absolutePath);
+        return create(filePath);
+    }
 
-        try {
-            this.file = new File(absolutePath);
-            this.fileOutputStream = new FileOutputStream(absolutePath, APPEND);
-        } catch (FileNotFoundException e) {
-            Log.e(e, "File could not be opened");
-            return ERROR_OPENING_FILE;
+    @Override
+    public FilePersistenceResult create(FilePath filePath) {
+        if (filePath.isUnknown()) {
+            return FilePersistenceResult.newInstance(ERROR_OPENING_FILE, filePath);
         }
 
-        return SUCCESS;
+        String absolutePath = filePath.path();
+
+        try {
+            file = new File(absolutePath);
+            fileOutputStream = new FileOutputStream(absolutePath, APPEND);
+        } catch (FileNotFoundException e) {
+            Log.e(e, "File could not be opened");
+            return FilePersistenceResult.newInstance(ERROR_OPENING_FILE, filePath);
+        }
+
+        return FilePersistenceResult.newInstance(SUCCESS, filePath);
     }
 
     private boolean isExternalStorageWritable() {

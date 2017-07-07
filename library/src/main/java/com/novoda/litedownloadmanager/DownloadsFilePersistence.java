@@ -14,6 +14,7 @@ class DownloadsFilePersistence {
 
     void persistSync(DownloadBatchId downloadBatchId,
                      FileName fileName,
+                     FilePath filePath,
                      FileSize fileSize,
                      String url,
                      DownloadFileId downloadFileId,
@@ -22,6 +23,7 @@ class DownloadsFilePersistence {
                 downloadBatchId,
                 downloadFileId,
                 fileName,
+                filePath,
                 fileSize.getTotalSize(),
                 url,
                 filePersistenceType
@@ -38,16 +40,16 @@ class DownloadsFilePersistence {
 
         List<DownloadFile> downloadFiles = new ArrayList<>(filePersistedList.size());
         for (DownloadsPersistence.FilePersisted filePersisted : filePersistedList) {
-            DownloadFileId downloadFileId = filePersisted.getDownloadFileId();
-            FileName fileName = filePersisted.getFileName();
+            DownloadFileId downloadFileId = filePersisted.downloadFileId();
+            FileName fileName = filePersisted.fileName();
 
             FilePersistenceCreator filePersistenceCreator = fileOperations.filePersistenceCreator();
-            FilePersistence filePersistence = filePersistenceCreator.create(filePersisted.getFilePersistenceType());
+            FilePersistence filePersistence = filePersistenceCreator.create(filePersisted.filePersistenceType());
 
             long currentSize = filePersistence.getCurrentSize(fileName);
-            long totalFileSize = filePersisted.getTotalFileSize();
+            long totalFileSize = filePersisted.totalFileSize();
             FileSize fileSize = new FileSize(currentSize, totalFileSize);
-            String url = filePersisted.getUrl();
+            String url = filePersisted.url();
 
             DownloadFileStatus downloadFileStatus = new DownloadFileStatus(
                     downloadFileId,
@@ -58,12 +60,14 @@ class DownloadsFilePersistence {
 
             FileSizeRequester fileSizeRequester = fileOperations.fileSizeRequester();
             FileDownloader fileDownloader = fileOperations.fileDownloader();
+            FilePath filePath = filePersisted.filePath();
 
             DownloadFile downloadFile = new DownloadFile(
                     batchId,
                     url,
                     downloadFileStatus,
                     fileName,
+                    filePath,
                     fileSize,
                     fileDownloader,
                     fileSizeRequester,

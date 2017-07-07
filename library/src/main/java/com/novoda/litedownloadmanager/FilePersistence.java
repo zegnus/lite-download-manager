@@ -6,19 +6,9 @@ public interface FilePersistence {
 
     void initialiseWith(Context context);
 
-    enum Status {
-        SUCCESS,
-        ERROR_UNKNOWN_TOTAL_FILE_SIZE,
-        ERROR_INSUFFICIENT_SPACE,
-        ERROR_EXTERNAL_STORAGE_NON_WRITABLE,
-        ERROR_OPENING_FILE;
+    FilePersistenceResult create(FileName fileName, FileSize fileSize);
 
-        public boolean isMarkedAsError() {
-            return this != SUCCESS;
-        }
-    }
-
-    Status create(FileName fileName, FileSize fileSize);
+    FilePersistenceResult create(FilePath filePath);
 
     boolean write(byte[] buffer, int offset, int numberOfBytesToWrite);
 

@@ -38,7 +38,7 @@ public class CustomDownloadsPersistence implements DownloadsPersistence {
 
     @Override
     public void persistFile(FilePersisted filePersisted) {
-        Log.v("Persist file id: " + filePersisted.getDownloadFileId());
+        Log.v("Persist file id: " + filePersisted.downloadFileId());
     }
 
     @Override
