@@ -10,6 +10,7 @@ import com.novoda.litedownloadmanager.AllBatchStatusesCallback;
 import com.novoda.litedownloadmanager.Batch;
 import com.novoda.litedownloadmanager.DownloadBatchCallback;
 import com.novoda.litedownloadmanager.DownloadBatchId;
+import com.novoda.litedownloadmanager.DownloadBatchIdCreator;
 import com.novoda.litedownloadmanager.DownloadBatchStatus;
 import com.novoda.litedownloadmanager.LiteDownloadManagerCommands;
 import com.novoda.notils.logger.simple.Log;
@@ -18,8 +19,8 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final DownloadBatchId BATCH_ID_1 = DownloadBatchId.from("batch_id_1");
-    private static final DownloadBatchId BATCH_ID_2 = DownloadBatchId.from("batch_id_2");
+    private static final DownloadBatchId BATCH_ID_1 = DownloadBatchIdCreator.createFrom("batch_id_1");
+    private static final DownloadBatchId BATCH_ID_2 = DownloadBatchIdCreator.createFrom("batch_id_2");
 
     private TextView textViewBatch1;
     private TextView textViewBatch2;
