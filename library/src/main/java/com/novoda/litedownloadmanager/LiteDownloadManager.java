@@ -16,7 +16,7 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
     private final NotificationCreator notificationCreator;
     private final LiteDownloadManagerDownloader downloader;
 
-    private DownloadServiceCommands downloadService;
+    private DownloadService downloadService;
 
     LiteDownloadManager(Object waitForDownloadService,
                         ExecutorService executor,
@@ -36,11 +36,11 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
         this.downloader = downloader;
     }
 
-    void initialise(DownloadServiceCommands downloadService) {
+    void initialise(DownloadService downloadService) {
         setDownloadService(downloadService);
     }
 
-    private void setDownloadService(DownloadServiceCommands downloadService) {
+    private void setDownloadService(DownloadService downloadService) {
         this.downloadService = downloadService;
         downloader.setDownloadService(downloadService);
         synchronized (waitForDownloadService) {

@@ -17,7 +17,7 @@ class LiteDownloadManagerDownloader {
     private final NotificationCreator notificationCreator;
     private final List<DownloadBatchCallback> callbacks;
 
-    private DownloadServiceCommands downloadService;
+    private DownloadService downloadService;
 
     LiteDownloadManagerDownloader(Object waitForDownloadService,
                                   ExecutorService executor,
@@ -116,7 +116,7 @@ class LiteDownloadManagerDownloader {
         };
     }
 
-    private void updateNotification(DownloadBatchStatus downloadBatchStatus, DownloadServiceCommands downloadService) {
+    private void updateNotification(DownloadBatchStatus downloadBatchStatus, DownloadService downloadService) {
         NotificationInformation notificationInformation = downloadBatchStatus.createNotification();
         if (downloadBatchStatus.isMarkedAsDownloading()) {
             downloadService.updateNotification(notificationInformation);
@@ -125,7 +125,7 @@ class LiteDownloadManagerDownloader {
         }
     }
 
-    void setDownloadService(DownloadServiceCommands downloadService) {
+    void setDownloadService(DownloadService downloadService) {
         this.downloadService = downloadService;
     }
 }

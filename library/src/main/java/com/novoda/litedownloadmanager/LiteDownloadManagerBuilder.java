@@ -31,7 +31,7 @@ public final class LiteDownloadManagerBuilder {
     private FilePersistenceCreator filePersistenceCreator;
     private FileSizeRequester fileSizeRequester;
     private FileDownloader fileDownloader;
-    private DownloadServiceCommands downloadService;
+    private DownloadService downloadService;
     private LiteDownloadManager liteDownloadManager;
     private NotificationCreator notificationCreator;
 
@@ -132,11 +132,11 @@ public final class LiteDownloadManagerBuilder {
     }
 
     public LiteDownloadManager build() {
-        Intent intent = new Intent(context, DownloadService.class);
+        Intent intent = new Intent(context, LiteDownloadService.class);
         ServiceConnection serviceConnection = new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
-                DownloadService.DownloadServiceBinder binder = (DownloadService.DownloadServiceBinder) service;
+                LiteDownloadService.DownloadServiceBinder binder = (LiteDownloadService.DownloadServiceBinder) service;
                 downloadService = binder.getService();
                 liteDownloadManager.submitAllStoredDownloads(new AllStoredDownloadsSubmittedCallback() {
                     @Override
