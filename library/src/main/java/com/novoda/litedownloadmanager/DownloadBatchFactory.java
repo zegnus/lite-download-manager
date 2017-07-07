@@ -15,7 +15,7 @@ final class DownloadBatchFactory {
                                      DownloadsBatchPersistence downloadsBatchPersistence,
                                      DownloadsFilePersistence downloadsFilePersistence,
                                      NotificationCreator notificationCreator) {
-        DownloadBatchTitle downloadBatchTitle = DownloadBatchTitle.from(batch);
+        DownloadBatchTitle downloadBatchTitle = DownloadBatchTitleCreator.createFrom(batch);
         List<String> fileUrls = batch.getFileUrls();
         List<DownloadFile> downloadFiles = new ArrayList<>(fileUrls.size());
         DownloadBatchId downloadBatchId = batch.getDownloadBatchId();
