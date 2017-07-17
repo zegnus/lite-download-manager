@@ -54,10 +54,10 @@ dependencies {
 }
 
 publish {
-    userOrg = 'novoda'
-    groupId = 'com.novoda'
+    userOrg = 'zegnus'
+    groupId = 'com.zegnus'
     artifactId = 'lite-download-manager'
     publishVersion = '0.0.1'
     description = 'Simple and lite Download Manager capable of download batches of files'
-    website = 'https://github.com/novoda/lite-download-manager'
+    website = 'https://github.com/zegnus/lite-download-manager'
 }
