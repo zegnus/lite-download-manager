@@ -53,11 +53,10 @@ final class DownloadBatchFactory {
             downloadFiles.add(downloadFile);
         }
 
-        DownloadBatchStatus downloadBatchStatus = new DownloadBatchStatus(
-                notificationCreator,
+        LiteDownloadBatchStatus liteDownloadBatchStatus = new LiteDownloadBatchStatus(
                 downloadBatchId,
                 downloadBatchTitle,
-                DownloadBatchStatus.Status.QUEUED
+                LiteDownloadBatchStatus.Status.QUEUED
         );
 
         return new DownloadBatch(
@@ -65,7 +64,7 @@ final class DownloadBatchFactory {
                 downloadBatchId,
                 downloadFiles,
                 new HashMap<DownloadFileId, Long>(),
-                downloadBatchStatus,
+                liteDownloadBatchStatus,
                 downloadsBatchPersistence
         );
     }
@@ -73,14 +72,14 @@ final class DownloadBatchFactory {
     static DownloadBatch newInstance(DownloadBatchTitle downloadBatchTitle,
                                      DownloadBatchId downloadBatchId,
                                      List<DownloadFile> downloadFiles,
-                                     DownloadBatchStatus downloadBatchStatus,
+                                     LiteDownloadBatchStatus liteDownloadBatchStatus,
                                      DownloadsBatchPersistence downloadsBatchPersistence) {
         return new DownloadBatch(
                 downloadBatchTitle,
                 downloadBatchId,
                 downloadFiles,
                 new HashMap<DownloadFileId, Long>(),
-                downloadBatchStatus,
+                liteDownloadBatchStatus,
                 downloadsBatchPersistence
         );
     }

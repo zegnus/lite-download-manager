@@ -17,6 +17,8 @@ import com.zegnus.litedownloadmanager.LiteDownloadManagerCommands;
 
 import java.util.List;
 
+import static com.zegnus.litedownloadmanager.DownloadBatchStatus.Status.ERROR;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final DownloadBatchId BATCH_ID_1 = DownloadBatchIdCreator.createFrom("batch_id_1");
@@ -132,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
 
         @NonNull
         private String getStatusMessage(DownloadBatchStatus downloadBatchStatus) {
-            if (downloadBatchStatus.isMarkedAsError()) {
+            if (downloadBatchStatus.status() == ERROR) {
                 return "\nstatus: " + downloadBatchStatus.status()
                         + " - " + downloadBatchStatus.getDownloadErrorType();
             } else {

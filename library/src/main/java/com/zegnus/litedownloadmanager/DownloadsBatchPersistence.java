@@ -18,7 +18,7 @@ class DownloadsBatchPersistence implements DownloadsBatchStatusPersistence {
 
     void persistAsync(final DownloadBatchTitle downloadBatchTitle,
                       final DownloadBatchId downloadBatchId,
-                      final DownloadBatchStatus.Status status,
+                      final LiteDownloadBatchStatus.Status status,
                       final List<DownloadFile> downloadFiles) {
         executor.execute(new Runnable() {
             @Override
@@ -55,11 +55,10 @@ class DownloadsBatchPersistence implements DownloadsBatchStatusPersistence {
 
                 List<DownloadBatch> downloadBatches = new ArrayList<>(batchPersistedList.size());
                 for (DownloadsPersistence.BatchPersisted batchPersisted : batchPersistedList) {
-                    DownloadBatchStatus.Status status = batchPersisted.getDownloadBatchStatus();
+                    LiteDownloadBatchStatus.Status status = batchPersisted.getDownloadBatchStatus();
                     DownloadBatchId downloadBatchId = batchPersisted.getDownloadBatchId();
                     DownloadBatchTitle downloadBatchTitle = batchPersisted.getDownloadBatchTitle();
-                    DownloadBatchStatus downloadBatchStatus = new DownloadBatchStatus(
-                            notificationCreator,
+                    LiteDownloadBatchStatus liteDownloadBatchStatus = new LiteDownloadBatchStatus(
                             downloadBatchId,
                             downloadBatchTitle,
                             status
@@ -78,13 +77,13 @@ class DownloadsBatchPersistence implements DownloadsBatchStatusPersistence {
                         currentBytesDownloaded += downloadFile.getCurrentDownloadedBytes();
                         totalBatchSizeBytes += downloadFile.getTotalSize();
                     }
-                    downloadBatchStatus.update(currentBytesDownloaded, totalBatchSizeBytes);
+                    liteDownloadBatchStatus.update(currentBytesDownloaded, totalBatchSizeBytes);
 
                     DownloadBatch downloadBatch = DownloadBatchFactory.newInstance(
                             downloadBatchTitle,
                             downloadBatchId,
                             downloadFiles,
-                            downloadBatchStatus,
+                            liteDownloadBatchStatus,
                             DownloadsBatchPersistence.this
                     );
 
@@ -112,7 +111,7 @@ class DownloadsBatchPersistence implements DownloadsBatchStatusPersistence {
     }
 
     @Override
-    public void updateStatusAsync(final DownloadBatchId downloadBatchId, final DownloadBatchStatus.Status status) {
+    public void updateStatusAsync(final DownloadBatchId downloadBatchId, final LiteDownloadBatchStatus.Status status) {
         executor.execute(new Runnable() {
             @Override
             public void run() {

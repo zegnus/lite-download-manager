@@ -33,7 +33,7 @@ class DownloadsFilePersistence {
     }
 
     List<DownloadFile> loadSync(DownloadBatchId batchId,
-                                DownloadBatchStatus.Status batchStatus,
+                                LiteDownloadBatchStatus.Status batchStatus,
                                 FileOperations fileOperations,
                                 DownloadsFilePersistence downloadsFilePersistence) {
         List<DownloadsPersistence.FilePersisted> filePersistedList = downloadsPersistence.loadFiles(batchId);
@@ -81,7 +81,7 @@ class DownloadsFilePersistence {
         return downloadFiles;
     }
 
-    private DownloadFileStatus.Status getFileStatusFrom(DownloadBatchStatus.Status batchStatus) {
+    private DownloadFileStatus.Status getFileStatusFrom(LiteDownloadBatchStatus.Status batchStatus) {
         switch (batchStatus) {
             case QUEUED:
                 return DownloadFileStatus.Status.QUEUED;

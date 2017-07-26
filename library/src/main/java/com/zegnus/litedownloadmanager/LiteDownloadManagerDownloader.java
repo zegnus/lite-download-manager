@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
+import static com.zegnus.litedownloadmanager.DownloadBatchStatus.Status.DOWNLOADING;
+import static com.zegnus.litedownloadmanager.DownloadBatchStatus.Status.PAUSED;
+
 class LiteDownloadManagerDownloader {
 
     private final Object waitForDownloadService;
@@ -92,10 +95,10 @@ class LiteDownloadManagerDownloader {
     }
 
     private void updateStatusToQueuedIfNeeded(DownloadBatch downloadBatch) {
-        DownloadBatchStatus downloadBatchStatus = downloadBatch.status();
+        LiteDownloadBatchStatus liteDownloadBatchStatus = downloadBatch.status();
 
-        if (!downloadBatchStatus.isMarkedAsPaused()) {
-            downloadBatchStatus.markAsQueued(downloadsBatchPersistence);
+        if (liteDownloadBatchStatus.status() != PAUSED) {
+            liteDownloadBatchStatus.markAsQueued(downloadsBatchPersistence);
         }
     }
 
@@ -116,9 +119,15 @@ class LiteDownloadManagerDownloader {
         };
     }
 
-    private void updateNotification(DownloadBatchStatus downloadBatchStatus, DownloadService downloadService) {
-        NotificationInformation notificationInformation = downloadBatchStatus.createNotification();
-        if (downloadBatchStatus.isMarkedAsDownloading()) {
+    private void updateNotification(DownloadBatchStatus liteDownloadBatchStatus, DownloadService downloadService) {
+        NotificationInformation notificationInformation = notificationCreator.createNotification(
+                liteDownloadBatchStatus.getDownloadBatchTitle(),
+                liteDownloadBatchStatus.percentageDownloaded(),
+                (int) liteDownloadBatchStatus.bytesTotalSize(),
+                (int) liteDownloadBatchStatus.bytesDownloaded()
+        );
+
+        if (liteDownloadBatchStatus.status() == DOWNLOADING) {
             downloadService.updateNotification(notificationInformation);
         } else {
             downloadService.makeNotificationDismissible(notificationInformation);

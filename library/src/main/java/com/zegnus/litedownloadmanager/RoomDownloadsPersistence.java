@@ -57,7 +57,7 @@ class RoomDownloadsPersistence implements DownloadsPersistence {
             BatchPersisted batchPersisted = new BatchPersisted(
                     DownloadBatchTitleCreator.createFrom(roomBatch.title),
                     DownloadBatchIdCreator.createFrom(roomBatch.id),
-                    DownloadBatchStatus.Status.from(roomBatch.status)
+                    LiteDownloadBatchStatus.Status.from(roomBatch.status)
             );
             batchPersistedList.add(batchPersisted);
         }
@@ -107,7 +107,7 @@ class RoomDownloadsPersistence implements DownloadsPersistence {
     }
 
     @Override
-    public void update(DownloadBatchId downloadBatchId, DownloadBatchStatus.Status status) {
+    public void update(DownloadBatchId downloadBatchId, LiteDownloadBatchStatus.Status status) {
         RoomBatch roomBatch = database.roomBatchDao().load(downloadBatchId.stringValue());
         roomBatch.status = status.toRawValue();
         database.roomBatchDao().update(roomBatch);

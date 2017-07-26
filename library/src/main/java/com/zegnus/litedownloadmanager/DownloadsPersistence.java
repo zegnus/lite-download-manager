@@ -20,14 +20,14 @@ public interface DownloadsPersistence {
 
     void delete(DownloadBatchId downloadBatchId);
 
-    void update(DownloadBatchId downloadBatchId, DownloadBatchStatus.Status status);
+    void update(DownloadBatchId downloadBatchId, LiteDownloadBatchStatus.Status status);
 
     class BatchPersisted {
         private final DownloadBatchTitle downloadBatchTitle;
         private final DownloadBatchId downloadBatchId;
-        private final DownloadBatchStatus.Status status;
+        private final LiteDownloadBatchStatus.Status status;
 
-        BatchPersisted(DownloadBatchTitle downloadBatchTitle, DownloadBatchId downloadBatchId, DownloadBatchStatus.Status status) {
+        BatchPersisted(DownloadBatchTitle downloadBatchTitle, DownloadBatchId downloadBatchId, LiteDownloadBatchStatus.Status status) {
             this.downloadBatchTitle = downloadBatchTitle;
             this.downloadBatchId = downloadBatchId;
             this.status = status;
@@ -37,7 +37,7 @@ public interface DownloadsPersistence {
             return downloadBatchId;
         }
 
-        public DownloadBatchStatus.Status getDownloadBatchStatus() {
+        public LiteDownloadBatchStatus.Status getDownloadBatchStatus() {
             return status;
         }
 
