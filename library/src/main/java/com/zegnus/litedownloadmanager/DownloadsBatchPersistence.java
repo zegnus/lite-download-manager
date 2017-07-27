@@ -26,11 +26,7 @@ class DownloadsBatchPersistence implements DownloadsBatchStatusPersistence {
                 downloadsPersistence.startTransaction();
 
                 try {
-                    DownloadsPersistence.BatchPersisted batchPersisted = new DownloadsPersistence.BatchPersisted(
-                            downloadBatchTitle,
-                            downloadBatchId,
-                            status
-                    );
+                    DownloadsBatchPersisted batchPersisted = new DownloadsBatchPersisted(downloadBatchTitle, downloadBatchId, status);
                     downloadsPersistence.persistBatch(batchPersisted);
 
                     for (DownloadFile downloadFile : downloadFiles) {
@@ -51,13 +47,13 @@ class DownloadsBatchPersistence implements DownloadsBatchStatusPersistence {
         executor.execute(new Runnable() {
             @Override
             public void run() {
-                List<DownloadsPersistence.BatchPersisted> batchPersistedList = downloadsPersistence.loadBatches();
+                List<DownloadsBatchPersisted> batchPersistedList = downloadsPersistence.loadBatches();
 
                 List<DownloadBatch> downloadBatches = new ArrayList<>(batchPersistedList.size());
-                for (DownloadsPersistence.BatchPersisted batchPersisted : batchPersistedList) {
-                    LiteDownloadBatchStatus.Status status = batchPersisted.getDownloadBatchStatus();
-                    DownloadBatchId downloadBatchId = batchPersisted.getDownloadBatchId();
-                    DownloadBatchTitle downloadBatchTitle = batchPersisted.getDownloadBatchTitle();
+                for (DownloadsBatchPersisted batchPersisted : batchPersistedList) {
+                    LiteDownloadBatchStatus.Status status = batchPersisted.downloadBatchStatus();
+                    DownloadBatchId downloadBatchId = batchPersisted.downloadBatchId();
+                    DownloadBatchTitle downloadBatchTitle = batchPersisted.downloadBatchTitle();
                     LiteDownloadBatchStatus liteDownloadBatchStatus = new LiteDownloadBatchStatus(
                             downloadBatchId,
                             downloadBatchTitle,

@@ -97,6 +97,6 @@ class LiteDownloadBatchStatus implements DownloadBatchStatus {
 
     @Override
     public DownloadError.Error getDownloadErrorType() {
-        return downloadError.getError();
+        return downloadError.error();
     }
 }

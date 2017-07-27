@@ -1,8 +1,8 @@
 package com.zegnus.litedownloadmanager;
 
-public class DownloadError {
+class DownloadError {
 
-    public enum Error {
+    enum Error {
         FILE_TOTAL_SIZE_REQUEST_FAILED,
         FILE_CANNOT_BE_CREATED_LOCALLY_INSUFFICIENT_FREE_SPACE,
         FILE_CANNOT_BE_WRITTEN,
@@ -21,7 +21,7 @@ public class DownloadError {
         this.error = error;
     }
 
-    Error getError() {
+    Error error() {
         return error;
     }
 }

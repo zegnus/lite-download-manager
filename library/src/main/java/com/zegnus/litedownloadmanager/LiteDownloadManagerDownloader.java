@@ -50,8 +50,7 @@ class LiteDownloadManagerDownloader {
                 batch,
                 fileOperations,
                 downloadsBatchPersistence,
-                downloadsFilePersistence,
-                notificationCreator
+                downloadsFilePersistence
         );
 
         downloadBatch.persist();

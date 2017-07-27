@@ -19,7 +19,7 @@ class DownloadsFilePersistence {
                      String url,
                      DownloadFileId downloadFileId,
                      FilePersistenceType filePersistenceType) {
-        DownloadsPersistence.FilePersisted filePersisted = new DownloadsPersistence.FilePersisted(
+        DownloadsFilePersisted filePersisted = new DownloadsFilePersisted(
                 downloadBatchId,
                 downloadFileId,
                 fileName,
@@ -36,10 +36,10 @@ class DownloadsFilePersistence {
                                 LiteDownloadBatchStatus.Status batchStatus,
                                 FileOperations fileOperations,
                                 DownloadsFilePersistence downloadsFilePersistence) {
-        List<DownloadsPersistence.FilePersisted> filePersistedList = downloadsPersistence.loadFiles(batchId);
+        List<DownloadsFilePersisted> filePersistedList = downloadsPersistence.loadFiles(batchId);
 
         List<DownloadFile> downloadFiles = new ArrayList<>(filePersistedList.size());
-        for (DownloadsPersistence.FilePersisted filePersisted : filePersistedList) {
+        for (DownloadsFilePersisted filePersisted : filePersistedList) {
             DownloadFileId downloadFileId = filePersisted.downloadFileId();
             FileName fileName = filePersisted.fileName();
 

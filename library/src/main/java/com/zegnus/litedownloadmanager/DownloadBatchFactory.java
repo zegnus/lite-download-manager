@@ -13,8 +13,7 @@ final class DownloadBatchFactory {
     static DownloadBatch newInstance(Batch batch,
                                      FileOperations fileOperations,
                                      DownloadsBatchPersistence downloadsBatchPersistence,
-                                     DownloadsFilePersistence downloadsFilePersistence,
-                                     NotificationCreator notificationCreator) {
+                                     DownloadsFilePersistence downloadsFilePersistence) {
         DownloadBatchTitle downloadBatchTitle = DownloadBatchTitleCreator.createFrom(batch);
         List<String> fileUrls = batch.getFileUrls();
         List<DownloadFile> downloadFiles = new ArrayList<>(fileUrls.size());

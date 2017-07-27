@@ -3,6 +3,8 @@ package com.zegnus.litedownloadmanager.demo;
 import com.novoda.notils.logger.simple.Log;
 import com.zegnus.litedownloadmanager.DownloadBatchId;
 import com.zegnus.litedownloadmanager.DownloadBatchStatus;
+import com.zegnus.litedownloadmanager.DownloadsBatchPersisted;
+import com.zegnus.litedownloadmanager.DownloadsFilePersisted;
 import com.zegnus.litedownloadmanager.DownloadsPersistence;
 
 import java.util.Collections;
@@ -26,23 +28,23 @@ public class CustomDownloadsPersistence implements DownloadsPersistence {
     }
 
     @Override
-    public void persistBatch(BatchPersisted batchPersisted) {
-        Log.v("Persist batch id: " + batchPersisted.getDownloadBatchId() + ", status: " + batchPersisted.getDownloadBatchStatus());
+    public void persistBatch(DownloadsBatchPersisted batchPersisted) {
+        Log.v("Persist batch id: " + batchPersisted.downloadBatchId() + ", status: " + batchPersisted.downloadBatchStatus());
     }
 
     @Override
-    public List<BatchPersisted> loadBatches() {
+    public List<DownloadsBatchPersisted> loadBatches() {
         Log.v("Load batches");
         return Collections.emptyList();
     }
 
     @Override
-    public void persistFile(FilePersisted filePersisted) {
+    public void persistFile(DownloadsFilePersisted filePersisted) {
         Log.v("Persist file id: " + filePersisted.downloadFileId());
     }
 
     @Override
-    public List<FilePersisted> loadFiles(DownloadBatchId batchId) {
+    public List<DownloadsFilePersisted> loadFiles(DownloadBatchId batchId) {
         Log.v("Load files for batch id: " + batchId);
         return Collections.emptyList();
     }
