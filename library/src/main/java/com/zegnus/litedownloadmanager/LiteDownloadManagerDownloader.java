@@ -94,7 +94,7 @@ class LiteDownloadManagerDownloader {
     }
 
     private void updateStatusToQueuedIfNeeded(DownloadBatch downloadBatch) {
-        LiteDownloadBatchStatus liteDownloadBatchStatus = downloadBatch.status();
+        InternalDownloadBatchStatus liteDownloadBatchStatus = downloadBatch.status();
 
         if (liteDownloadBatchStatus.status() != PAUSED) {
             liteDownloadBatchStatus.markAsQueued(downloadsBatchPersistence);

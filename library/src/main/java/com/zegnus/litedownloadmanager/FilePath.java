@@ -1,26 +1,8 @@
 package com.zegnus.litedownloadmanager;
 
-public class FilePath {
+public interface FilePath {
 
-    private static final String UNKNOWN = "unknown";
+    String path();
 
-    static final FilePath UNKNOWN_FILEPATH = newInstance(UNKNOWN);
-
-    private final String path;
-
-    public static FilePath newInstance(String path) {
-        return new FilePath(path);
-    }
-
-    private FilePath(String path) {
-        this.path = path;
-    }
-
-    String path() {
-        return path;
-    }
-
-    boolean isUnknown() {
-        return path.equals(UNKNOWN);
-    }
+    boolean isUnknown();
 }

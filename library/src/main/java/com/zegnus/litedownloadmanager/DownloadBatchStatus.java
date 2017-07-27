@@ -27,6 +27,7 @@ public interface DownloadBatchStatus {
         }
 
     }
+
     DownloadBatchTitle getDownloadBatchTitle();
 
     int percentageDownloaded();

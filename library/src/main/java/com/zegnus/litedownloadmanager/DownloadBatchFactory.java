@@ -20,7 +20,7 @@ final class DownloadBatchFactory {
         DownloadBatchId downloadBatchId = batch.getDownloadBatchId();
 
         for (String fileUrl : fileUrls) {
-            FileSize fileSize = FileSize.Unknown();
+            InternalFileSize fileSize = InternalFileSizeCreator.UNKNOWN;
             DownloadFileId downloadFileId = DownloadFileId.from(batch);
             DownloadError downloadError = new DownloadError();
             DownloadFileStatus downloadFileStatus = new DownloadFileStatus(
@@ -29,12 +29,12 @@ final class DownloadBatchFactory {
                     fileSize,
                     downloadError
             );
-            FileName fileName = FileName.from(batch, fileUrl);
+            FileName fileName = LiteFileName.from(batch, fileUrl);
 
             FilePersistenceCreator filePersistenceCreator = fileOperations.filePersistenceCreator();
             FileDownloader fileDownloader = fileOperations.fileDownloader();
             FileSizeRequester fileSizeRequester = fileOperations.fileSizeRequester();
-            FilePath filePath = FilePath.UNKNOWN_FILEPATH;
+            FilePath filePath = FilePathCreator.UNKNOWN_FILEPATH;
 
             FilePersistence filePersistence = filePersistenceCreator.create();
             DownloadFile downloadFile = new DownloadFile(
@@ -52,10 +52,10 @@ final class DownloadBatchFactory {
             downloadFiles.add(downloadFile);
         }
 
-        LiteDownloadBatchStatus liteDownloadBatchStatus = new LiteDownloadBatchStatus(
+        InternalDownloadBatchStatus liteDownloadBatchStatus = new LiteDownloadBatchStatus(
                 downloadBatchId,
                 downloadBatchTitle,
-                LiteDownloadBatchStatus.Status.QUEUED
+                DownloadBatchStatus.Status.QUEUED
         );
 
         return new DownloadBatch(
@@ -71,7 +71,7 @@ final class DownloadBatchFactory {
     static DownloadBatch newInstance(DownloadBatchTitle downloadBatchTitle,
                                      DownloadBatchId downloadBatchId,
                                      List<DownloadFile> downloadFiles,
-                                     LiteDownloadBatchStatus liteDownloadBatchStatus,
+                                     InternalDownloadBatchStatus liteDownloadBatchStatus,
                                      DownloadsBatchPersistence downloadsBatchPersistence) {
         return new DownloadBatch(
                 downloadBatchTitle,

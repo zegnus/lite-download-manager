@@ -28,7 +28,7 @@ class NetworkFileDownloader implements FileDownloader {
 
         Request.Builder requestBuilder = new Request.Builder().url(url);
         if (fileSize.areBytesDownloadedKnown()) {
-            requestBuilder.addHeader("Range", "bytes=" + fileSize.getCurrentSize() + "-" + fileSize.getTotalSize());
+            requestBuilder.addHeader("Range", "bytes=" + fileSize.currentSize() + "-" + fileSize.totalSize());
         }
 
         Call call = httpClient.newCall(requestBuilder.build());

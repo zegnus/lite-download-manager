@@ -1,56 +1,18 @@
 package com.zegnus.litedownloadmanager;
 
-public class DownloadsFilePersisted {
+public interface DownloadsFilePersisted {
 
-    private final DownloadBatchId downloadBatchId;
-    private final DownloadFileId downloadFileId;
-    private final FileName fileName;
-    private final FilePath filePath;
-    private final long totalFileSize;
-    private final String url;
-    private final FilePersistenceType filePersistenceType;
+    DownloadBatchId downloadBatchId();
 
-    DownloadsFilePersisted(DownloadBatchId downloadBatchId,
-                           DownloadFileId downloadFileId,
-                           FileName fileName,
-                           FilePath filePath,
-                           long totalFileSize,
-                           String url,
-                           FilePersistenceType filePersistenceType) {
-        this.downloadBatchId = downloadBatchId;
-        this.downloadFileId = downloadFileId;
-        this.fileName = fileName;
-        this.filePath = filePath;
-        this.totalFileSize = totalFileSize;
-        this.url = url;
-        this.filePersistenceType = filePersistenceType;
-    }
+    FileName fileName();
 
-    public DownloadBatchId downloadBatchId() {
-        return downloadBatchId;
-    }
+    FilePath filePath();
 
-    public FileName fileName() {
-        return fileName;
-    }
+    long totalFileSize();
 
-    public FilePath filePath() {
-        return filePath;
-    }
+    String url();
 
-    public long totalFileSize() {
-        return totalFileSize;
-    }
+    DownloadFileId downloadFileId();
 
-    public String url() {
-        return url;
-    }
-
-    public DownloadFileId downloadFileId() {
-        return downloadFileId;
-    }
-
-    FilePersistenceType filePersistenceType() {
-        return filePersistenceType;
-    }
+    FilePersistenceType filePersistenceType();
 }

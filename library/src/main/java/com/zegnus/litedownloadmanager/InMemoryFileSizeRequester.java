@@ -6,6 +6,6 @@ class InMemoryFileSizeRequester implements FileSizeRequester {
 
     @Override
     public FileSize requestFileSize(String url) {
-        return FileSize.Total(TOTAL_FILE_SIZE);
+        return FileSizeCreator.createFromTotalSize(TOTAL_FILE_SIZE);
     }
 }

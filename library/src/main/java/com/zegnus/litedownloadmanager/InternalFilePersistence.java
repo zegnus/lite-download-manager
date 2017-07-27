@@ -31,11 +31,11 @@ class InternalFilePersistence implements FilePersistence {
         }
 
         long usableSpace = context.getFilesDir().getUsableSpace();
-        if (usableSpace < fileSize.getTotalSize()) {
+        if (usableSpace < fileSize.totalSize()) {
             return FilePersistenceResult.newInstance(Status.ERROR_INSUFFICIENT_SPACE);
         }
 
-        FilePath filePath = FilePath.newInstance(fileName.getName());
+        FilePath filePath = FilePathCreator.create(fileName.name());
         return create(filePath);
     }
 
@@ -48,7 +48,7 @@ class InternalFilePersistence implements FilePersistence {
             return FilePersistenceResult.newInstance(Status.ERROR_OPENING_FILE);
         }
 
-        fileName = FileName.from(filePath.path());
+        fileName = LiteFileName.from(filePath.path());
         return FilePersistenceResult.newInstance(Status.SUCCESS, filePath);
     }
 
@@ -75,7 +75,7 @@ class InternalFilePersistence implements FilePersistence {
             return;
         }
 
-        context.deleteFile(fileName.getName());
+        context.deleteFile(fileName.name());
     }
 
     @Override
@@ -97,7 +97,7 @@ class InternalFilePersistence implements FilePersistence {
     public long getCurrentSize(FileName fileName) {
         FileOutputStream file = null;
         try {
-            file = context.openFileOutput(fileName.getName(), Context.MODE_APPEND);
+            file = context.openFileOutput(fileName.name(), Context.MODE_APPEND);
             return file.getChannel().size();
         } catch (IOException e) {
             Log.e(e, "Error requesting file size for " + fileName);

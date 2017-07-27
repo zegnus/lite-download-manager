@@ -20,6 +20,6 @@ public interface DownloadsPersistence {
 
     void delete(DownloadBatchId downloadBatchId);
 
-    void update(DownloadBatchId downloadBatchId, LiteDownloadBatchStatus.Status status);
+    void update(DownloadBatchId downloadBatchId, DownloadBatchStatus.Status status);
 
 }

@@ -14,7 +14,7 @@ class DownloadFile {
     private final FilePersistence filePersistence;
     private final DownloadsFilePersistence downloadsFilePersistence;
 
-    private FileSize fileSize;
+    private InternalFileSize fileSize;
     private FilePath filePath;
 
     DownloadFile(DownloadBatchId downloadBatchId,
@@ -22,7 +22,7 @@ class DownloadFile {
                  DownloadFileStatus downloadFileStatus,
                  FileName fileName,
                  FilePath filePath,
-                 FileSize fileSize,
+                 InternalFileSize fileSize,
                  FileDownloader fileDownloader,
                  FileSizeRequester fileSizeRequester,
                  FilePersistence filePersistence,
@@ -61,7 +61,7 @@ class DownloadFile {
         filePath = result.filePath();
         fileSize.setCurrentSize(filePersistence.getCurrentSize());
 
-        if (fileSize.getCurrentSize() == fileSize.getTotalSize()) {
+        if (fileSize.currentSize() == fileSize.totalSize()) {
             downloadFileStatus.update(fileSize);
             callback.onUpdate(downloadFileStatus);
             return;
@@ -127,13 +127,13 @@ class DownloadFile {
         return DownloadError.Error.UNKNOWN;
     }
 
-    private FileSize requestTotalFileSizeIfNecessary(FileSize fileSize) {
-        FileSize updatedFileSize = fileSize.copy();
+    private LiteFileSize requestTotalFileSizeIfNecessary(InternalFileSize fileSize) {
+        LiteFileSize updatedFileSize = fileSize.copy();
 
         if (fileSize.isTotalSizeUnknown()) {
             FileSize requestFileSize = fileSizeRequester.requestFileSize(url);
             if (requestFileSize.isTotalSizeKnown()) {
-                updatedFileSize.setTotalSize(requestFileSize.getTotalSize());
+                updatedFileSize.setTotalSize(requestFileSize.totalSize());
             }
         }
 
@@ -172,11 +172,11 @@ class DownloadFile {
     long getTotalSize() {
         if (fileSize.isTotalSizeUnknown()) {
             FileSize requestFileSize = fileSizeRequester.requestFileSize(url);
-            fileSize.setTotalSize(requestFileSize.getTotalSize());
+            fileSize.setTotalSize(requestFileSize.totalSize());
             persistSync();
         }
 
-        return fileSize.getTotalSize();
+        return fileSize.totalSize();
     }
 
     void persistSync() {
@@ -192,7 +192,7 @@ class DownloadFile {
     }
 
     long getCurrentDownloadedBytes() {
-        return fileSize.getCurrentSize();
+        return fileSize.currentSize();
     }
 
     interface Callback {

@@ -1,6 +1,6 @@
 package com.zegnus.litedownloadmanager;
 
-class LiteDownloadBatchStatus implements DownloadBatchStatus {
+class LiteDownloadBatchStatus implements InternalDownloadBatchStatus {
 
     private static final long ZERO_BYTES = 0;
 
@@ -29,7 +29,8 @@ class LiteDownloadBatchStatus implements DownloadBatchStatus {
         return totalBatchSizeBytes;
     }
 
-    void update(long currentBytesDownloaded, long totalBatchSizeBytes) {
+    @Override
+    public void update(long currentBytesDownloaded, long totalBatchSizeBytes) {
         this.bytesDownloaded = currentBytesDownloaded;
         this.totalBatchSizeBytes = totalBatchSizeBytes;
         this.percentageDownloaded = getPercentageFrom(bytesDownloaded, totalBatchSizeBytes);
@@ -67,26 +68,31 @@ class LiteDownloadBatchStatus implements DownloadBatchStatus {
         return status;
     }
 
-    void markAsDownloading(DownloadsBatchStatusPersistence persistence) {
+    @Override
+    public void markAsDownloading(DownloadsBatchStatusPersistence persistence) {
         status = Status.DOWNLOADING;
         updateStatus(status, persistence);
     }
 
-    void markAsPaused(DownloadsBatchStatusPersistence persistence) {
+    @Override
+    public void markAsPaused(DownloadsBatchStatusPersistence persistence) {
         status = Status.PAUSED;
         updateStatus(status, persistence);
     }
 
-    void markAsQueued(DownloadsBatchStatusPersistence persistence) {
+    @Override
+    public void markAsQueued(DownloadsBatchStatusPersistence persistence) {
         status = Status.QUEUED;
         updateStatus(status, persistence);
     }
 
-    void markForDeletion() {
+    @Override
+    public void markForDeletion() {
         status = Status.DELETION;
     }
 
-    void markAsError(DownloadError downloadError) {
+    @Override
+    public void markAsError(DownloadError downloadError) {
         this.status = Status.ERROR;
         this.downloadError = downloadError;
     }

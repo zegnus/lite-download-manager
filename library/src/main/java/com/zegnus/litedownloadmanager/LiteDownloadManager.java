@@ -13,7 +13,6 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
     private final List<DownloadBatchCallback> callbacks;
     private final FileOperations fileOperations;
     private final DownloadsBatchPersistence downloadsBatchPersistence;
-    private final NotificationCreator notificationCreator;
     private final LiteDownloadManagerDownloader downloader;
 
     private DownloadService downloadService;
@@ -24,7 +23,6 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
                         List<DownloadBatchCallback> callbacks,
                         FileOperations fileOperations,
                         DownloadsBatchPersistence downloadsBatchPersistence,
-                        NotificationCreator notificationCreator,
                         LiteDownloadManagerDownloader downloader) {
         this.waitForDownloadService = waitForDownloadService;
         this.executor = executor;
@@ -32,7 +30,6 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
         this.callbacks = callbacks;
         this.fileOperations = fileOperations;
         this.downloadsBatchPersistence = downloadsBatchPersistence;
-        this.notificationCreator = notificationCreator;
         this.downloader = downloader;
     }
 
@@ -50,7 +47,7 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
 
     @Override
     public void submitAllStoredDownloads(AllStoredDownloadsSubmittedCallback callback) {
-        downloadsBatchPersistence.loadAsync(fileOperations, notificationCreator, loadBatchesCallback(callback));
+        downloadsBatchPersistence.loadAsync(fileOperations, loadBatchesCallback(callback));
     }
 
     private DownloadsBatchPersistence.LoadBatchesCallback loadBatchesCallback(final AllStoredDownloadsSubmittedCallback callback) {

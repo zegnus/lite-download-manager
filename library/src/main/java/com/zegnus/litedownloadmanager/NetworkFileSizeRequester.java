@@ -28,12 +28,12 @@ class NetworkFileSizeRequester implements FileSizeRequester {
             Response response = httpClient.newCall(requestBuilder.build()).execute();
             if (response.isSuccessful()) {
                 long totalFileSize = Long.parseLong(response.header(HEADER_CONTENT_LENGTH, String.valueOf(UNKNOWN_CONTENT_LENGTH)));
-                return FileSize.Total(totalFileSize);
+                return FileSizeCreator.createFromTotalSize(totalFileSize);
             }
         } catch (IOException e) {
             Log.e(e, "Error requesting file size for " + url);
         }
 
-        return FileSize.Unknown();
+        return FileSizeCreator.UNKNOWN;
     }
 }

@@ -14,7 +14,7 @@ public class FilePersistenceResult {
     private final FilePath filePath;
 
     public static FilePersistenceResult newInstance(Status status) {
-        return new FilePersistenceResult(status, FilePath.UNKNOWN_FILEPATH);
+        return new FilePersistenceResult(status, FilePathCreator.UNKNOWN_FILEPATH);
     }
 
     public static FilePersistenceResult newInstance(Status status, FilePath filePath) {

@@ -29,7 +29,7 @@ class DownloadFileStatus {
     }
 
     long bytesDownloaded() {
-        return fileSize.getCurrentSize();
+        return fileSize.currentSize();
     }
 
     DownloadFileId getDownloadFileId() {

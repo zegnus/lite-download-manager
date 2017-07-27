@@ -19,12 +19,12 @@ class DownloadsFilePersistence {
                      String url,
                      DownloadFileId downloadFileId,
                      FilePersistenceType filePersistenceType) {
-        DownloadsFilePersisted filePersisted = new DownloadsFilePersisted(
+        LiteDownloadsFilePersisted filePersisted = new LiteDownloadsFilePersisted(
                 downloadBatchId,
                 downloadFileId,
                 fileName,
                 filePath,
-                fileSize.getTotalSize(),
+                fileSize.totalSize(),
                 url,
                 filePersistenceType
         );
@@ -33,7 +33,7 @@ class DownloadsFilePersistence {
     }
 
     List<DownloadFile> loadSync(DownloadBatchId batchId,
-                                LiteDownloadBatchStatus.Status batchStatus,
+                                DownloadBatchStatus.Status batchStatus,
                                 FileOperations fileOperations,
                                 DownloadsFilePersistence downloadsFilePersistence) {
         List<DownloadsFilePersisted> filePersistedList = downloadsPersistence.loadFiles(batchId);
@@ -48,7 +48,7 @@ class DownloadsFilePersistence {
 
             long currentSize = filePersistence.getCurrentSize(fileName);
             long totalFileSize = filePersisted.totalFileSize();
-            FileSize fileSize = new FileSize(currentSize, totalFileSize);
+            InternalFileSize fileSize = InternalFileSizeCreator.createFromCurrentAndTotalSize(currentSize, totalFileSize);
             String url = filePersisted.url();
 
             DownloadFileStatus downloadFileStatus = new DownloadFileStatus(
@@ -81,7 +81,7 @@ class DownloadsFilePersistence {
         return downloadFiles;
     }
 
-    private DownloadFileStatus.Status getFileStatusFrom(LiteDownloadBatchStatus.Status batchStatus) {
+    private DownloadFileStatus.Status getFileStatusFrom(DownloadBatchStatus.Status batchStatus) {
         switch (batchStatus) {
             case QUEUED:
                 return DownloadFileStatus.Status.QUEUED;

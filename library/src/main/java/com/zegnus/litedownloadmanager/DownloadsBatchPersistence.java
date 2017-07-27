@@ -18,7 +18,7 @@ class DownloadsBatchPersistence implements DownloadsBatchStatusPersistence {
 
     void persistAsync(final DownloadBatchTitle downloadBatchTitle,
                       final DownloadBatchId downloadBatchId,
-                      final LiteDownloadBatchStatus.Status status,
+                      final DownloadBatchStatus.Status status,
                       final List<DownloadFile> downloadFiles) {
         executor.execute(new Runnable() {
             @Override
@@ -26,7 +26,7 @@ class DownloadsBatchPersistence implements DownloadsBatchStatusPersistence {
                 downloadsPersistence.startTransaction();
 
                 try {
-                    DownloadsBatchPersisted batchPersisted = new DownloadsBatchPersisted(downloadBatchTitle, downloadBatchId, status);
+                    LiteDownloadsBatchPersisted batchPersisted = new LiteDownloadsBatchPersisted(downloadBatchTitle, downloadBatchId, status);
                     downloadsPersistence.persistBatch(batchPersisted);
 
                     for (DownloadFile downloadFile : downloadFiles) {
@@ -41,9 +41,7 @@ class DownloadsBatchPersistence implements DownloadsBatchStatusPersistence {
         });
     }
 
-    void loadAsync(final FileOperations fileOperations,
-                   final NotificationCreator notificationCreator,
-                   final LoadBatchesCallback callback) {
+    void loadAsync(final FileOperations fileOperations, final LoadBatchesCallback callback) {
         executor.execute(new Runnable() {
             @Override
             public void run() {
@@ -51,10 +49,10 @@ class DownloadsBatchPersistence implements DownloadsBatchStatusPersistence {
 
                 List<DownloadBatch> downloadBatches = new ArrayList<>(batchPersistedList.size());
                 for (DownloadsBatchPersisted batchPersisted : batchPersistedList) {
-                    LiteDownloadBatchStatus.Status status = batchPersisted.downloadBatchStatus();
+                    DownloadBatchStatus.Status status = batchPersisted.downloadBatchStatus();
                     DownloadBatchId downloadBatchId = batchPersisted.downloadBatchId();
                     DownloadBatchTitle downloadBatchTitle = batchPersisted.downloadBatchTitle();
-                    LiteDownloadBatchStatus liteDownloadBatchStatus = new LiteDownloadBatchStatus(
+                    InternalDownloadBatchStatus liteDownloadBatchStatus = new LiteDownloadBatchStatus(
                             downloadBatchId,
                             downloadBatchTitle,
                             status
@@ -107,7 +105,7 @@ class DownloadsBatchPersistence implements DownloadsBatchStatusPersistence {
     }
 
     @Override
-    public void updateStatusAsync(final DownloadBatchId downloadBatchId, final LiteDownloadBatchStatus.Status status) {
+    public void updateStatusAsync(final DownloadBatchId downloadBatchId, final DownloadBatchStatus.Status status) {
         executor.execute(new Runnable() {
             @Override
             public void run() {

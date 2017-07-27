@@ -18,7 +18,7 @@ class CustomFileDownloader implements FileDownloader {
 
         canDownload = true;
 
-        while (canDownload && fileSize.getCurrentSize() < fileSize.getTotalSize()) {
+        while (canDownload && fileSize.currentSize() < fileSize.totalSize()) {
             try {
                 Thread.sleep(200);
             } catch (InterruptedException e) {

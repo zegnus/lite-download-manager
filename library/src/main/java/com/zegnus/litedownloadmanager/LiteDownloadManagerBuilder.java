@@ -175,7 +175,6 @@ public final class LiteDownloadManagerBuilder {
                 callbacks,
                 fileOperations,
                 downloadsBatchPersistence,
-                notificationCreator,
                 downloader
         );
 

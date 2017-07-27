@@ -54,10 +54,10 @@ class RoomDownloadsPersistence implements DownloadsPersistence {
 
         List<DownloadsBatchPersisted> batchPersistedList = new ArrayList<>(roomBatches.size());
         for (RoomBatch roomBatch : roomBatches) {
-            DownloadsBatchPersisted batchPersisted = new DownloadsBatchPersisted(
+            DownloadsBatchPersisted batchPersisted = new LiteDownloadsBatchPersisted(
                     DownloadBatchTitleCreator.createFrom(roomBatch.title),
                     DownloadBatchIdCreator.createFrom(roomBatch.id),
-                    LiteDownloadBatchStatus.Status.from(roomBatch.status)
+                    DownloadBatchStatus.Status.from(roomBatch.status)
             );
             batchPersistedList.add(batchPersisted);
         }
@@ -71,7 +71,7 @@ class RoomDownloadsPersistence implements DownloadsPersistence {
         roomFile.totalSize = filePersisted.totalFileSize();
         roomFile.batchId = filePersisted.downloadBatchId().stringValue();
         roomFile.url = filePersisted.url();
-        roomFile.name = filePersisted.fileName().getName();
+        roomFile.name = filePersisted.fileName().name();
         roomFile.path = filePersisted.filePath().path();
         roomFile.path = filePersisted.filePath().path();
         roomFile.id = filePersisted.downloadFileId().toRawId();
@@ -85,11 +85,11 @@ class RoomDownloadsPersistence implements DownloadsPersistence {
         List<RoomFile> roomFiles = database.roomFileDao().loadAllFilesFor(downloadBatchId.stringValue());
         List<DownloadsFilePersisted> filePersistedList = new ArrayList<>(roomFiles.size());
         for (RoomFile roomFile : roomFiles) {
-            DownloadsFilePersisted filePersisted = new DownloadsFilePersisted(
+            DownloadsFilePersisted filePersisted = new LiteDownloadsFilePersisted(
                     DownloadBatchIdCreator.createFrom(roomFile.batchId),
                     DownloadFileId.from(roomFile.id),
-                    FileName.from(roomFile.name),
-                    FilePath.newInstance(roomFile.path),
+                    LiteFileName.from(roomFile.name),
+                    FilePathCreator.create(roomFile.path),
                     roomFile.totalSize,
                     roomFile.url,
                     FilePersistenceType.from(roomFile.persistenceType)
@@ -107,7 +107,7 @@ class RoomDownloadsPersistence implements DownloadsPersistence {
     }
 
     @Override
-    public void update(DownloadBatchId downloadBatchId, LiteDownloadBatchStatus.Status status) {
+    public void update(DownloadBatchId downloadBatchId, DownloadBatchStatus.Status status) {
         RoomBatch roomBatch = database.roomBatchDao().load(downloadBatchId.stringValue());
         roomBatch.status = status.toRawValue();
         database.roomBatchDao().update(roomBatch);

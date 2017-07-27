@@ -12,7 +12,7 @@ class DownloadBatch {
     private final DownloadBatchId downloadBatchId;
     private final DownloadBatchTitle downloadBatchTitle;
     private final Map<DownloadFileId, Long> fileBytesDownloadedMap;
-    private final LiteDownloadBatchStatus liteDownloadBatchStatus;
+    private final InternalDownloadBatchStatus downloadBatchStatus;
     private final List<DownloadFile> downloadFiles;
     private final DownloadsBatchPersistence downloadsBatchPersistence;
 
@@ -23,13 +23,13 @@ class DownloadBatch {
                   DownloadBatchId downloadBatchId,
                   List<DownloadFile> downloadFiles,
                   Map<DownloadFileId, Long> fileBytesDownloadedMap,
-                  LiteDownloadBatchStatus liteDownloadBatchStatus,
+                  InternalDownloadBatchStatus internalDownloadBatchStatus,
                   DownloadsBatchPersistence downloadsBatchPersistence) {
         this.downloadBatchTitle = downloadBatchTitle;
         this.downloadBatchId = downloadBatchId;
         this.downloadFiles = downloadFiles;
         this.fileBytesDownloadedMap = fileBytesDownloadedMap;
-        this.liteDownloadBatchStatus = liteDownloadBatchStatus;
+        this.downloadBatchStatus = internalDownloadBatchStatus;
         this.downloadsBatchPersistence = downloadsBatchPersistence;
     }
 
@@ -38,24 +38,24 @@ class DownloadBatch {
     }
 
     void download() {
-        if (liteDownloadBatchStatus.status() == PAUSED) {
+        if (downloadBatchStatus.status() == PAUSED) {
             return;
         }
 
-        if (liteDownloadBatchStatus.status() == DELETION) {
+        if (downloadBatchStatus.status() == DELETION) {
             return;
         }
 
-        liteDownloadBatchStatus.markAsDownloading(downloadsBatchPersistence);
-        notifyCallback(liteDownloadBatchStatus);
+        downloadBatchStatus.markAsDownloading(downloadsBatchPersistence);
+        notifyCallback(downloadBatchStatus);
 
         totalBatchSizeBytes = getTotalSize(downloadFiles);
 
         if (totalBatchSizeBytes <= ZERO_BYTES) {
             DownloadError downloadError = new DownloadError();
             downloadError.setError(DownloadError.Error.CANNOT_DOWNLOAD_FILE);
-            liteDownloadBatchStatus.markAsError(downloadError);
-            notifyCallback(liteDownloadBatchStatus);
+            downloadBatchStatus.markAsError(downloadError);
+            notifyCallback(downloadBatchStatus);
             return;
         }
 
@@ -65,12 +65,12 @@ class DownloadBatch {
             public void onUpdate(DownloadFileStatus downloadFileStatus) {
                 fileBytesDownloadedMap.put(downloadFileStatus.getDownloadFileId(), downloadFileStatus.bytesDownloaded());
                 long currentBytesDownloaded = getBytesDownloadedFrom(fileBytesDownloadedMap);
-                liteDownloadBatchStatus.update(currentBytesDownloaded, totalBatchSizeBytes);
+                downloadBatchStatus.update(currentBytesDownloaded, totalBatchSizeBytes);
                 if (downloadFileStatus.isMarkedAsError()) {
-                    liteDownloadBatchStatus.markAsError(downloadFileStatus.getError());
+                    downloadBatchStatus.markAsError(downloadFileStatus.getError());
                 }
 
-                notifyCallback(liteDownloadBatchStatus);
+                notifyCallback(downloadBatchStatus);
             }
         };
 
@@ -83,7 +83,7 @@ class DownloadBatch {
     }
 
     private boolean batchCannotContinue() {
-        DownloadBatchStatus.Status status = liteDownloadBatchStatus.status();
+        DownloadBatchStatus.Status status = downloadBatchStatus.status();
         return status == ERROR || status == DELETION || status == PAUSED;
     }
 
@@ -95,11 +95,11 @@ class DownloadBatch {
         return bytesDownloaded;
     }
 
-    private void notifyCallback(LiteDownloadBatchStatus liteDownloadBatchStatus) {
+    private void notifyCallback(InternalDownloadBatchStatus downloadBatchStatus) {
         if (callback == null) {
             return;
         }
-        callback.onUpdate(liteDownloadBatchStatus);
+        callback.onUpdate(downloadBatchStatus);
     }
 
     private long getTotalSize(List<DownloadFile> downloadFiles) {
@@ -113,22 +113,22 @@ class DownloadBatch {
     }
 
     void pause() {
-        if (liteDownloadBatchStatus.status() == PAUSED) {
+        if (downloadBatchStatus.status() == PAUSED) {
             return;
         }
-        liteDownloadBatchStatus.markAsPaused(downloadsBatchPersistence);
-        notifyCallback(liteDownloadBatchStatus);
+        downloadBatchStatus.markAsPaused(downloadsBatchPersistence);
+        notifyCallback(downloadBatchStatus);
         for (DownloadFile downloadFile : downloadFiles) {
             downloadFile.pause();
         }
     }
 
     void resume() {
-        if (liteDownloadBatchStatus.status() == QUEUED || liteDownloadBatchStatus.status() == DOWNLOADING) {
+        if (downloadBatchStatus.status() == QUEUED || downloadBatchStatus.status() == DOWNLOADING) {
             return;
         }
-        liteDownloadBatchStatus.markAsQueued(downloadsBatchPersistence);
-        notifyCallback(liteDownloadBatchStatus);
+        downloadBatchStatus.markAsQueued(downloadsBatchPersistence);
+        notifyCallback(downloadBatchStatus);
         for (DownloadFile downloadFile : downloadFiles) {
             downloadFile.resume();
         }
@@ -136,8 +136,8 @@ class DownloadBatch {
 
     void delete() {
         downloadsBatchPersistence.deleteAsync(downloadBatchId);
-        liteDownloadBatchStatus.markForDeletion();
-        notifyCallback(liteDownloadBatchStatus);
+        downloadBatchStatus.markForDeletion();
+        notifyCallback(downloadBatchStatus);
         for (DownloadFile downloadFile : downloadFiles) {
             downloadFile.delete();
         }
@@ -147,11 +147,11 @@ class DownloadBatch {
         return downloadBatchId;
     }
 
-    LiteDownloadBatchStatus status() {
-        return liteDownloadBatchStatus;
+    InternalDownloadBatchStatus status() {
+        return downloadBatchStatus;
     }
 
     void persist() {
-        downloadsBatchPersistence.persistAsync(downloadBatchTitle, downloadBatchId, liteDownloadBatchStatus.status(), downloadFiles);
+        downloadsBatchPersistence.persistAsync(downloadBatchTitle, downloadBatchId, downloadBatchStatus.status(), downloadFiles);
     }
 }
