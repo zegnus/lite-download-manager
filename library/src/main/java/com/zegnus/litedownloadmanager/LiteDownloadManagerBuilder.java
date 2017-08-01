@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.DrawableRes;
 
+import com.novoda.notils.logger.simple.Log;
 import com.squareup.okhttp.OkHttpClient;
 
 import java.util.ArrayList;
@@ -34,8 +35,12 @@ public final class LiteDownloadManagerBuilder {
     private DownloadService downloadService;
     private LiteDownloadManager liteDownloadManager;
     private NotificationCreator notificationCreator;
+    private ConnectionType connectionTypeAllowed;
+    private boolean allowNetworkRecovery;
 
     public static LiteDownloadManagerBuilder newInstance(Context context, Handler callbackHandler, @DrawableRes int notificationIcon) {
+        Log.setShowLogs(true);
+
         // File persistence
         FilePersistenceCreator filePersistenceCreator = FilePersistenceCreator.newInternalFilePersistenceCreator(context);
 
@@ -57,6 +62,10 @@ public final class LiteDownloadManagerBuilder {
 
         DownloadBatchNotification downloadBatchNotification = new DownloadBatchNotification(context, notificationIcon);
 
+        // Connection type not allowed
+        ConnectionType connectionTypeAllowed = ConnectionType.ALL;
+        boolean allowNetworkRecovery = true;
+
         return new LiteDownloadManagerBuilder(
                 context,
                 callbackHandler,
@@ -65,7 +74,9 @@ public final class LiteDownloadManagerBuilder {
                 downloadsFilePersistence,
                 fileSizeRequester,
                 fileDownloader,
-                downloadBatchNotification
+                downloadBatchNotification,
+                connectionTypeAllowed,
+                allowNetworkRecovery
         );
     }
 
@@ -113,6 +124,16 @@ public final class LiteDownloadManagerBuilder {
         return this;
     }
 
+    public LiteDownloadManagerBuilder withAllowedConnectionType(ConnectionType connectionTypeNotAllowed) {
+        this.connectionTypeAllowed = connectionTypeNotAllowed;
+        return this;
+    }
+
+    public LiteDownloadManagerBuilder withNetworkRecovery(boolean enabled) {
+        allowNetworkRecovery = enabled;
+        return this;
+    }
+
     private LiteDownloadManagerBuilder(Context context,
                                        Handler callbackHandler,
                                        FilePersistenceCreator filePersistenceCreator,
@@ -120,7 +141,9 @@ public final class LiteDownloadManagerBuilder {
                                        DownloadsFilePersistence downloadsFilePersistence,
                                        FileSizeRequester fileSizeRequester,
                                        FileDownloader fileDownloader,
-                                       NotificationCreator notificationCreator) {
+                                       NotificationCreator notificationCreator,
+                                       ConnectionType connectionTypeAllowed,
+                                       boolean allowNetworkRecovery) {
         this.context = context;
         this.callbackHandler = callbackHandler;
         this.filePersistenceCreator = filePersistenceCreator;
@@ -129,6 +152,8 @@ public final class LiteDownloadManagerBuilder {
         this.fileSizeRequester = fileSizeRequester;
         this.fileDownloader = fileDownloader;
         this.notificationCreator = notificationCreator;
+        this.connectionTypeAllowed = connectionTypeAllowed;
+        this.allowNetworkRecovery = allowNetworkRecovery;
     }
 
     public LiteDownloadManager build() {
@@ -142,6 +167,12 @@ public final class LiteDownloadManagerBuilder {
                     @Override
                     public void onAllDownloadsSubmitted() {
                         liteDownloadManager.initialise(downloadService);
+
+                        if (allowNetworkRecovery) {
+                            DownloadsNetworkRecoveryCreator.createEnabled(context, liteDownloadManager, connectionTypeAllowed);
+                        } else {
+                            DownloadsNetworkRecoveryCreator.createDisabled();
+                        }
                     }
                 });
             }

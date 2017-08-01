@@ -84,7 +84,7 @@ class DownloadFile {
 
             @Override
             public void onError() {
-                updateAndFeedbackWithStatus(Error.CANNOT_DOWNLOAD_FILE, callback);
+                updateAndFeedbackWithStatus(Error.NETWORK_ERROR_CANNOT_DOWNLOAD_FILE, callback);
             }
 
             @Override
