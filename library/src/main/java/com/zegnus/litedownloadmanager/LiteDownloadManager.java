@@ -57,7 +57,11 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
                 for (DownloadBatch downloadBatch : downloadBatches) {
                     DownloadBatchId id = downloadBatch.getId();
                     if (downloadBatchMap.containsKey(id)) {
-                        resume(id);
+                        InternalDownloadBatchStatus batchStatus = downloadBatch.status();
+                        DownloadBatchStatus.Status status = batchStatus.status();
+                        if (status == DownloadBatchStatus.Status.ERROR) {
+                            resume(id);
+                        }
                     } else {
                         downloader.download(downloadBatch, downloadBatchMap);
                     }
