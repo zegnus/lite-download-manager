@@ -32,4 +32,11 @@ class LiteDownloadBatchId implements DownloadBatchId {
     public int hashCode() {
         return id.hashCode();
     }
+
+    @Override
+    public String toString() {
+        return "LiteDownloadBatchId{" +
+                "id='" + id + '\'' +
+                '}';
+    }
 }

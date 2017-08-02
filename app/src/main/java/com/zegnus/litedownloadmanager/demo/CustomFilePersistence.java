@@ -50,8 +50,8 @@ public class CustomFilePersistence implements FilePersistence {
     }
 
     @Override
-    public long getCurrentSize(FileName fileName) {
-        Log.v("getCurrentSize for " + fileName + ": " + currentSize);
+    public long getCurrentSize(FilePath filePath) {
+        Log.v("getCurrentSize for " + filePath + ": " + currentSize);
         return 0;
     }
 

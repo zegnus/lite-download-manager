@@ -61,6 +61,8 @@ class DownloadFile {
         filePath = result.filePath();
         fileSize.setCurrentSize(filePersistence.getCurrentSize());
 
+        persistSync();
+
         if (fileSize.currentSize() == fileSize.totalSize()) {
             downloadFileStatus.update(fileSize);
             callback.onUpdate(downloadFileStatus);
@@ -100,6 +102,7 @@ class DownloadFile {
     private FilePersistenceResult createFile() {
         if (filePath.isUnknown()) {
             return filePersistence.create(fileName, fileSize);
+
         } else {
             return filePersistence.create(filePath);
         }
@@ -193,6 +196,10 @@ class DownloadFile {
 
     long getCurrentDownloadedBytes() {
         return fileSize.currentSize();
+    }
+
+    DownloadFileId id() {
+        return downloadFileStatus.getDownloadFileId();
     }
 
     interface Callback {

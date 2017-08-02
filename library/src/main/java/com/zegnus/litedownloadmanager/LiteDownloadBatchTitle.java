@@ -9,7 +9,14 @@ class LiteDownloadBatchTitle implements DownloadBatchTitle {
     }
 
     @Override
-    public String toString() {
+    public String asString() {
         return title;
+    }
+
+    @Override
+    public String toString() {
+        return "LiteDownloadBatchTitle{" +
+                "title='" + title + '\'' +
+                '}';
     }
 }

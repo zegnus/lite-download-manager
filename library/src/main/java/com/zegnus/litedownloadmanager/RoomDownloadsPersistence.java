@@ -43,7 +43,7 @@ class RoomDownloadsPersistence implements DownloadsPersistence {
         RoomBatch roomBatch = new RoomBatch();
         roomBatch.id = batchPersisted.downloadBatchId().stringValue();
         roomBatch.status = batchPersisted.downloadBatchStatus().toRawValue();
-        roomBatch.title = batchPersisted.downloadBatchTitle().toString();
+        roomBatch.title = batchPersisted.downloadBatchTitle().asString();
 
         database.roomBatchDao().insert(roomBatch);
     }
@@ -72,7 +72,6 @@ class RoomDownloadsPersistence implements DownloadsPersistence {
         roomFile.batchId = filePersisted.downloadBatchId().stringValue();
         roomFile.url = filePersisted.url();
         roomFile.name = filePersisted.fileName().name();
-        roomFile.path = filePersisted.filePath().path();
         roomFile.path = filePersisted.filePath().path();
         roomFile.id = filePersisted.downloadFileId().toRawId();
         roomFile.persistenceType = filePersisted.filePersistenceType().toRawValue();

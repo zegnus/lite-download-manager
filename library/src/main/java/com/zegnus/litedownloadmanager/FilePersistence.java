@@ -16,7 +16,7 @@ public interface FilePersistence {
 
     long getCurrentSize();
 
-    long getCurrentSize(FileName fileName);
+    long getCurrentSize(FilePath filePath);
 
     void close();
 

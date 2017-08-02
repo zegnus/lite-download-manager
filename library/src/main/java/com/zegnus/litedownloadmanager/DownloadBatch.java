@@ -118,6 +118,7 @@ class DownloadBatch {
         }
         downloadBatchStatus.markAsPaused(downloadsBatchPersistence);
         notifyCallback(downloadBatchStatus);
+
         for (DownloadFile downloadFile : downloadFiles) {
             downloadFile.pause();
         }

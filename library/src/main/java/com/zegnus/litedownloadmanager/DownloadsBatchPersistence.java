@@ -1,7 +1,9 @@
 package com.zegnus.litedownloadmanager;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executor;
 
 class DownloadsBatchPersistence implements DownloadsBatchStatusPersistence {
@@ -65,18 +67,23 @@ class DownloadsBatchPersistence implements DownloadsBatchStatusPersistence {
                             downloadsFilePersistence
                     );
 
+                    Map<DownloadFileId, Long> downloadedFileSizeMap = new HashMap<>(downloadFiles.size());
+
                     long currentBytesDownloaded = 0;
                     long totalBatchSizeBytes = 0;
                     for (DownloadFile downloadFile : downloadFiles) {
+                        downloadedFileSizeMap.put(downloadFile.id(), downloadFile.getCurrentDownloadedBytes());
                         currentBytesDownloaded += downloadFile.getCurrentDownloadedBytes();
                         totalBatchSizeBytes += downloadFile.getTotalSize();
                     }
+
                     liteDownloadBatchStatus.update(currentBytesDownloaded, totalBatchSizeBytes);
 
-                    DownloadBatch downloadBatch = DownloadBatchFactory.newInstance(
+                    DownloadBatch downloadBatch = new DownloadBatch(
                             downloadBatchTitle,
                             downloadBatchId,
                             downloadFiles,
+                            downloadedFileSizeMap,
                             liteDownloadBatchStatus,
                             DownloadsBatchPersistence.this
                     );

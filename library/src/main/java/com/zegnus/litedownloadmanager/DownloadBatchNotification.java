@@ -23,7 +23,7 @@ class DownloadBatchNotification implements NotificationCreator {
                                                       int percentageDownloaded,
                                                       int bytesFileSize,
                                                       int bytesDownloaded) {
-        String title = downloadBatchTitle.toString();
+        String title = downloadBatchTitle.asString();
         String content = percentageDownloaded + "% downloaded";
 
         Notification notification = new NotificationCompat.Builder(context)

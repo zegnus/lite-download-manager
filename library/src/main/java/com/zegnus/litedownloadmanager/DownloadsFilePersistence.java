@@ -46,7 +46,7 @@ class DownloadsFilePersistence {
             FilePersistenceCreator filePersistenceCreator = fileOperations.filePersistenceCreator();
             FilePersistence filePersistence = filePersistenceCreator.create(filePersisted.filePersistenceType());
 
-            long currentSize = filePersistence.getCurrentSize(fileName);
+            long currentSize = filePersistence.getCurrentSize(filePersisted.filePath());
             long totalFileSize = filePersisted.totalFileSize();
             InternalFileSize fileSize = InternalFileSizeCreator.createFromCurrentAndTotalSize(currentSize, totalFileSize);
             String url = filePersisted.url();

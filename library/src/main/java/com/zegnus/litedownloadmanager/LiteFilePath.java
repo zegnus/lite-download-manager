@@ -17,4 +17,11 @@ class LiteFilePath implements FilePath {
     public boolean isUnknown() {
         return path.equalsIgnoreCase(FilePathCreator.UNKNOWN_FILEPATH.path());
     }
+
+    @Override
+    public String toString() {
+        return "LiteFilePath{" +
+                "path='" + path + '\'' +
+                '}';
+    }
 }

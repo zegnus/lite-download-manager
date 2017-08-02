@@ -56,4 +56,12 @@ class LiteFileSize implements InternalFileSize {
     public LiteFileSize copy() {
         return new LiteFileSize(currentSize, totalSize);
     }
+
+    @Override
+    public String toString() {
+        return "LiteFileSize{" +
+                "currentSize=" + currentSize +
+                ", totalSize=" + totalSize +
+                '}';
+    }
 }

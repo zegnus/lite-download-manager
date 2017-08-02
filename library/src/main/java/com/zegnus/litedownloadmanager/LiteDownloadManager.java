@@ -55,16 +55,7 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
             @Override
             public void onLoaded(List<DownloadBatch> downloadBatches) {
                 for (DownloadBatch downloadBatch : downloadBatches) {
-                    DownloadBatchId id = downloadBatch.getId();
-                    if (downloadBatchMap.containsKey(id)) {
-                        InternalDownloadBatchStatus batchStatus = downloadBatch.status();
-                        DownloadBatchStatus.Status status = batchStatus.status();
-                        if (status == DownloadBatchStatus.Status.ERROR) {
-                            resume(id);
-                        }
-                    } else {
-                        downloader.download(downloadBatch, downloadBatchMap);
-                    }
+                    downloader.download(downloadBatch, downloadBatchMap);
                 }
 
                 callback.onAllDownloadsSubmitted();
@@ -92,6 +83,11 @@ class LiteDownloadManager implements LiteDownloadManagerCommands {
         if (downloadBatch == null) {
             return;
         }
+
+        if (downloadBatch.status().status() == DownloadBatchStatus.Status.DOWNLOADING) {
+            return;
+        }
+
         downloadBatchMap.remove(downloadBatchId);
         downloadBatch.resume();
 
