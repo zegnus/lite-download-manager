@@ -20,10 +20,10 @@ class LiteJobDownload extends Job {
             @Override
             public void onAllDownloadsSubmitted() {
                 // done
-                Log.v("Ferran, job done, all downloads submitted");
+                Log.v("LiteJobDownload all jobs submitted");
             }
         });
-        Log.v("Ferran, onRunJob");
+        Log.v("LiteJobDownload run network recovery job");
         return Result.SUCCESS;
     }
 }

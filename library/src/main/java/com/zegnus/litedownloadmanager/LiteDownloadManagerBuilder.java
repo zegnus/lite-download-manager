@@ -62,7 +62,6 @@ public final class LiteDownloadManagerBuilder {
 
         DownloadBatchNotification downloadBatchNotification = new DownloadBatchNotification(context, notificationIcon);
 
-        // Connection type not allowed
         ConnectionType connectionTypeAllowed = ConnectionType.ALL;
         boolean allowNetworkRecovery = true;
 

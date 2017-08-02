@@ -16,7 +16,6 @@ class LiteJobCreator implements JobCreator {
 
     @Override
     public Job create(String tag) {
-        Log.v("Ferran, create " + tag);
         if (tag.equals(TAG)) {
            return new LiteJobDownload(liteDownloadManager);
         }
