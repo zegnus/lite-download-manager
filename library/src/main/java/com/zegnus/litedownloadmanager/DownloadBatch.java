@@ -53,7 +53,7 @@ class DownloadBatch {
 
         if (totalBatchSizeBytes <= ZERO_BYTES) {
             DownloadError downloadError = new DownloadError();
-            downloadError.setError(DownloadError.Error.CANNOT_DOWNLOAD_FILE);
+            downloadError.setError(DownloadError.Error.NETWORK_ERROR_CANNOT_DOWNLOAD_FILE);
             downloadBatchStatus.markAsError(downloadError);
             notifyCallback(downloadBatchStatus);
             return;
@@ -77,9 +77,24 @@ class DownloadBatch {
         for (DownloadFile downloadFile : downloadFiles) {
             downloadFile.download(fileDownloadCallback);
             if (batchCannotContinue()) {
-                return;
+                break;
             }
         }
+
+        if (networkError()) {
+            DownloadsNetworkRecoveryCreator.getInstance().scheduleRecovery();
+        }
+    }
+
+    private boolean networkError() {
+        DownloadBatchStatus.Status status = downloadBatchStatus.status();
+        if (status == ERROR) {
+            DownloadError.Error downloadErrorType = downloadBatchStatus.getDownloadErrorType();
+            if (downloadErrorType == DownloadError.Error.NETWORK_ERROR_CANNOT_DOWNLOAD_FILE) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean batchCannotContinue() {

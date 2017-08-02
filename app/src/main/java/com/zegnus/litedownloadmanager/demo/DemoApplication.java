@@ -30,11 +30,12 @@ public class DemoApplication extends Application {
         Handler handler = new Handler(Looper.getMainLooper());
         liteDownloadManagerCommands = LiteDownloadManagerBuilder
                 .newInstance(this, handler, R.mipmap.ic_launcher_round)
-                .withFileDownloaderCustom(fileSizeRequester, fileDownloader)
-                .withFilePersistenceExternal()
+                //.withFileDownloaderCustom(fileSizeRequester, fileDownloader)
+                //.withFilePersistenceExternal()
                 //.withFilePersistenceCustom(CustomFilePersistence.class)
                 //.withDownloadsPersistenceCustom(downloadsPersistence)
                 //.withNotification(notificationCreator)
+                .withNetworkRecovery(true)
                 .build();
     }
 
