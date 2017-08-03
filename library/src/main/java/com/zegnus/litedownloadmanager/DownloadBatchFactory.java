@@ -67,19 +67,4 @@ final class DownloadBatchFactory {
                 downloadsBatchPersistence
         );
     }
-
-    static DownloadBatch newInstance(DownloadBatchTitle downloadBatchTitle,
-                                     DownloadBatchId downloadBatchId,
-                                     List<DownloadFile> downloadFiles,
-                                     InternalDownloadBatchStatus liteDownloadBatchStatus,
-                                     DownloadsBatchPersistence downloadsBatchPersistence) {
-        return new DownloadBatch(
-                downloadBatchTitle,
-                downloadBatchId,
-                downloadFiles,
-                new HashMap<DownloadFileId, Long>(),
-                liteDownloadBatchStatus,
-                downloadsBatchPersistence
-        );
-    }
 }
