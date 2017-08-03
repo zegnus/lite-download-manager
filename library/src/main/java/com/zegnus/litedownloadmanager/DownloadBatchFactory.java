@@ -13,7 +13,8 @@ final class DownloadBatchFactory {
     static DownloadBatch newInstance(Batch batch,
                                      FileOperations fileOperations,
                                      DownloadsBatchPersistence downloadsBatchPersistence,
-                                     DownloadsFilePersistence downloadsFilePersistence) {
+                                     DownloadsFilePersistence downloadsFilePersistence,
+                                     CallbackThrottle callbackThrottle) {
         DownloadBatchTitle downloadBatchTitle = DownloadBatchTitleCreator.createFrom(batch);
         List<String> fileUrls = batch.getFileUrls();
         List<DownloadFile> downloadFiles = new ArrayList<>(fileUrls.size());
@@ -64,22 +65,8 @@ final class DownloadBatchFactory {
                 downloadFiles,
                 new HashMap<DownloadFileId, Long>(),
                 liteDownloadBatchStatus,
-                downloadsBatchPersistence
-        );
-    }
-
-    static DownloadBatch newInstance(DownloadBatchTitle downloadBatchTitle,
-                                     DownloadBatchId downloadBatchId,
-                                     List<DownloadFile> downloadFiles,
-                                     InternalDownloadBatchStatus liteDownloadBatchStatus,
-                                     DownloadsBatchPersistence downloadsBatchPersistence) {
-        return new DownloadBatch(
-                downloadBatchTitle,
-                downloadBatchId,
-                downloadFiles,
-                new HashMap<DownloadFileId, Long>(),
-                liteDownloadBatchStatus,
-                downloadsBatchPersistence
+                downloadsBatchPersistence,
+                callbackThrottle
         );
     }
 }

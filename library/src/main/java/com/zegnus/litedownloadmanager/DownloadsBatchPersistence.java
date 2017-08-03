@@ -11,11 +11,16 @@ class DownloadsBatchPersistence implements DownloadsBatchStatusPersistence {
     private final Executor executor;
     private final DownloadsFilePersistence downloadsFilePersistence;
     private final DownloadsPersistence downloadsPersistence;
+    private final CallbackThrottle callbackThrottle;
 
-    DownloadsBatchPersistence(Executor executor, DownloadsFilePersistence downloadsFilePersistence, DownloadsPersistence downloadsPersistence) {
+    DownloadsBatchPersistence(Executor executor,
+                              DownloadsFilePersistence downloadsFilePersistence,
+                              DownloadsPersistence downloadsPersistence,
+                              CallbackThrottle callbackThrottle) {
         this.executor = executor;
         this.downloadsFilePersistence = downloadsFilePersistence;
         this.downloadsPersistence = downloadsPersistence;
+        this.callbackThrottle = callbackThrottle;
     }
 
     void persistAsync(final DownloadBatchTitle downloadBatchTitle,
@@ -85,7 +90,8 @@ class DownloadsBatchPersistence implements DownloadsBatchStatusPersistence {
                             downloadFiles,
                             downloadedFileSizeMap,
                             liteDownloadBatchStatus,
-                            DownloadsBatchPersistence.this
+                            DownloadsBatchPersistence.this,
+                            callbackThrottle
                     );
 
                     downloadBatches.add(downloadBatch);

@@ -27,8 +27,6 @@ public final class LiteDownloadManagerBuilder {
     private final Context context;
     private final Handler callbackHandler;
 
-    private DownloadsBatchPersistence downloadsBatchPersistence;
-    private DownloadsFilePersistence downloadsFilePersistence;
     private FilePersistenceCreator filePersistenceCreator;
     private FileSizeRequester fileSizeRequester;
     private FileDownloader fileDownloader;
@@ -37,9 +35,14 @@ public final class LiteDownloadManagerBuilder {
     private NotificationCreator notificationCreator;
     private ConnectionType connectionTypeAllowed;
     private boolean allowNetworkRecovery;
+    private CallbackThrottle callbackThrottle;
+    private DownloadsPersistence downloadsPersistence;
 
     public static LiteDownloadManagerBuilder newInstance(Context context, Handler callbackHandler, @DrawableRes int notificationIcon) {
         Log.setShowLogs(true);
+
+        // Callback throttle
+        CallbackThrottle callbackThrottle = new LiteCallbackThrottle();
 
         // File persistence
         FilePersistenceCreator filePersistenceCreator = FilePersistenceCreator.newInternalFilePersistenceCreator(context);
@@ -49,7 +52,12 @@ public final class LiteDownloadManagerBuilder {
 
         Executor executor = Executors.newSingleThreadExecutor();
         DownloadsFilePersistence downloadsFilePersistence = new DownloadsFilePersistence(downloadsPersistence);
-        DownloadsBatchPersistence downloadsBatchPersistence = new DownloadsBatchPersistence(executor, downloadsFilePersistence, downloadsPersistence);
+        DownloadsBatchPersistence downloadsBatchPersistence = new DownloadsBatchPersistence(
+                executor,
+                downloadsFilePersistence,
+                downloadsPersistence,
+                callbackThrottle
+        );
 
         // Network downloader
         OkHttpClient httpClient = new OkHttpClient();
@@ -69,13 +77,13 @@ public final class LiteDownloadManagerBuilder {
                 context,
                 callbackHandler,
                 filePersistenceCreator,
-                downloadsBatchPersistence,
-                downloadsFilePersistence,
+                downloadsPersistence,
                 fileSizeRequester,
                 fileDownloader,
                 downloadBatchNotification,
                 connectionTypeAllowed,
-                allowNetworkRecovery
+                allowNetworkRecovery,
+                callbackThrottle
         );
     }
 
@@ -112,9 +120,7 @@ public final class LiteDownloadManagerBuilder {
     }
 
     public LiteDownloadManagerBuilder withDownloadsPersistenceCustom(DownloadsPersistence downloadsPersistence) {
-        Executor executor = Executors.newSingleThreadExecutor();
-        this.downloadsFilePersistence = new DownloadsFilePersistence(downloadsPersistence);
-        this.downloadsBatchPersistence = new DownloadsBatchPersistence(executor, downloadsFilePersistence, downloadsPersistence);
+        this.downloadsPersistence = downloadsPersistence;
         return this;
     }
 
@@ -133,26 +139,31 @@ public final class LiteDownloadManagerBuilder {
         return this;
     }
 
+    public LiteDownloadManagerBuilder withCallbackThrottle(CallbackThrottle callbackThrottle) {
+        this.callbackThrottle = callbackThrottle;
+        return this;
+    }
+
     private LiteDownloadManagerBuilder(Context context,
                                        Handler callbackHandler,
                                        FilePersistenceCreator filePersistenceCreator,
-                                       DownloadsBatchPersistence downloadsBatchPersistence,
-                                       DownloadsFilePersistence downloadsFilePersistence,
+                                       DownloadsPersistence downloadsPersistence,
                                        FileSizeRequester fileSizeRequester,
                                        FileDownloader fileDownloader,
                                        NotificationCreator notificationCreator,
                                        ConnectionType connectionTypeAllowed,
-                                       boolean allowNetworkRecovery) {
+                                       boolean allowNetworkRecovery,
+                                       CallbackThrottle callbackThrottle) {
         this.context = context;
         this.callbackHandler = callbackHandler;
         this.filePersistenceCreator = filePersistenceCreator;
-        this.downloadsBatchPersistence = downloadsBatchPersistence;
-        this.downloadsFilePersistence = downloadsFilePersistence;
+        this.downloadsPersistence = downloadsPersistence;
         this.fileSizeRequester = fileSizeRequester;
         this.fileDownloader = fileDownloader;
         this.notificationCreator = notificationCreator;
         this.connectionTypeAllowed = connectionTypeAllowed;
         this.allowNetworkRecovery = allowNetworkRecovery;
+        this.callbackThrottle = callbackThrottle;
     }
 
     public LiteDownloadManager build() {
@@ -187,6 +198,15 @@ public final class LiteDownloadManagerBuilder {
         FileOperations fileOperations = new FileOperations(filePersistenceCreator, fileSizeRequester, fileDownloader);
         ArrayList<DownloadBatchCallback> callbacks = new ArrayList<>();
 
+        Executor executor = Executors.newSingleThreadExecutor();
+        DownloadsFilePersistence downloadsFilePersistence = new DownloadsFilePersistence(downloadsPersistence);
+        DownloadsBatchPersistence downloadsBatchPersistence = new DownloadsBatchPersistence(
+                executor,
+                downloadsFilePersistence,
+                downloadsPersistence,
+                callbackThrottle
+        );
+
         LiteDownloadManagerDownloader downloader = new LiteDownloadManagerDownloader(
                 LOCK,
                 EXECUTOR,
@@ -195,7 +215,8 @@ public final class LiteDownloadManagerBuilder {
                 downloadsBatchPersistence,
                 downloadsFilePersistence,
                 notificationCreator,
-                callbacks
+                callbacks,
+                callbackThrottle
         );
 
         liteDownloadManager = new LiteDownloadManager(

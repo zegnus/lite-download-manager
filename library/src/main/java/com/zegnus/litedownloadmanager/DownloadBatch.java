@@ -15,8 +15,8 @@ class DownloadBatch {
     private final InternalDownloadBatchStatus downloadBatchStatus;
     private final List<DownloadFile> downloadFiles;
     private final DownloadsBatchPersistence downloadsBatchPersistence;
+    private final CallbackThrottle callbackThrottle;
 
-    private DownloadBatchCallback callback;
     private long totalBatchSizeBytes;
 
     DownloadBatch(DownloadBatchTitle downloadBatchTitle,
@@ -24,17 +24,19 @@ class DownloadBatch {
                   List<DownloadFile> downloadFiles,
                   Map<DownloadFileId, Long> fileBytesDownloadedMap,
                   InternalDownloadBatchStatus internalDownloadBatchStatus,
-                  DownloadsBatchPersistence downloadsBatchPersistence) {
+                  DownloadsBatchPersistence downloadsBatchPersistence,
+                  CallbackThrottle callbackThrottle) {
         this.downloadBatchTitle = downloadBatchTitle;
         this.downloadBatchId = downloadBatchId;
         this.downloadFiles = downloadFiles;
         this.fileBytesDownloadedMap = fileBytesDownloadedMap;
         this.downloadBatchStatus = internalDownloadBatchStatus;
         this.downloadsBatchPersistence = downloadsBatchPersistence;
+        this.callbackThrottle = callbackThrottle;
     }
 
     void setCallback(DownloadBatchCallback callback) {
-        this.callback = callback;
+        callbackThrottle.setCallback(callback);
     }
 
     void download() {
@@ -111,10 +113,7 @@ class DownloadBatch {
     }
 
     private void notifyCallback(InternalDownloadBatchStatus downloadBatchStatus) {
-        if (callback == null) {
-            return;
-        }
-        callback.onUpdate(downloadBatchStatus);
+        callbackThrottle.update(downloadBatchStatus);
     }
 
     private long getTotalSize(List<DownloadFile> downloadFiles) {
