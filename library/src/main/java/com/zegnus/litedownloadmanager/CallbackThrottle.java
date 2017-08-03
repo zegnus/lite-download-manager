@@ -4,5 +4,5 @@ public interface CallbackThrottle {
 
     void setCallback(DownloadBatchCallback callback);
 
-    void update(InternalDownloadBatchStatus downloadBatchStatus);
+    void update(DownloadBatchStatus downloadBatchStatus);
 }

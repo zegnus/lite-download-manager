@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.os.Looper;
 
 import com.facebook.stetho.Stetho;
+import com.zegnus.litedownloadmanager.CallbackThrottle;
 import com.zegnus.litedownloadmanager.FileDownloader;
 import com.zegnus.litedownloadmanager.FileSizeRequester;
 import com.zegnus.litedownloadmanager.LiteDownloadManagerBuilder;
@@ -26,8 +27,10 @@ public class DemoApplication extends Application {
         FileDownloader fileDownloader = new CustomFileDownloader();
         //DownloadsPersistence downloadsPersistence = new CustomDownloadsPersistence();
         //NotificationCreator notificationCreator = new CustomNotificationCreator(this, R.mipmap.ic_launcher_round);
+        CallbackThrottle customCallbackThrottle = new CustomCallbackThrottle();
 
         Handler handler = new Handler(Looper.getMainLooper());
+
         liteDownloadManagerCommands = LiteDownloadManagerBuilder
                 .newInstance(this, handler, R.mipmap.ic_launcher_round)
                 .withFileDownloaderCustom(fileSizeRequester, fileDownloader)
@@ -36,6 +39,7 @@ public class DemoApplication extends Application {
                 //.withDownloadsPersistenceCustom(downloadsPersistence)
                 //.withNotification(notificationCreator)
                 .withNetworkRecovery(true)
+                .withCallbackThrottle(customCallbackThrottle)
                 .build();
     }
 
