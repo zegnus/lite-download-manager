@@ -10,7 +10,7 @@ class LiteCallbackThrottle implements CallbackThrottle {
     }
 
     @Override
-    public void update(InternalDownloadBatchStatus downloadBatchStatus) {
+    public void update(DownloadBatchStatus downloadBatchStatus) {
         if (callback == null) {
             return;
         }
