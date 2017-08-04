@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.novoda.library.test", appContext.getPackageName());
+        assertEquals("com.zegnus.library.test", appContext.getPackageName());
     }
 }

@@ -1,4 +1,4 @@
-package com.novoda.litedownloadmanager.demo;
+package com.zegnus.litedownloadmanager.demo;
 
 import org.junit.Test;
 
