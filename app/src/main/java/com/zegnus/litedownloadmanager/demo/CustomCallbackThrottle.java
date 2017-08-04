@@ -16,4 +16,9 @@ class CustomCallbackThrottle implements CallbackThrottle {
     public void update(DownloadBatchStatus downloadBatchStatus) {
         Log.v("update " + downloadBatchStatus.getDownloadBatchTitle().asString());
     }
+
+    @Override
+    public void stopUpdates() {
+        Log.v("stopUpdates");
+    }
 }

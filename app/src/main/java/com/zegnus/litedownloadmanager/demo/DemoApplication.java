@@ -39,7 +39,8 @@ public class DemoApplication extends Application {
                 //.withDownloadsPersistenceCustom(downloadsPersistence)
                 //.withNotification(notificationCreator)
                 .withNetworkRecovery(true)
-                .withCallbackThrottle(customCallbackThrottle)
+                //.withCallbackThrottle(customCallbackThrottle)
+                //.withCallbackThrottleByTime(TimeUnit.SECONDS, 3)
                 .build();
     }
 

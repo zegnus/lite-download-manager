@@ -18,6 +18,7 @@ class DownloadBatch {
     private final CallbackThrottle callbackThrottle;
 
     private long totalBatchSizeBytes;
+    private DownloadBatchCallback callback;
 
     DownloadBatch(DownloadBatchTitle downloadBatchTitle,
                   DownloadBatchId downloadBatchId,
@@ -36,6 +37,7 @@ class DownloadBatch {
     }
 
     void setCallback(DownloadBatchCallback callback) {
+        this.callback = callback;
         callbackThrottle.setCallback(callback);
     }
 
@@ -72,7 +74,7 @@ class DownloadBatch {
                     downloadBatchStatus.markAsError(downloadFileStatus.getError());
                 }
 
-                notifyCallback(downloadBatchStatus);
+                callbackThrottle.update(downloadBatchStatus);
             }
         };
 
@@ -86,6 +88,8 @@ class DownloadBatch {
         if (networkError()) {
             DownloadsNetworkRecoveryCreator.getInstance().scheduleRecovery();
         }
+
+        callbackThrottle.stopUpdates();
     }
 
     private boolean networkError() {
@@ -113,7 +117,9 @@ class DownloadBatch {
     }
 
     private void notifyCallback(InternalDownloadBatchStatus downloadBatchStatus) {
-        callbackThrottle.update(downloadBatchStatus);
+        if (callback != null) {
+            callback.onUpdate(downloadBatchStatus);
+        }
     }
 
     private long getTotalSize(List<DownloadFile> downloadFiles) {
