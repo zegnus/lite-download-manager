@@ -19,6 +19,7 @@ class LiteDownloadManagerDownloader {
     private final DownloadsFilePersistence downloadsFilePersistence;
     private final NotificationCreator notificationCreator;
     private final List<DownloadBatchCallback> callbacks;
+    private final CallbackThrottleCreator callbackThrottleCreator;
 
     private DownloadService downloadService;
 
@@ -29,7 +30,8 @@ class LiteDownloadManagerDownloader {
                                   DownloadsBatchPersistence downloadsBatchPersistence,
                                   DownloadsFilePersistence downloadsFilePersistence,
                                   NotificationCreator notificationCreator,
-                                  List<DownloadBatchCallback> callbacks) {
+                                  List<DownloadBatchCallback> callbacks,
+                                  CallbackThrottleCreator callbackThrottleCreator) {
         this.waitForDownloadService = waitForDownloadService;
         this.executor = executor;
         this.callbackHandler = callbackHandler;
@@ -38,6 +40,7 @@ class LiteDownloadManagerDownloader {
         this.downloadsFilePersistence = downloadsFilePersistence;
         this.notificationCreator = notificationCreator;
         this.callbacks = callbacks;
+        this.callbackThrottleCreator = callbackThrottleCreator;
     }
 
     public void download(Batch batch, Map<DownloadBatchId, DownloadBatch> downloadBatchMap) {
@@ -46,11 +49,14 @@ class LiteDownloadManagerDownloader {
             return;
         }
 
+        CallbackThrottle callbackThrottle = callbackThrottleCreator.create();
+
         DownloadBatch downloadBatch = DownloadBatchFactory.newInstance(
                 batch,
                 fileOperations,
                 downloadsBatchPersistence,
-                downloadsFilePersistence
+                downloadsFilePersistence,
+                callbackThrottle
         );
 
         downloadBatch.persist();

@@ -28,6 +28,7 @@ public class DemoApplication extends Application {
         //NotificationCreator notificationCreator = new CustomNotificationCreator(this, R.mipmap.ic_launcher_round);
 
         Handler handler = new Handler(Looper.getMainLooper());
+
         liteDownloadManagerCommands = LiteDownloadManagerBuilder
                 .newInstance(this, handler, R.mipmap.ic_launcher_round)
                 //.withFileDownloaderCustom(fileSizeRequester, fileDownloader)
@@ -35,7 +36,10 @@ public class DemoApplication extends Application {
                 //.withFilePersistenceCustom(CustomFilePersistence.class)
                 //.withDownloadsPersistenceCustom(downloadsPersistence)
                 //.withNotification(notificationCreator)
-                .withNetworkRecovery(true)
+                //.withNetworkRecovery(false)
+                //.withCallbackThrottleCustom(CustomCallbackThrottle.class)
+                //.withCallbackThrottleByTime(TimeUnit.SECONDS, 3)
+                //.withCallbackThrottleByProgressIncrease()
                 .build();
     }
 

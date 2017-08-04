@@ -43,7 +43,7 @@ class FilePersistenceCreator {
                 filePersistence = new ExternalFilePersistence();
                 break;
             case CUSTOM:
-                filePersistence = getCustomFilePersistence();
+                filePersistence = createCustomFilePersistence();
                 break;
             default:
                 throw new IllegalStateException("Persistence of type " + type + " is not supported");
@@ -53,9 +53,9 @@ class FilePersistenceCreator {
         return filePersistence;
     }
 
-    private FilePersistence getCustomFilePersistence() {
+    private FilePersistence createCustomFilePersistence() {
         if (customClass == null) {
-            throw new CustomFilePersistenceException("Class cannot be accessed, is it public?");
+            throw new CustomFilePersistenceException("CustomFilePersistence class cannot be accessed, is it public?");
         }
 
         try {

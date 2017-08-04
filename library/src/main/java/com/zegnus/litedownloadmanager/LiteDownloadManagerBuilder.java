@@ -27,8 +27,6 @@ public final class LiteDownloadManagerBuilder {
     private final Context context;
     private final Handler callbackHandler;
 
-    private DownloadsBatchPersistence downloadsBatchPersistence;
-    private DownloadsFilePersistence downloadsFilePersistence;
     private FilePersistenceCreator filePersistenceCreator;
     private FileSizeRequester fileSizeRequester;
     private FileDownloader fileDownloader;
@@ -37,6 +35,11 @@ public final class LiteDownloadManagerBuilder {
     private NotificationCreator notificationCreator;
     private ConnectionType connectionTypeAllowed;
     private boolean allowNetworkRecovery;
+    private Class<? extends CallbackThrottle> customCallbackThrottle;
+    private DownloadsPersistence downloadsPersistence;
+    private CallbackThrottleCreator.Type callbackThrottleCreatorType;
+    private TimeUnit timeUnit;
+    private long frequency;
 
     public static LiteDownloadManagerBuilder newInstance(Context context, Handler callbackHandler, @DrawableRes int notificationIcon) {
         Log.setShowLogs(true);
@@ -46,10 +49,6 @@ public final class LiteDownloadManagerBuilder {
 
         // Downloads information persistence
         DownloadsPersistence downloadsPersistence = RoomDownloadsPersistence.newInstance(context);
-
-        Executor executor = Executors.newSingleThreadExecutor();
-        DownloadsFilePersistence downloadsFilePersistence = new DownloadsFilePersistence(downloadsPersistence);
-        DownloadsBatchPersistence downloadsBatchPersistence = new DownloadsBatchPersistence(executor, downloadsFilePersistence, downloadsPersistence);
 
         // Network downloader
         OkHttpClient httpClient = new OkHttpClient();
@@ -65,18 +64,42 @@ public final class LiteDownloadManagerBuilder {
         ConnectionType connectionTypeAllowed = ConnectionType.ALL;
         boolean allowNetworkRecovery = true;
 
+        CallbackThrottleCreator.Type callbackThrottleCreatorType = CallbackThrottleCreator.Type.THROTTLE_BY_PROGRESS_INCREASE;
+
         return new LiteDownloadManagerBuilder(
                 context,
                 callbackHandler,
                 filePersistenceCreator,
-                downloadsBatchPersistence,
-                downloadsFilePersistence,
+                downloadsPersistence,
                 fileSizeRequester,
                 fileDownloader,
                 downloadBatchNotification,
                 connectionTypeAllowed,
-                allowNetworkRecovery
+                allowNetworkRecovery,
+                callbackThrottleCreatorType
         );
+    }
+
+    private LiteDownloadManagerBuilder(Context context,
+                                       Handler callbackHandler,
+                                       FilePersistenceCreator filePersistenceCreator,
+                                       DownloadsPersistence downloadsPersistence,
+                                       FileSizeRequester fileSizeRequester,
+                                       FileDownloader fileDownloader,
+                                       NotificationCreator notificationCreator,
+                                       ConnectionType connectionTypeAllowed,
+                                       boolean allowNetworkRecovery,
+                                       CallbackThrottleCreator.Type callbackThrottleCreatorType) {
+        this.context = context;
+        this.callbackHandler = callbackHandler;
+        this.filePersistenceCreator = filePersistenceCreator;
+        this.downloadsPersistence = downloadsPersistence;
+        this.fileSizeRequester = fileSizeRequester;
+        this.fileDownloader = fileDownloader;
+        this.notificationCreator = notificationCreator;
+        this.connectionTypeAllowed = connectionTypeAllowed;
+        this.allowNetworkRecovery = allowNetworkRecovery;
+        this.callbackThrottleCreatorType = callbackThrottleCreatorType;
     }
 
     public LiteDownloadManagerBuilder withNetworkDownloader() {
@@ -112,9 +135,7 @@ public final class LiteDownloadManagerBuilder {
     }
 
     public LiteDownloadManagerBuilder withDownloadsPersistenceCustom(DownloadsPersistence downloadsPersistence) {
-        Executor executor = Executors.newSingleThreadExecutor();
-        this.downloadsFilePersistence = new DownloadsFilePersistence(downloadsPersistence);
-        this.downloadsBatchPersistence = new DownloadsBatchPersistence(executor, downloadsFilePersistence, downloadsPersistence);
+        this.downloadsPersistence = downloadsPersistence;
         return this;
     }
 
@@ -133,26 +154,22 @@ public final class LiteDownloadManagerBuilder {
         return this;
     }
 
-    private LiteDownloadManagerBuilder(Context context,
-                                       Handler callbackHandler,
-                                       FilePersistenceCreator filePersistenceCreator,
-                                       DownloadsBatchPersistence downloadsBatchPersistence,
-                                       DownloadsFilePersistence downloadsFilePersistence,
-                                       FileSizeRequester fileSizeRequester,
-                                       FileDownloader fileDownloader,
-                                       NotificationCreator notificationCreator,
-                                       ConnectionType connectionTypeAllowed,
-                                       boolean allowNetworkRecovery) {
-        this.context = context;
-        this.callbackHandler = callbackHandler;
-        this.filePersistenceCreator = filePersistenceCreator;
-        this.downloadsBatchPersistence = downloadsBatchPersistence;
-        this.downloadsFilePersistence = downloadsFilePersistence;
-        this.fileSizeRequester = fileSizeRequester;
-        this.fileDownloader = fileDownloader;
-        this.notificationCreator = notificationCreator;
-        this.connectionTypeAllowed = connectionTypeAllowed;
-        this.allowNetworkRecovery = allowNetworkRecovery;
+    public LiteDownloadManagerBuilder withCallbackThrottleCustom(Class<? extends CallbackThrottle> customCallbackThrottle) {
+        this.callbackThrottleCreatorType = CallbackThrottleCreator.Type.CUSTOM;
+        this.customCallbackThrottle = customCallbackThrottle;
+        return this;
+    }
+
+    public LiteDownloadManagerBuilder withCallbackThrottleByTime(TimeUnit timeUnit, long frequency) {
+        this.callbackThrottleCreatorType = CallbackThrottleCreator.Type.THROTTLE_BY_TIME;
+        this.timeUnit = timeUnit;
+        this.frequency = frequency;
+        return this;
+    }
+
+    public LiteDownloadManagerBuilder withCallbackThrottleByProgressIncrease() {
+        this.callbackThrottleCreatorType = CallbackThrottleCreator.Type.THROTTLE_BY_PROGRESS_INCREASE;
+        return this;
     }
 
     public LiteDownloadManager build() {
@@ -187,6 +204,22 @@ public final class LiteDownloadManagerBuilder {
         FileOperations fileOperations = new FileOperations(filePersistenceCreator, fileSizeRequester, fileDownloader);
         ArrayList<DownloadBatchCallback> callbacks = new ArrayList<>();
 
+        CallbackThrottleCreator callbackThrottleCreator = getCallbackThrottleCreator(
+                callbackThrottleCreatorType,
+                timeUnit,
+                frequency,
+                customCallbackThrottle
+        );
+
+        Executor executor = Executors.newSingleThreadExecutor();
+        DownloadsFilePersistence downloadsFilePersistence = new DownloadsFilePersistence(downloadsPersistence);
+        DownloadsBatchPersistence downloadsBatchPersistence = new DownloadsBatchPersistence(
+                executor,
+                downloadsFilePersistence,
+                downloadsPersistence,
+                callbackThrottleCreator
+        );
+
         LiteDownloadManagerDownloader downloader = new LiteDownloadManagerDownloader(
                 LOCK,
                 EXECUTOR,
@@ -195,7 +228,8 @@ public final class LiteDownloadManagerBuilder {
                 downloadsBatchPersistence,
                 downloadsFilePersistence,
                 notificationCreator,
-                callbacks
+                callbacks,
+                callbackThrottleCreator
         );
 
         liteDownloadManager = new LiteDownloadManager(
@@ -209,5 +243,21 @@ public final class LiteDownloadManagerBuilder {
         );
 
         return liteDownloadManager;
+    }
+
+    private CallbackThrottleCreator getCallbackThrottleCreator(CallbackThrottleCreator.Type callbackThrottleType,
+                                                               TimeUnit timeUnit,
+                                                               long frequency,
+                                                               Class<? extends CallbackThrottle> customCallbackThrottle) {
+        switch (callbackThrottleType) {
+            case THROTTLE_BY_TIME:
+                return CallbackThrottleCreator.ByTime(timeUnit, frequency);
+            case THROTTLE_BY_PROGRESS_INCREASE:
+                return CallbackThrottleCreator.ByProgressIncrease();
+            case CUSTOM:
+                return CallbackThrottleCreator.ByCustomThrottle(customCallbackThrottle);
+            default:
+                throw new IllegalStateException("callbackThrottle type " + callbackThrottleType + " not implemented yet");
+        }
     }
 }
