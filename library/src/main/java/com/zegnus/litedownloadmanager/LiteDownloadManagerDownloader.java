@@ -132,10 +132,10 @@ class LiteDownloadManagerDownloader {
                 (int) liteDownloadBatchStatus.bytesDownloaded()
         );
 
-        if (liteDownloadBatchStatus.status() == DOWNLOADING) {
+        downloadService.updateNotification(notificationInformation);
+
+        if (liteDownloadBatchStatus.status() != DOWNLOADING) {
             downloadService.updateNotification(notificationInformation);
-        } else {
-            downloadService.makeNotificationDismissible(notificationInformation);
         }
     }
 
