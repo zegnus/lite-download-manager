@@ -3,7 +3,7 @@ package com.zegnus.litedownloadmanager;
 import java.util.Timer;
 import java.util.TimerTask;
 
-class LiteCallbackThrottleByTime implements CallbackThrottle {
+class CallbackThrottleByTime implements CallbackThrottle {
 
     private final long period;
 
@@ -14,7 +14,7 @@ class LiteCallbackThrottleByTime implements CallbackThrottle {
     private TimerTask timerTask;
     private DownloadBatchCallback callback;
 
-    LiteCallbackThrottleByTime(long period) {
+    CallbackThrottleByTime(long period) {
         this.period = period;
     }
 

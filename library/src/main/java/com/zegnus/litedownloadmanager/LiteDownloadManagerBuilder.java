@@ -64,9 +64,7 @@ public final class LiteDownloadManagerBuilder {
         ConnectionType connectionTypeAllowed = ConnectionType.ALL;
         boolean allowNetworkRecovery = true;
 
-        CallbackThrottleCreator.Type callbackThrottleCreatorType = CallbackThrottleCreator.Type.THROTTLE_BY_TIME;
-        TimeUnit timeUnit = TimeUnit.SECONDS;
-        long quantity = 1;
+        CallbackThrottleCreator.Type callbackThrottleCreatorType = CallbackThrottleCreator.Type.THROTTLE_BY_PROGRESS_INCREASE;
 
         return new LiteDownloadManagerBuilder(
                 context,
@@ -78,9 +76,7 @@ public final class LiteDownloadManagerBuilder {
                 downloadBatchNotification,
                 connectionTypeAllowed,
                 allowNetworkRecovery,
-                callbackThrottleCreatorType,
-                timeUnit,
-                quantity
+                callbackThrottleCreatorType
         );
     }
 
@@ -93,9 +89,7 @@ public final class LiteDownloadManagerBuilder {
                                        NotificationCreator notificationCreator,
                                        ConnectionType connectionTypeAllowed,
                                        boolean allowNetworkRecovery,
-                                       CallbackThrottleCreator.Type callbackThrottleCreatorType,
-                                       TimeUnit timeUnit,
-                                       long frequency) {
+                                       CallbackThrottleCreator.Type callbackThrottleCreatorType) {
         this.context = context;
         this.callbackHandler = callbackHandler;
         this.filePersistenceCreator = filePersistenceCreator;
@@ -106,8 +100,6 @@ public final class LiteDownloadManagerBuilder {
         this.connectionTypeAllowed = connectionTypeAllowed;
         this.allowNetworkRecovery = allowNetworkRecovery;
         this.callbackThrottleCreatorType = callbackThrottleCreatorType;
-        this.timeUnit = timeUnit;
-        this.frequency = frequency;
     }
 
     public LiteDownloadManagerBuilder withNetworkDownloader() {
@@ -171,6 +163,11 @@ public final class LiteDownloadManagerBuilder {
         this.callbackThrottleCreatorType = CallbackThrottleCreator.Type.THROTTLE_BY_TIME;
         this.timeUnit = timeUnit;
         this.frequency = frequency;
+        return this;
+    }
+
+    public LiteDownloadManagerBuilder withCallbackThrottleByProgressIncrease() {
+        this.callbackThrottleCreatorType = CallbackThrottleCreator.Type.THROTTLE_BY_PROGRESS_INCREASE;
         return this;
     }
 
@@ -246,9 +243,8 @@ public final class LiteDownloadManagerBuilder {
         switch (callbackThrottleType) {
             case THROTTLE_BY_TIME:
                 return CallbackThrottleCreator.ByTime(timeUnit, frequency);
-            case THROTTLE_BY_FREQUENCY:
-                // TODO
-                throw new IllegalStateException("callbackThrottle type " + callbackThrottleType + " not implemented yet");
+            case THROTTLE_BY_PROGRESS_INCREASE:
+                return CallbackThrottleCreator.ByProgressIncrease();
             default:
                 throw new IllegalStateException("callbackThrottle type " + callbackThrottleType + " not implemented yet");
         }

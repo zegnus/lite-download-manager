@@ -41,6 +41,7 @@ public class DemoApplication extends Application {
                 .withNetworkRecovery(true)
                 //.withCallbackThrottle(customCallbackThrottle)
                 //.withCallbackThrottleByTime(TimeUnit.SECONDS, 3)
+                //.withCallbackThrottleByProgressIncrease()
                 .build();
     }
 
