@@ -35,7 +35,7 @@ public final class LiteDownloadManagerBuilder {
     private NotificationCreator notificationCreator;
     private ConnectionType connectionTypeAllowed;
     private boolean allowNetworkRecovery;
-    private CallbackThrottle customCallbackThrottle;
+    private Class<? extends CallbackThrottle> customCallbackThrottle;
     private DownloadsPersistence downloadsPersistence;
     private CallbackThrottleCreator.Type callbackThrottleCreatorType;
     private TimeUnit timeUnit;
@@ -154,7 +154,8 @@ public final class LiteDownloadManagerBuilder {
         return this;
     }
 
-    public LiteDownloadManagerBuilder withCallbackThrottleCustom(CallbackThrottle customCallbackThrottle) {
+    public LiteDownloadManagerBuilder withCallbackThrottleCustom(Class<? extends CallbackThrottle> customCallbackThrottle) {
+        this.callbackThrottleCreatorType = CallbackThrottleCreator.Type.CUSTOM;
         this.customCallbackThrottle = customCallbackThrottle;
         return this;
     }
@@ -203,7 +204,12 @@ public final class LiteDownloadManagerBuilder {
         FileOperations fileOperations = new FileOperations(filePersistenceCreator, fileSizeRequester, fileDownloader);
         ArrayList<DownloadBatchCallback> callbacks = new ArrayList<>();
 
-        CallbackThrottleCreator callbackThrottleCreator = getCallbackThrottleCreator(callbackThrottleCreatorType, timeUnit, frequency);
+        CallbackThrottleCreator callbackThrottleCreator = getCallbackThrottleCreator(
+                callbackThrottleCreatorType,
+                timeUnit,
+                frequency,
+                customCallbackThrottle
+        );
 
         Executor executor = Executors.newSingleThreadExecutor();
         DownloadsFilePersistence downloadsFilePersistence = new DownloadsFilePersistence(downloadsPersistence);
@@ -239,12 +245,17 @@ public final class LiteDownloadManagerBuilder {
         return liteDownloadManager;
     }
 
-    private CallbackThrottleCreator getCallbackThrottleCreator(CallbackThrottleCreator.Type callbackThrottleType, TimeUnit timeUnit, long frequency) {
+    private CallbackThrottleCreator getCallbackThrottleCreator(CallbackThrottleCreator.Type callbackThrottleType,
+                                                               TimeUnit timeUnit,
+                                                               long frequency,
+                                                               Class<? extends CallbackThrottle> customCallbackThrottle) {
         switch (callbackThrottleType) {
             case THROTTLE_BY_TIME:
                 return CallbackThrottleCreator.ByTime(timeUnit, frequency);
             case THROTTLE_BY_PROGRESS_INCREASE:
                 return CallbackThrottleCreator.ByProgressIncrease();
+            case CUSTOM:
+                return CallbackThrottleCreator.ByCustomThrottle(customCallbackThrottle);
             default:
                 throw new IllegalStateException("callbackThrottle type " + callbackThrottleType + " not implemented yet");
         }

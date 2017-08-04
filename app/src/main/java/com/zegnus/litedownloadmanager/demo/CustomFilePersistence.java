@@ -10,6 +10,7 @@ import com.zegnus.litedownloadmanager.FilePersistenceResult;
 import com.zegnus.litedownloadmanager.FilePersistenceType;
 import com.zegnus.litedownloadmanager.FileSize;
 
+// Must be public
 public class CustomFilePersistence implements FilePersistence {
 
     private int currentSize = 0;
