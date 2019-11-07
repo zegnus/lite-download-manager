@@ -1,7 +1,7 @@
 package com.zegnus.litedownloadmanager;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.novoda.notils.logger.simple.Log;
 import com.zegnus.litedownloadmanager.FilePersistenceResult.Status;

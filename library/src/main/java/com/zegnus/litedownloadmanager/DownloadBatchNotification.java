@@ -2,8 +2,8 @@ package com.zegnus.litedownloadmanager;
 
 import android.app.Notification;
 import android.content.Context;
-import android.support.annotation.DrawableRes;
-import android.support.v4.app.NotificationCompat;
+import androidx.annotation.DrawableRes;
+import androidx.core.app.NotificationCompat;
 
 class DownloadBatchNotification implements NotificationCreator {
 

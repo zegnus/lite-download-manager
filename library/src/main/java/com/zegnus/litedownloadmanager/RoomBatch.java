@@ -1,13 +1,15 @@
 package com.zegnus.litedownloadmanager;
 
-import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.Index;
-import android.arch.persistence.room.PrimaryKey;
+import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Index;
+import androidx.room.PrimaryKey;
 
 @Entity(indices={@Index("batch_id")})
 class RoomBatch {
 
+    @NonNull
     @PrimaryKey
     @ColumnInfo(name = "batch_id")
     public String id;

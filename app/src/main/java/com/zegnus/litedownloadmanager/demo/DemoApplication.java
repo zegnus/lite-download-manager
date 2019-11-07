@@ -4,7 +4,6 @@ import android.app.Application;
 import android.os.Handler;
 import android.os.Looper;
 
-import com.facebook.stetho.Stetho;
 import com.zegnus.litedownloadmanager.FileDownloader;
 import com.zegnus.litedownloadmanager.FileSizeRequester;
 import com.zegnus.litedownloadmanager.LiteDownloadManagerBuilder;
@@ -17,7 +16,6 @@ public class DemoApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Stetho.initializeWithDefaults(this);
         createLiteDownloadManager();
     }
 

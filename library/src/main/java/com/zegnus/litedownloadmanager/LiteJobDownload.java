@@ -1,6 +1,6 @@
 package com.zegnus.litedownloadmanager;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.evernote.android.job.Job;
 import com.novoda.notils.logger.simple.Log;

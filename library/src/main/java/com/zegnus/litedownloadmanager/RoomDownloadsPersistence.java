@@ -1,6 +1,6 @@
 package com.zegnus.litedownloadmanager;
 
-import android.arch.persistence.room.Room;
+import androidx.room.Room;
 import android.content.Context;
 
 import java.util.ArrayList;

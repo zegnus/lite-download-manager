@@ -2,7 +2,7 @@ package com.zegnus.litedownloadmanager.demo;
 
 import android.app.Notification;
 import android.content.Context;
-import android.support.v4.app.NotificationCompat;
+import androidx.core.app.NotificationCompat;
 
 import com.novoda.notils.logger.simple.Log;
 import com.zegnus.litedownloadmanager.DownloadBatchTitle;

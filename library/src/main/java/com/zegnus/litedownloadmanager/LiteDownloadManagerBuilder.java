@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Handler;
 import android.os.IBinder;
-import android.support.annotation.DrawableRes;
+import androidx.annotation.DrawableRes;
 
 import com.novoda.notils.logger.simple.Log;
 import com.squareup.okhttp.OkHttpClient;

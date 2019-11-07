@@ -1,9 +1,9 @@
 package com.zegnus.litedownloadmanager;
 
-import android.arch.persistence.room.Database;
-import android.arch.persistence.room.RoomDatabase;
+import androidx.room.Database;
+import androidx.room.RoomDatabase;
 
-@Database(entities = {RoomBatch.class, RoomFile.class}, version = 1)
+@Database(entities = {RoomBatch.class, RoomFile.class}, version = 1, exportSchema = false)
 abstract class RoomAppDatabase extends RoomDatabase {
 
     abstract RoomBatchDao roomBatchDao();
