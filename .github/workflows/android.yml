@@ -15,7 +15,7 @@ jobs:
 #       run: ./gradlew assembleDebug
 
   instrumentation-tests:
-    runs-on: macOS-latest
+    runs-on: macOS-10.14
     steps:
       - uses: actions/checkout@v1
         with:
