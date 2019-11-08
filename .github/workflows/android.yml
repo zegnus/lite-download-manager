@@ -27,7 +27,7 @@ jobs:
       - name: Install Android SDK
         uses: malinskiy/action-android/install-sdk@release/0.0.2
       - name: Instrumentation Tests
-        uses: malinskiy/action-android/emulator-run-cmd@release/0.0.2
+        uses: malinskiy/action-android/emulator-run-cmd@release/0.0.3
         with:
           cmd: ./gradlew assembleDebug
           api: 21
